@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Audio Streaming</title>
+    <style>
+      body {
+        display: flex;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+      .stream-list {
+        width: 250px;
+        background-color: #f0f0f0;
+        padding: 10px;
+        overflow-y: auto;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
+      .audio-player-container {
+        flex-grow: 1;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+      .controls {
+        margin-top: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+  </head>
+  <body>
+    <div class="stream-list">
+      <h1>Live Audio Streaming</h1>
+      <h2>Available Streams:</h2>
+      <select id="streamSelect">
+        <option value="">Select a stream</option>
+      </select>
+    </div>
+
+    <!-- <button id="notifyBtn">Notify!</button> -->
+
+    <div class="audio-player-container">
+      <audio id="player" autoplay></audio>
+      <div id="micControls" class="controls" style="display: none">
+        <!-- <button id="startMic">Start Mic</button> -->
+        <!-- <button id="stopMic">Stop Mic</button> -->
+        <button onclick="startPay()">PLAY</button>
+        <button onclick="stopPay()">STOP</button>
+
+        <!-- <input type="file" id="audioUpload" accept="audio/mp3, audio/wav" /> -->
+        <!-- <script>
+          document
+            .getElementById("audioUpload")
+            .addEventListener("change", function (event) {
+              const file = event.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                  const arrayBuffer = e.target.result;
+                  const buffer = new Uint8Array(arrayBuffer);
+                  // const base64String = btoa(String.fromCharCode(...buffer));
+                  ws.send(buffer);
+                  console.log(buffer);
+                };
+                reader.readAsArrayBuffer(file);
+              }
+            });
+
+         
+        </script> -->
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("notifyBtn")
+        .addEventListener("click", function () {
+          Toastify({
+            text: "Wow, so easy!",
+            duration: 3000, // Toast disappears after 3 seconds
+            close: true,
+            gravity: "top", // 'top', 'bottom'
+            position: "right", // 'left', 'center', 'right'
+            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+          }).showToast();
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+      const ws = new WebSocket(
+        window.location.protocol.replace("http", "ws") +
+          "//" +
+          window.location.host +
+          "?ptpl=Ptpl123"
+      );
+
+      const streamList = document.getElementById("streamSelect");
+      const audioElement = document.getElementById("player");
+      const micControls = document.getElementById("micControls");
+      const startMicButton = document.getElementById("startMic");
+      const stopMicButton = document.getElementById("stopMic");
+
+      let currentStream = null;
+      let mediaSource = null;
+      let sourceBuffer = null;
+      let audioQueue = [];
+      let isBuffering = false;
+      let rooms = [];
+
+      let micStream = null;
+      let micRecorder = null;
+      let isMicActive = false;
+
+      const startPay = async () => {
+        try {
+          await fetch(`/audio/${currentStream}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }).then(async (res) => {
+            var res = await res.json();
+            console.log(res)
+            Toastify({
+              text: res?.message || "ERROR :)",
+              duration: 3000, // Toast disappears after 3 seconds
+              close: true,
+              gravity: "top", // 'top', 'bottom'
+              position: "right", // 'left', 'center', 'right'
+              backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+            }).showToast();
+          });
+        } catch (error) {
+          console.log(error);
+          Toastify({
+            text:
+              error?.response?.data?.message ||
+              error?.message ||
+              "An unexpected error occurred.",
+            duration: 3000, // Toast disappears after 3 seconds
+            close: true,
+            gravity: "top", // 'top', 'bottom'
+            position: "right", // 'left', 'center', 'right'
+            backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+          }).showToast();
+        }
+      };
+
+      const stopPay = async () => {
+        try {
+          await fetch(`/audio/${currentStream}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }).then(async (res) => {
+            var res = await res.json();
+            Toastify({
+              text: res?.message || "ERROR :)",
+              duration: 3000, // Toast disappears after 3 seconds
+              close: true,
+              gravity: "top", // 'top', 'bottom'
+              position: "right", // 'left', 'center', 'right'
+              backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+            }).showToast();
+          });
+        } catch (error) {
+          console.log(error);
+          Toastify({
+            text:
+              error?.response?.data?.message ||
+              error?.message ||
+              "An unexpected error occurred.",
+            duration: 3000, // Toast disappears after 3 seconds
+            close: true,
+            gravity: "top", // 'top', 'bottom'
+            position: "right", // 'left', 'center', 'right'
+            backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+          }).showToast();
+        }
+      };
+
+      ws.onopen = () => {
+        console.log("WebSocket connection established");
+        ws.send(
+          JSON.stringify({
+            type: "register-user",
+            id: Math.random().toString(36).substr(2, 9),
+            name: "test",
+          })
+        );
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const { type, ...message } = JSON.parse(event.data);
+
+          if (type == "add-stream") {
+            rooms = [...rooms, ...message.stream];
+            // in the room if any id undefined then check roomId then change id to roomId
+            rooms.forEach((room) => {
+              if (room.id === undefined) {
+                room.id = room.roomId;
+              }
+            });
+            updateStreamList();
+          } else if (type == "remove-stream") {
+            const roomId = message.stream[0].roomId;
+            rooms = rooms.filter((room) => room.id !== roomId);
+            if (currentStream === roomId) {
+              stopStreaming();
+            }
+
+            updateStreamList();
+          } else if (type == "audio-chunk") {
+            if (message.chunk.type == "audio-buffer" || false)
+              handleVoiceChunk(message.chunk.data);
+            else handleAudioChunk(message.chunk);
+          } else if (type == "error") {
+            alert(message.error);
+          } else if (type == "audio-chunk2") {
+            console.log(message.chunk);
+            const binaryData = Uint8Array.from(atob(message.chunk.data), (c) =>
+              c.charCodeAt(0)
+            );
+
+            const audioBlob = new Blob([binaryData], {
+              type: "audio/webm; codecs=opus",
+            });
+            const audioUrl = URL.createObjectURL(audioBlob);
+
+            const audio = new Audio(audioUrl);
+            audio.play();
+            audio.onended = () => {
+              URL.revokeObjectURL(audioUrl);
+            };
+
+            // if (mediaSource) {
+            //   mediaSource.endOfStream();
+            // }
+            // mediaSource = new MediaSource();
+            // const audioBlob = new Blob([new Uint8Array(message.chunk.data)], {
+            //   type: "audio/webm",
+            // });
+            // const audioUrl = URL.createObjectURL(audioBlob);
+            // console.log("Media source URL:", audioElement.src);
+            // mediaSource.addEventListener("sourceopen", () => {
+            //   if (MediaSource.isTypeSupported('audio/webm; codecs="opus"')) {
+            //     sourceBuffer = mediaSource.addSourceBuffer(
+            //       'audio/webm; codecs="opus"'
+            //     );
+            //   } else {
+            //     console.error("Unsupported audio format.");
+            //   }
+            // });
+            // const audio = new Audio(audioUrl);
+            // audio.play();
+            // audio.onended = () => {
+            //   URL.revokeObjectURL(audioUrl);
+            // };
+          }
+        } catch (error) {
+          return;
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+
+      ws.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
+
+      // Update the list of available streams
+      const updateStreamList = () => {
+        var val = currentStream ? currentStream : "";
+        streamList.innerHTML = `<option value="">Select a stream</option>`;
+        rooms.forEach((room) => {
+          const option = document.createElement("option");
+          option.value = room.id;
+          option.textContent = room.name;
+          streamList.appendChild(option);
+        });
+        if (currentStream) {
+          streamList.value = currentStream;
+        }
+      };
+
+      // Handle stream selection
+      streamList.addEventListener("change", () => {
+        const selectedStream = streamList.value;
+        if (currentStream !== selectedStream) {
+          stopStreaming();
+          currentStream = selectedStream;
+          if (currentStream) {
+            startStreaming();
+            micControls.style.display = "block";
+          } else {
+            micControls.style.display = "none";
+          }
+        }
+      });
+
+      const handleVoiceChunk = (data) => {
+        const audioBlob = new Blob([new Uint8Array(data)], {
+          type: "audio/webm",
+        });
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        const audio = new Audio(audioUrl);
+        audio.play();
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+        };
+      };
+
+      // Start streaming function
+      const startStreaming = async () => {
+        if (!currentStream || ws.readyState !== WebSocket.OPEN) return;
+
+        // Create a new MediaSource
+        if (mediaSource) {
+          mediaSource.endOfStream();
+        }
+        // const stream = await navigator.mediaDevices.getUserMedia({
+        //   audio: true,
+        // });
+        mediaSource = new MediaSource();
+        audioElement.src = URL.createObjectURL(mediaSource);
+
+        mediaSource.addEventListener("sourceopen", () => {
+          sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
+          sourceBuffer.addEventListener("updateend", () => {
+            if (!isBuffering && audioQueue.length > 0) {
+              appendToBuffer();
+            }
+          });
+        });
+
+        // Ensure playback starts only after setting the source
+        audioElement.oncanplay = () => {
+          audioElement.play().catch((err) => {
+            console.error("Error during playback:", err);
+          });
+        };
+
+        // Join the selected stream
+        ws.send(JSON.stringify({ type: "join-room", roomId: currentStream }));
+        console.log("Listening to stream:", currentStream);
+      };
+
+      // Handle incoming audio chunks
+      const handleAudioChunk = (chunkBase64) => {
+        const chunk = new Uint8Array(chunkBase64.data);
+        audioQueue.push(chunk);
+
+        if (!sourceBuffer.updating && !isBuffering) {
+          appendToBuffer();
+        }
+      };
+
+      // Append audio chunks to the sourceBuffer
+      const appendToBuffer = () => {
+        if (audioQueue.length > 0 && sourceBuffer && !sourceBuffer.updating) {
+          const chunk = audioQueue.shift();
+          isBuffering = true;
+          sourceBuffer.appendBuffer(chunk);
+          isBuffering = false;
+        }
+      };
+
+      // Stop streaming and reset media source
+      const stopStreaming = () => {
+        if (currentStream) {
+          ws.send(
+            JSON.stringify({ type: "leave-room", roomId: currentStream })
+          );
+          currentStream = null;
+        }
+        resetMediaSource();
+      };
+
+      const resetMediaSource = () => {
+        if (mediaSource) {
+          mediaSource.endOfStream();
+          mediaSource = null;
+        }
+      };
+
+      const startMicStreaming = async () => {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert("Microphone access is not supported by your browser.");
+          return;
+        }
+
+        try {
+          // Access the microphone stream
+          micStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+
+          if (!micStream) {
+            console.error("Microphone stream not available.");
+            return;
+          }
+
+          // Use MediaRecorder to capture and encode audio
+          mediaRecorder = new MediaRecorder(micStream);
+
+          audioChunks = [];
+          mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data);
+          };
+
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+
+            // Convert Blob to ArrayBuffer
+            const arrayBuffer = await audioBlob.arrayBuffer();
+
+            // Convert ArrayBuffer to Uint8Array and store as buffer
+            const buffer = new Uint8Array(arrayBuffer);
+            audioBufferData = {
+              type: "audio-buffer",
+              data: Array.from(buffer), // Convert Uint8Array to array
+            };
+
+            ws.send(
+              JSON.stringify({
+                type: "audio-chunk",
+                chunk: audioBufferData,
+              })
+            );
+          };
+
+          mediaRecorder.start();
+
+          setTimeout(() => {
+            mediaRecorder.stop();
+            setTimeout(startMicStreaming, 1000); // Restart after 1 second
+          }, 1000); // Record for 5 seconds
+        } catch (err) {
+          console.error("Error accessing microphone:", err);
+        }
+      };
+
+      const stopMicStreaming = () => {
+        if (micRecorder && micRecorder.state !== "inactive") {
+          micRecorder.stop();
+        }
+        if (micStream) {
+          micStream.getTracks().forEach((track) => track.stop());
+        }
+        console.log("Microphone streaming stopped.");
+      };
+
+      // startMicButton.addEventListener("click", startMicStreaming);
+      // stopMicButton.addEventListener("click", stopMicStreaming);
+
+      window.addEventListener("beforeunload", () => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close();
+        }
+        stopMicStreaming();
+      });
+    </script>
+  </body>
+</html>

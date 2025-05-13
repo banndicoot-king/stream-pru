@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mic Audio Record to Buffer</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      button {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="recordButton">Record 5s Audio</button>
+    <button id="playButton" disabled>Play Recorded Audio</button>
+
+    <script>
+      const domain = window.location.hostname;
+      const windowProtocol = window.location.protocol;
+      console.log(domain);
+      console.log(windowProtocol);
+      var url =
+        (windowProtocol === "https:" ? "wss://" : "ws://") +
+        domain +
+        (windowProtocol === "https:" ? "" : ":3031");
+      var ws = new WebSocket(url);
+
+      let mediaRecorder;
+      let audioChunks = [];
+      let audioBufferData; // Store audio as buffer
+      const recordButton = document.getElementById("recordButton");
+      const playButton = document.getElementById("playButton");
+
+      ws.onopen = () => {
+        console.log("WebSocket connection established");
+        ws.send(
+          JSON.stringify({
+            type: "register-stream",
+            roomId: "audio-call-",
+            name: "live audio call",
+          })
+        );
+      };
+
+      // Record 5 seconds of audio
+      recordButton.addEventListener("click", async () => {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert("Your browser does not support audio recording.");
+          return;
+        }
+
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+          mediaRecorder = new MediaRecorder(stream);
+
+          audioChunks = [];
+          mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data);
+          };
+
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+
+            // Convert Blob to ArrayBuffer
+            const arrayBuffer = await audioBlob.arrayBuffer();
+
+            // Convert ArrayBuffer to Uint8Array and store as buffer
+            const buffer = new Uint8Array(arrayBuffer);
+            audioBufferData = {
+              type: "buffer",
+              data: Array.from(buffer), // Convert Uint8Array to array
+            };
+
+            console.log("Audio Buffer:", audioBufferData);
+
+            ws.send(
+              JSON.stringify({
+                type: "audio-chunk",
+                chunk: audioBufferData,
+              })
+            );
+            playButton.disabled = false;
+            alert(
+              "Recording complete. Click 'Play Recorded Audio' to hear it."
+            );
+          };
+
+          mediaRecorder.start();
+          recordButton.disabled = true;
+          playButton.disabled = true;
+
+          setTimeout(() => {
+            mediaRecorder.stop();
+            recordButton.disabled = false;
+          }, 5000); // Record for 5 seconds
+        } catch (error) {
+          console.error("Error accessing microphone:", error);
+          alert("Failed to record audio. Please check microphone permissions.");
+        }
+      });
+
+      // Play the recorded audio
+      playButton.addEventListener("click", () => {
+        if (!audioBufferData || !audioBufferData.data) {
+          alert("No audio recorded yet. Please record audio first.");
+          return;
+        }
+
+        // Convert the buffer back to Blob for playback
+        const audioBlob = new Blob([new Uint8Array(audioBufferData.data)], {
+          type: "audio/webm",
+        });
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        const audio = new Audio(audioUrl);
+        audio.play();
+
+        playButton.disabled = true; // Disable play button during playback
+        audio.onended = () => {
+          playButton.disabled = false; // Re-enable play button after playback ends
+        };
+      });
+    </script>
+  </body>
+</html>
