@@ -81,6 +81,7 @@ wss.on("connection", (ws, req) => {
         // console.log("m set");
       } catch (error) {
         console.log("hit");
+	console.log(message.toString(), "message.toString()");
 
         const filePath = path.join(__dirname, "audios", "Taka.mp3");
 
