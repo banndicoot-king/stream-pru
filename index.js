@@ -21,6 +21,7 @@ var room_send = [];
 
 // WebSocket Authentication Middleware
 function authenticate(req) {
+console.log(req.headers);
   const authHeader = req.headers["authorization"] || "";
   var url_auth = req.url;
   if (url_auth.includes("?")) {
