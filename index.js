@@ -82,12 +82,12 @@ wss.on("connection", (ws, req) => {
         // console.log("m set");
       } catch (error) {
         console.log("hit");
-	console.log(message.toString(), "message.toString()");
+	//console.log(message.toString(), "message.toString()");
 
         const filePath = path.join(__dirname, "audios", "Taka.mp3");
 
-        console.log(message);
-         ws.send(message);
+       // console.log(message);
+         //ws.send(message);
 
         const message2 = JSON.stringify({
           type: "audio-chunk2",
@@ -115,7 +115,7 @@ wss.on("connection", (ws, req) => {
       }
 
       if (!m) return;
-      console.log("m", message.toString());
+      //console.log("m", message.toString());
       var { type, ...data } = m;
       type = type ? type : "register-stream";
       switch (type) {
