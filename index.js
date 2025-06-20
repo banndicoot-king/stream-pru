@@ -87,7 +87,7 @@ wss.on("connection", (ws, req) => {
         const filePath = path.join(__dirname, "audios", "Taka.mp3");
 
        // console.log(message);
-       // ws.send(message);
+        ws.send(message);
 
         const message2 = JSON.stringify({
           type: "audio-chunk2",
