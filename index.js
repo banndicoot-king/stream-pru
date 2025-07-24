@@ -21,7 +21,7 @@ var room_send = [];
 
 // WebSocket Authentication Middleware
 function authenticate(req) {
-console.log(req.headers);
+  console.log(req.headers);
   const authHeader = req.headers["authorization"] || "";
   var url_auth = req.url;
   if (url_auth.includes("?")) {
@@ -73,6 +73,8 @@ wss.on("connection", (ws, req) => {
     console.log("Authorized");
   }
 
+  var voiceBuffer = [];
+
   ws.on("message", (message) => {
     try {
       var m;
@@ -82,12 +84,19 @@ wss.on("connection", (ws, req) => {
         // console.log("m set");
       } catch (error) {
         console.log("hit");
-	//console.log(message.toString(), "message.toString()");
+        //console.log(message.toString(), "message.toString()");
 
-        const filePath = path.join(__dirname, "audios", "Taka.mp3");
+        // const filePath = path.join(__dirname, "audios", "Taka.mp3");
 
-       // console.log(message);
+        // console.log(message);
         // ws.send(message);
+
+        const bufferChunk = Buffer.from(message); // Actual audio buffer
+        voiceBuffer.push(bufferChunk); // 🔹 Store in buffer
+
+        // 🔹 Save to "out.mp3" (replaces old file each time)
+        const audioPath = path.join(__dirname, "public", "out.mp3");
+        fs.writeFileSync(audioPath, Buffer.concat(voiceBuffer));
 
         const message2 = JSON.stringify({
           type: "audio-chunk2",
@@ -97,6 +106,8 @@ wss.on("connection", (ws, req) => {
           },
         });
 
+        // save the chunk to the buffer
+
         const roomId = Object.keys(streams).find((roomId) =>
           streams[roomId].listeners.has(ws)
         );
@@ -105,7 +116,7 @@ wss.on("connection", (ws, req) => {
           const listeners = Array.from(streams[roomId]?.listeners || []);
           listeners.forEach((listenerWs) => {
             if (listenerWs.readyState === WebSocket.OPEN && listenerWs !== ws) {
-	      //listenerWs.send(message);
+              //listenerWs.send(message);
               listenerWs.send(message2);
             }
           });
@@ -120,7 +131,7 @@ wss.on("connection", (ws, req) => {
       type = type ? type : "register-stream";
       switch (type) {
         case "register-stream": {
-          const { roomId, CallId: name  } = data;
+          const { roomId, CallId: name } = data;
           streams[roomId] = { name, listeners: new Set() };
           streams[roomId].listeners.add(ws);
           // send all users to new stream name and id
@@ -169,6 +180,8 @@ wss.on("connection", (ws, req) => {
           for (const streamId in streams) {
             streams[streamId].listeners.delete(ws);
           }
+
+          // save to path
 
           for (const streamId in streams) {
             if (streams[streamId].listeners.size === 0) {
@@ -389,6 +402,37 @@ app.post("/audio/:id", (req, res) => {
     });
 });
 
+app.get("/all", (req, res) => {
+  // collect all files names from pubic path
+  const mPath = path.join(__dirname, "public");
+  const files = fs.readdirSync(mPath);
+  // then send a html with files list and if click download like
+  const fileList = files
+    .filter((file) => file.endsWith(".mp3"))
+    .map((file) => `<li><a href="/${file}" download>${file}</a></li>`)
+    .join("");
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Files</title>
+</head>
+<body>
+  <h1>Audio Files</h1>
+  <ul>
+    ${fileList}
+  </ul>
+  <script>
+    // Add any client-side JavaScript if needed
+  </script>
+</body>
+</html>
+  `;
+  res.send(html);
+});
+
 app.delete("/audio/:id", (req, res) => {
   const { id } = req.params;
 
@@ -500,4 +544,3 @@ async function connect(room_id) {
     processAudio();
   };
 }
-  
