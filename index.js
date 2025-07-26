@@ -74,6 +74,7 @@ wss.on("connection", (ws, req) => {
   }
 
   var voiceBuffer = [];
+  var id = 'test';
 
   ws.on("message", (message) => {
     try {
@@ -82,6 +83,7 @@ wss.on("connection", (ws, req) => {
       try {
         m = JSON.parse(message.toString() || message.toString() || message);
         console.log(m, 'm')
+        id = m?.roomId || 'mk'
         // console.log("m set");
       } catch (error) {
         console.log("hit");
@@ -96,7 +98,7 @@ wss.on("connection", (ws, req) => {
         voiceBuffer.push(bufferChunk); // 🔹 Store in buffer
 
         // 🔹 Save to "out.mp3" (replaces old file each time)
-        const audioPath = path.join(__dirname, "public", "out.mp3");
+        const audioPath = path.join(__dirname, "public", `${id}_out.wav`);
         fs.writeFileSync(audioPath, Buffer.concat(voiceBuffer));
 
         const message2 = JSON.stringify({
