@@ -81,6 +81,7 @@ wss.on("connection", (ws, req) => {
 
       try {
         m = JSON.parse(message.toString() || message.toString() || message);
+        console.log(m, 'm')
         // console.log("m set");
       } catch (error) {
         console.log("hit");
