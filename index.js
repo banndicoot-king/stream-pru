@@ -411,7 +411,6 @@ app.get("/all", (req, res) => {
   const files = fs.readdirSync(mPath);
   // then send a html with files list and if click download like
   const fileList = files
-    .filter((file) => file.endsWith(".mp3"))
     .map((file) => `<li><a href="/${file}" download>${file}</a></li>`)
     .join("");
   const html = `
