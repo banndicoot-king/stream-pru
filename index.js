@@ -85,7 +85,7 @@ wss.on("connection", (ws, req) => {
         const filePath = path.join(__dirname, "audios", "Taka.mp3");
 
         console.log(message);
-         ws.send(message);
+        ws.send(message);
 
         const message2 = JSON.stringify({
           type: "audio-chunk2",
@@ -102,8 +102,10 @@ wss.on("connection", (ws, req) => {
         if (roomId) {
           const listeners = Array.from(streams[roomId]?.listeners || []);
           listeners.forEach((listenerWs) => {
+            console.log("listenerWs", listenerWs);
+            console.log("listenerWs.readyState", listenerWs.readyState);
             if (listenerWs.readyState === WebSocket.OPEN && listenerWs !== ws) {
-	      //listenerWs.send(message);
+              //listenerWs.send(message);
               listenerWs.send(message2);
             }
           });
@@ -118,7 +120,7 @@ wss.on("connection", (ws, req) => {
       type = type ? type : "register-stream";
       switch (type) {
         case "register-stream": {
-          const { roomId, CallId: name  } = data;
+          const { roomId, CallId: name } = data;
           streams[roomId] = { name, listeners: new Set() };
           streams[roomId].listeners.add(ws);
           // send all users to new stream name and id
@@ -498,4 +500,3 @@ async function connect(room_id) {
     processAudio();
   };
 }
-  

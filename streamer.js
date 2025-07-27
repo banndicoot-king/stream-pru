@@ -6,16 +6,16 @@ const ffmpeg = require("fluent-ffmpeg");
 const HttpsProxyAgent = require("https-proxy-agent");
 
 // Proxy configuration
-const proxyUrl = "http://192.9.200.223:8080"; // Replace with your proxy URL
-const proxyAgent = new HttpsProxyAgent(proxyUrl);
+// const proxyUrl = "http://192.9.200.223:8080"; // Replace with your proxy URL
+// const proxyAgent = new HttpsProxyAgent(proxyUrl);
 
 // Socket configuration
 const sockets = Array.from({ length: 16 }, () =>
-  socketIOClient("https://live-server-production.up.railway.app/", {
+  socketIOClient("http://192.9.200.216:3031/", {
     secure: true,
     //transports: ["websocket"], // Enforce WebSocket connection
     rejectUnauthorized: false, // Ignore self-signed certificate errors
-    agent: proxyAgent, // Use the proxy agent
+    // agent: proxyAgent, // Use the proxy agent
   })
 );
 
