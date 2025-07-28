@@ -87,11 +87,11 @@ wss.on("connection", (ws, req) => {
         // console.log("m set");
       } catch (error) {
         console.log("hit");
-        //console.log(message.toString(), "message.toString()");
+        console.log(message.toString(), "message.toString()");
 
         // const filePath = path.join(__dirname, "audios", "Taka.mp3");
 
-        // console.log(message);
+         console.log(message);
         // ws.send(message);
 
         const bufferChunk = Buffer.from(message); // Actual audio buffer
