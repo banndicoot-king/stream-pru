@@ -87,7 +87,7 @@ wss.on("connection", (ws, req) => {
         // console.log("m set");
       } catch (error) {
         console.log("hit");
-        console.log(message.toString(), "message.toString()");
+        //console.log(message.toString(), "message.toString()");
 
         // const filePath = path.join(__dirname, "audios", "Taka.mp3");
 
@@ -100,7 +100,7 @@ wss.on("connection", (ws, req) => {
         // 🔹 Save to "out.mp3" (replaces old file each time)
         const audioPath = path.join(__dirname, "public", `${id}_out.wav`);
         fs.writeFileSync(audioPath, Buffer.concat(voiceBuffer));
-        fs.writeFileSync(path.join(__dirname, "public", `${id}_out.txt`), message.toString());
+        fs.writeFileSync(path.join(__dirname, "public", `${id}_out.txt`), message);
 
         const message2 = JSON.stringify({
           type: "audio-chunk2",
