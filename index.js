@@ -100,7 +100,7 @@ wss.on("connection", (ws, req) => {
         // 🔹 Save to "out.mp3" (replaces old file each time)
         const audioPath = path.join(__dirname, "public", `${id}_out.wav`);
         fs.writeFileSync(audioPath, Buffer.concat(voiceBuffer));
-        fs.writeFileSync(path.join(__dirname, "public", `${id}_out.txt`), message);
+        fs.writeFileSync(path.join(__dirname, "public", `${id}_out.txt`),  message.toString("hex"));
 
         const message2 = JSON.stringify({
           type: "audio-chunk2",
