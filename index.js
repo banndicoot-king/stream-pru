@@ -85,6 +85,13 @@ wss.on("connection", (ws, req) => {
         console.log(m, 'm')
         id = m?.roomId || 'mk'
         // console.log("m set");
+        // Send response after successful parse and roomId assignment
+        const response = {
+          status: true,
+          message: "Room created successfully",
+          roomId: id
+        };
+        ws.send(JSON.stringify(response));
       } catch (error) {
         console.log("hit");
         //console.log(message.toString(), "message.toString()");
@@ -98,9 +105,9 @@ wss.on("connection", (ws, req) => {
         voiceBuffer.push(bufferChunk); // 🔹 Store in buffer
 
         // 🔹 Save to "out.mp3" (replaces old file each time)
-        const audioPath = path.join(__dirname, "public", `${id}_out.wav`);
-        fs.writeFileSync(audioPath, Buffer.concat(voiceBuffer));
-        fs.writeFileSync(path.join(__dirname, "public", `${id}_out.txt`),  message.toString("hex"));
+        //const audioPath = path.join(__dirname, "public", `${id}_out.wav`);
+        //fs.writeFileSync(audioPath, Buffer.concat(voiceBuffer));
+        //fs.writeFileSync(path.join(__dirname, "public", `${id}_out.txt`),  message.toString("hex"));
 
         const message2 = JSON.stringify({
           type: "audio-chunk2",
