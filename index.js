@@ -87,7 +87,7 @@ wss.on("connection", (ws, req) => {
         // console.log("m set");
         // Send response after successful parse and roomId assignment
         const response = {
-          status: false,
+          status: true,
           message: "Room created successfully",
           roomId: id
         };
