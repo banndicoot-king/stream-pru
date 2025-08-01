@@ -19,6 +19,8 @@ let users = {}; // { userId: { name } }
 
 var room_send = [];
 
+var isRoomCreate = true;
+
 // WebSocket Authentication Middleware
 function authenticate(req) {
   console.log(req.headers);
@@ -74,7 +76,7 @@ wss.on("connection", (ws, req) => {
   }
 
   var voiceBuffer = [];
-  var id = 'test';
+  var id = "test";
 
   ws.on("message", (message) => {
     try {
@@ -82,14 +84,16 @@ wss.on("connection", (ws, req) => {
 
       try {
         m = JSON.parse(message.toString() || message.toString() || message);
-        console.log(m, 'm')
-        id = m?.roomId || 'mk'
+        console.log(m, "m");
+        id = m?.roomId || "mk";
         // console.log("m set");
         // Send response after successful parse and roomId assignment
         const response = {
-          status: true,
-          message: "Room created successfully",
-          roomId: id
+          status: isRoomCreate ? true : false,
+          message: isRoomCreate
+            ? "Room created successfully"
+            : "Room creation failed",
+          roomId: id,
         };
         ws.send(JSON.stringify(response));
       } catch (error) {
@@ -98,7 +102,7 @@ wss.on("connection", (ws, req) => {
 
         // const filePath = path.join(__dirname, "audios", "Taka.mp3");
 
-         //console.log(message);
+        //console.log(message);
         // ws.send(message);
 
         const bufferChunk = Buffer.from(message); // Actual audio buffer
@@ -390,6 +394,18 @@ wss.on("close", () => {
 });
 
 const PORT = 3031;
+
+app.post("/roomStart", (req, res) => {
+  const { status = 0 } = req.body;
+  isRoomCreate = status === 1 ? true : false;
+
+  res.json({
+    status: isRoomCreate ? true : false,
+    message: isRoomCreate
+      ? "Room created successfully"
+      : "Room creation failed",
+  });
+});
 
 app.post("/audio/:id", (req, res) => {
   const { id } = req.params;
