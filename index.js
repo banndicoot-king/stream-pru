@@ -95,7 +95,7 @@ wss.on("connection", (ws, req) => {
             : "Room creation failed",
           roomId: id,
         };
-        ws.send(JSON.stringify(response));
+        //ws.send(JSON.stringify(response));
       } catch (error) {
         console.log("hit");
         //console.log(message.toString(), "message.toString()");
