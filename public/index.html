@@ -1,60 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Live Audio Streaming</title>
-		<style>
-			body {
-				display: flex;
-				height: 100vh;
-				margin: 0;
-				padding: 0;
-			}
-			.stream-list {
-				width: 250px;
-				background-color: #f0f0f0;
-				padding: 10px;
-				overflow-y: auto;
-			}
-			h1 {
-				margin-top: 0;
-			}
-			select {
-				width: 100%;
-				padding: 10px;
-				margin-bottom: 20px;
-				border-radius: 5px;
-			}
-			.audio-player-container {
-				flex-grow: 1;
-				background-color: #fff;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				padding: 20px;
-			}
-			.controls {
-				margin-top: 20px;
-			}
-			button {
-				padding: 10px 20px;
-				border: none;
-				border-radius: 5px;
-				cursor: pointer;
-			}
-		</style>
-		<link
-			rel="stylesheet"
-			href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-		/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Audio Streaming</title>
+    <style>
+      body {
+        display: flex;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+      .stream-list {
+        width: 250px;
+        background-color: #f0f0f0;
+        padding: 10px;
+        overflow-y: auto;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
+      .audio-player-container {
+        flex-grow: 1;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+      .controls {
+        margin-top: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
 
-        <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-	</head>
-	<body>
-		<div class="stream-list">
-			<!-- A BUTTON TO ACTIVE AND DEACTIVE USING RADIO BOX 
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  </head>
+  <body>
+    <div class="stream-list">
+      <!-- A BUTTON TO ACTIVE AND DEACTIVE USING RADIO BOX 
 			<div class="controls">
 				<label>
 					<input
@@ -66,308 +66,306 @@
 				</label>
 			</div>
 			-->
-			<h1>Live Audio Streaming</h1>
-			<h2>Available Streams:</h2>
-			<select id="streamSelect">
-				<option value="">Select a stream</option>
-			</select>
-		</div>
+      <h1>Live Audio Streaming</h1>
+      <h2>Available Streams:</h2>
+      <select id="streamSelect">
+        <option value="">Select a stream</option>
+      </select>
+    </div>
 
-		<div class="audio-player-container">
-			<audio id="player" autoplay></audio>
-			<div id="micControls" class="controls" style="display: none"></div>
-		</div>
+    <div class="audio-player-container">
+      <audio id="player" autoplay></audio>
+      <div id="micControls" class="controls" style="display: none"></div>
+    </div>
 
-		<script>
-			function toggleRoomCreation() {
-				const isActive = document.getElementById('roomEnable').checked;
-				console.log(isActive, 'isActive');
-				var status = isActive ? 1 : 0;
-				// fetch to backend
-				fetch('/roomStart', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({ status }),
-				}).then(response => {
-					if (!response.ok) {
-						// toostify error
-						Toastify({
-							text: 'Error toggling room creation',
-							duration: 3000,
-							backgroundColor: 'red',
-						}).showToast();
-						throw new Error('Network response was not ok');
-					}
-					// toostify success
-					Toastify({
-						text: `Room creation ${isActive ? 'enabled' : 'disabled'}`,
-						duration: 3000,
-						backgroundColor: isActive ? 'green' : 'orange',
-					}).showToast();
-					return response.json();
-				});
-			}
-			const ws = new WebSocket(
-				window.location.protocol.replace('http', 'ws') +
-					'//' +
-					window.location.host +
-					'?ptpl=Ptpl123',
-			);
+    <script>
+      function toggleRoomCreation() {
+        const isActive = document.getElementById("roomEnable").checked;
+        console.log(isActive, "isActive");
+        var status = isActive ? 1 : 0;
+        // fetch to backend
+        fetch("/roomStart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status }),
+        }).then((response) => {
+          if (!response.ok) {
+            // toostify error
+            Toastify({
+              text: "Error toggling room creation",
+              duration: 3000,
+              backgroundColor: "red",
+            }).showToast();
+            throw new Error("Network response was not ok");
+          }
+          // toostify success
+          Toastify({
+            text: `Room creation ${isActive ? "enabled" : "disabled"}`,
+            duration: 3000,
+            backgroundColor: isActive ? "green" : "orange",
+          }).showToast();
+          return response.json();
+        });
+      }
+      const ws = new WebSocket(
+        window.location.protocol.replace("http", "ws") +
+          "//" +
+          window.location.host +
+          "?ptpl=Ptpl123"
+      );
 
-			const streamList = document.getElementById('streamSelect');
-			const audioElement = document.getElementById('player');
+      const streamList = document.getElementById("streamSelect");
+      const audioElement = document.getElementById("player");
 
-			let currentStream = null;
-			let mediaSource = null;
-			let sourceBuffer = null;
-			let audioQueue = [];
-			let isBuffering = false;
-			let rooms = [];
+      let currentStream = null;
+      let mediaSource = null;
+      let sourceBuffer = null;
+      let audioQueue = [];
+      let isBuffering = false;
+      let rooms = [];
 
-			let micStream = null;
-			let micRecorder = null;
-			let isMicActive = false;
+      let micStream = null;
+      let micRecorder = null;
+      let isMicActive = false;
 
-			ws.onopen = () => {
-				console.log('WebSocket connection established');
-				ws.send(
-					JSON.stringify({
-						type: 'register-user',
-						id: Math.random().toString(36).substr(2, 9),
-						name: 'test',
-					}),
-				);
-			};
+      ws.onopen = () => {
+        console.log("WebSocket connection established");
+        ws.send(
+          JSON.stringify({
+            type: "register-user",
+            id: Math.random().toString(36).substr(2, 9),
+            name: "test",
+          })
+        );
+      };
 
-			ws.onmessage = event => {
-				try {
-					const { type, ...message } = JSON.parse(event.data);
+      ws.onmessage = (event) => {
+        try {
+          const { type, ...message } = JSON.parse(event.data);
 
-					if (type == 'add-stream') {
-						rooms = [...rooms, ...message.stream];
-						// in the room if any id undefined then check roomId then change id to roomId
-						rooms.forEach(room => {
-							if (room.id === undefined) {
-								room.id = room.roomId;
-							}
-						});
-						updateStreamList();
-					} else if (type == 'remove-stream') {
-						const roomId = message.stream[0].roomId;
-						rooms = rooms.filter(room => room.id !== roomId);
-						if (currentStream === roomId) {
-							stopStreaming();
-						}
+          if (type == "add-stream") {
+            rooms = [...rooms, ...message.stream];
+            // in the room if any id undefined then check roomId then change id to roomId
+            rooms.forEach((room) => {
+              if (room.id === undefined) {
+                room.id = room.roomId;
+              }
+            });
+            updateStreamList();
+          } else if (type == "remove-stream") {
+            const roomId = message.stream[0].roomId;
+            rooms = rooms.filter((room) => room.id !== roomId);
+            if (currentStream === roomId) {
+              stopStreaming();
+            }
 
-						updateStreamList();
-					} else if (type == 'audio-chunk') {
-						if (message.chunk.type == 'audio-buffer' || false)
-							handleVoiceChunk(message.chunk.data);
-						else handleAudioChunk(message.chunk);
-					} else if (type == 'error') {
-						alert(message.error);
-					} else if (type == 'audio-chunk2') {
-						console.log('message.chunkkk', message.chunk);
+            updateStreamList();
+          } else if (type == "audio-chunk") {
+            if (message.chunk.type == "audio-buffer" || false)
+              handleVoiceChunk(message.chunk.data);
+            else handleAudioChunk(message.chunk);
+          } else if (type == "error") {
+            alert(message.error);
+          } else if (type == "audio-chunk2") {
+            console.log("message.chunkkk", message.chunk);
 
-						// Decode base64 to binary
-						const binaryString = atob(message.chunk.data);
-						const rawPCM = new Uint8Array(binaryString.length);
-						for (let i = 0; i < binaryString.length; i++) {
-							rawPCM[i] = binaryString.charCodeAt(i);
-						}
+            // Fast base64 decode to binary
+            const binaryString = atob(message.chunk.data);
+            const rawPCM = Uint8Array.from(binaryString, (c) =>
+              c.charCodeAt(0)
+            );
 
-						// WAV header generation (for 8-bit mono PCM at 8000 Hz)
-						function createWavHeader(dataLength, options = {}) {
-							const numChannels = options.numChannels || 1;
-							const sampleRate = options.sampleRate || 8000;
-							const bitsPerSample = options.bitsPerSample || 8;
-							const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
-							const blockAlign = (numChannels * bitsPerSample) / 8;
-							const buffer = new ArrayBuffer(44);
-							const view = new DataView(buffer);
+            // WAV header generator (8-bit mono PCM at 8000 Hz)
+            function createWavHeader(dataLength, options = {}) {
+              const numChannels = options.numChannels || 1;
+              const sampleRate = options.sampleRate || 8000;
+              const bitsPerSample = options.bitsPerSample || 8;
+              const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+              const blockAlign = (numChannels * bitsPerSample) / 8;
+              const buffer = new ArrayBuffer(44);
+              const view = new DataView(buffer);
 
-							const writeString = (offset, str) => {
-								for (let i = 0; i < str.length; i++) {
-									view.setUint8(offset + i, str.charCodeAt(i));
-								}
-							};
+              const writeString = (offset, str) => {
+                for (let i = 0; i < str.length; i++) {
+                  view.setUint8(offset + i, str.charCodeAt(i));
+                }
+              };
 
-							writeString(0, 'RIFF');
-							view.setUint32(4, 36 + dataLength, true);
-							writeString(8, 'WAVE');
-							writeString(12, 'fmt ');
-							view.setUint32(16, 16, true); // Subchunk1Size
-							view.setUint16(20, 1, true); // AudioFormat PCM = 1
-							view.setUint16(22, numChannels, true);
-							view.setUint32(24, sampleRate, true);
-							view.setUint32(28, byteRate, true);
-							view.setUint16(32, blockAlign, true);
-							view.setUint16(34, bitsPerSample, true);
-							writeString(36, 'data');
-							view.setUint32(40, dataLength, true);
+              writeString(0, "RIFF");
+              view.setUint32(4, 36 + dataLength, true);
+              writeString(8, "WAVE");
+              writeString(12, "fmt ");
+              view.setUint32(16, 16, true); // Subchunk1Size
+              view.setUint16(20, 1, true); // AudioFormat PCM = 1
+              view.setUint16(22, numChannels, true);
+              view.setUint32(24, sampleRate, true);
+              view.setUint32(28, byteRate, true);
+              view.setUint16(32, blockAlign, true);
+              view.setUint16(34, bitsPerSample, true);
+              writeString(36, "data");
+              view.setUint32(40, dataLength, true);
 
-							return new Uint8Array(buffer);
-						}
+              return new Uint8Array(buffer);
+            }
+            const header = createWavHeader(rawPCM.length, {
+              sampleRate: 8000,
+              numChannels: 1,
+              bitsPerSample: 8,
+            });
 
-						const header = createWavHeader(rawPCM.length, {
-							sampleRate: 8000,
-							numChannels: 1,
-							bitsPerSample: 8,
-						});
+            // Combine header + PCM
+            const wavData = new Uint8Array(header.length + rawPCM.length);
+            wavData.set(header, 0);
+            wavData.set(rawPCM, header.length);
 
-						// Combine header + PCM
-						const wavData = new Uint8Array(header.length + rawPCM.length);
-						wavData.set(header, 0);
-						wavData.set(rawPCM, header.length);
+            const blob = new Blob([wavData], { type: "audio/wav" });
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            audio.play().catch((err) => {
+              console.error("Audio play failed:", err);
+            });
 
-						const blob = new Blob([wavData], { type: 'audio/wav' });
-						const url = URL.createObjectURL(blob);
-						const audio = new Audio(url);
-						audio.play().catch(err => {
-							console.error('Audio play failed:', err);
-						});
+            audio.onended = () => {
+              URL.revokeObjectURL(url);
+            };
+          }
+        } catch (error) {
+          return;
+        }
+      };
 
-						audio.onended = () => {
-							URL.revokeObjectURL(url);
-						};
-					}
-				} catch (error) {
-					return;
-				}
-			};
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
 
-			ws.onerror = error => {
-				console.error('WebSocket error:', error);
-			};
+      ws.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
 
-			ws.onclose = () => {
-				console.log('WebSocket connection closed');
-			};
+      // Update the list of available streams
+      const updateStreamList = () => {
+        var val = currentStream ? currentStream : "";
+        streamList.innerHTML = `<option value="">Select a stream</option>`;
+        rooms.forEach((room) => {
+          const option = document.createElement("option");
+          option.value = room.id;
+          option.textContent = room.name;
+          streamList.appendChild(option);
+        });
+        if (currentStream) {
+          streamList.value = currentStream;
+        }
+      };
 
-			// Update the list of available streams
-			const updateStreamList = () => {
-				var val = currentStream ? currentStream : '';
-				streamList.innerHTML = `<option value="">Select a stream</option>`;
-				rooms.forEach(room => {
-					const option = document.createElement('option');
-					option.value = room.id;
-					option.textContent = room.name;
-					streamList.appendChild(option);
-				});
-				if (currentStream) {
-					streamList.value = currentStream;
-				}
-			};
+      // Handle stream selection
+      streamList.addEventListener("change", () => {
+        const selectedStream = streamList.value;
+        if (currentStream !== selectedStream) {
+          stopStreaming();
+          currentStream = selectedStream;
+          if (currentStream) {
+            startStreaming();
+            micControls.style.display = "block";
+          } else {
+            micControls.style.display = "none";
+          }
+        }
+      });
 
-			// Handle stream selection
-			streamList.addEventListener('change', () => {
-				const selectedStream = streamList.value;
-				if (currentStream !== selectedStream) {
-					stopStreaming();
-					currentStream = selectedStream;
-					if (currentStream) {
-						startStreaming();
-						micControls.style.display = 'block';
-					} else {
-						micControls.style.display = 'none';
-					}
-				}
-			});
+      const handleVoiceChunk = (data) => {
+        const audioBlob = new Blob([new Uint8Array(data)], {
+          type: "audio/webm",
+        });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        console.log(data, "data");
 
-			const handleVoiceChunk = data => {
-				const audioBlob = new Blob([new Uint8Array(data)], {
-					type: 'audio/webm',
-				});
-				const audioUrl = URL.createObjectURL(audioBlob);
-				console.log(data, 'data');
+        const audio = new Audio(audioUrl);
+        audio.play();
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+        };
+      };
 
-				const audio = new Audio(audioUrl);
-				audio.play();
-				audio.onended = () => {
-					URL.revokeObjectURL(audioUrl);
-				};
-			};
+      // Start streaming function
+      const startStreaming = async () => {
+        if (!currentStream || ws.readyState !== WebSocket.OPEN) return;
 
-			// Start streaming function
-			const startStreaming = async () => {
-				if (!currentStream || ws.readyState !== WebSocket.OPEN) return;
+        // Create a new MediaSource
+        if (mediaSource) {
+          mediaSource.endOfStream();
+        }
+        // const stream = await navigator.mediaDevices.getUserMedia({
+        //   audio: true,
+        // });
+        mediaSource = new MediaSource();
+        audioElement.src = URL.createObjectURL(mediaSource);
 
-				// Create a new MediaSource
-				if (mediaSource) {
-					mediaSource.endOfStream();
-				}
-				// const stream = await navigator.mediaDevices.getUserMedia({
-				//   audio: true,
-				// });
-				mediaSource = new MediaSource();
-				audioElement.src = URL.createObjectURL(mediaSource);
+        mediaSource.addEventListener("sourceopen", () => {
+          sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
+          sourceBuffer.addEventListener("updateend", () => {
+            if (!isBuffering && audioQueue.length > 0) {
+              appendToBuffer();
+            }
+          });
+        });
 
-				mediaSource.addEventListener('sourceopen', () => {
-					sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
-					sourceBuffer.addEventListener('updateend', () => {
-						if (!isBuffering && audioQueue.length > 0) {
-							appendToBuffer();
-						}
-					});
-				});
+        // Ensure playback starts only after setting the source
+        audioElement.oncanplay = () => {
+          audioElement.play().catch((err) => {
+            console.error("Error during playback:", err);
+          });
+        };
 
-				// Ensure playback starts only after setting the source
-				audioElement.oncanplay = () => {
-					audioElement.play().catch(err => {
-						console.error('Error during playback:', err);
-					});
-				};
+        // Join the selected stream
+        ws.send(JSON.stringify({ type: "join-room", roomId: currentStream }));
+        console.log("Listening to stream:", currentStream);
+      };
 
-				// Join the selected stream
-				ws.send(JSON.stringify({ type: 'join-room', roomId: currentStream }));
-				console.log('Listening to stream:', currentStream);
-			};
+      // Handle incoming audio chunks
+      const handleAudioChunk = (chunkBase64) => {
+        const chunk = new Uint8Array(chunkBase64.data);
+        audioQueue.push(chunk);
 
-			// Handle incoming audio chunks
-			const handleAudioChunk = chunkBase64 => {
-				const chunk = new Uint8Array(chunkBase64.data);
-				audioQueue.push(chunk);
+        if (!sourceBuffer.updating && !isBuffering) {
+          appendToBuffer();
+        }
+      };
 
-				if (!sourceBuffer.updating && !isBuffering) {
-					appendToBuffer();
-				}
-			};
+      // Append audio chunks to the sourceBuffer
+      const appendToBuffer = () => {
+        if (audioQueue.length > 0 && sourceBuffer && !sourceBuffer.updating) {
+          const chunk = audioQueue.shift();
+          isBuffering = true;
+          sourceBuffer.appendBuffer(chunk);
+          isBuffering = false;
+        }
+      };
 
-			// Append audio chunks to the sourceBuffer
-			const appendToBuffer = () => {
-				if (audioQueue.length > 0 && sourceBuffer && !sourceBuffer.updating) {
-					const chunk = audioQueue.shift();
-					isBuffering = true;
-					sourceBuffer.appendBuffer(chunk);
-					isBuffering = false;
-				}
-			};
+      // Stop streaming and reset media source
+      const stopStreaming = () => {
+        if (currentStream) {
+          ws.send(
+            JSON.stringify({ type: "leave-room", roomId: currentStream })
+          );
+          currentStream = null;
+        }
+        resetMediaSource();
+      };
 
-			// Stop streaming and reset media source
-			const stopStreaming = () => {
-				if (currentStream) {
-					ws.send(
-						JSON.stringify({ type: 'leave-room', roomId: currentStream }),
-					);
-					currentStream = null;
-				}
-				resetMediaSource();
-			};
+      const resetMediaSource = () => {
+        if (mediaSource) {
+          mediaSource.endOfStream();
+          mediaSource = null;
+        }
+      };
 
-			const resetMediaSource = () => {
-				if (mediaSource) {
-					mediaSource.endOfStream();
-					mediaSource = null;
-				}
-			};
-
-			window.addEventListener('beforeunload', () => {
-				if (ws.readyState === WebSocket.OPEN) {
-					ws.close();
-				}
-			});
-		</script>
-	</body>
+      window.addEventListener("beforeunload", () => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close();
+        }
+      });
+    </script>
+  </body>
 </html>
