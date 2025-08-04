@@ -21,6 +21,8 @@ var room_send = [];
 
 var isRoomCreate = true;
 
+var timeCreate = null;
+
 // WebSocket Authentication Middleware
 function authenticate(req) {
   console.log(req.headers);
@@ -95,9 +97,16 @@ wss.on("connection", (ws, req) => {
             : "Room creation failed",
           roomId: id,
         };
+        timeCreate = Date.now();
         //ws.send(JSON.stringify(response));
       } catch (error) {
         console.log("hit");
+        const endTime = Date.now();
+        if(timeCreate) {
+          const diff = endTime - timeCreate; // in milliseconds
+          console.log(`Time taken: ${diff} ms`);
+          timeCreate = null;
+        }
         //console.log(message.toString(), "message.toString()");
 
         // const filePath = path.join(__dirname, "audios", "Taka.mp3");
