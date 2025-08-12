@@ -98,7 +98,7 @@ wss.on("connection", (ws, req) => {
           roomId: id,
         };
         timeCreate = Date.now();
-        //ws.send(JSON.stringify(response));
+        // ws.send(JSON.stringify(response));
       } catch (error) {
         console.log("hit");
         const endTime = Date.now();
@@ -112,7 +112,7 @@ wss.on("connection", (ws, req) => {
         // const filePath = path.join(__dirname, "audios", "Taka.mp3");
 
         //console.log(message);
-        // ws.send(message);
+        ws.send(message);
 
         const bufferChunk = Buffer.from(message); // Actual audio buffer
         voiceBuffer.push(bufferChunk); // 🔹 Store in buffer
