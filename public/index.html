@@ -1406,18 +1406,10 @@
         overlay.classList.add("show");
         popup.classList.add("show");
 
-        // Auto-dismiss after 15 seconds
+        // Auto-dismiss after 10 seconds
         popupTimeout = setTimeout(() => {
           dismissRoomPopup();
-        }, 15000);
-
-        // Log the event
-        logToConsole(
-          "info",
-          `Room request popup shown: ${roomData.name}`,
-          roomData,
-          "events"
-        );
+        }, 10000);
       }
 
       // Close popup when clicking overlay
@@ -1464,12 +1456,12 @@
           //     );
           //   }
 
-        //   logToConsole(
-        //     "success",
-        //     `Accepted room request: ${currentRoomRequest.name}`,
-        //     currentRoomRequest,
-        //     "events"
-        //   );
+          //   logToConsole(
+          //     "success",
+          //     `Accepted room request: ${currentRoomRequest.name}`,
+          //     currentRoomRequest,
+          //     "events"
+          //   );
 
           // Show success toast
           Toastify({
