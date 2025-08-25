@@ -173,11 +173,7 @@
       }
 
       .audio-section {
-        flex: 1;
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
         padding: 40px;
         background: var(--primary-bg);
       }
@@ -496,26 +492,6 @@
 
       <div class="audio-section">
         <audio class="audio-player" id="player" controls autoplay></audio>
-
-        <div class="volume-control">
-          <span>🔊</span>
-          <input
-            type="range"
-            class="volume-slider"
-            id="volumeSlider"
-            min="0"
-            max="100"
-            value="50"
-          />
-          <span id="volumeValue">50%</span>
-        </div>
-
-        <div class="player-controls" id="micControls" style="display: none">
-          <button class="btn btn-primary" id="micButton">🎤 Start Mic</button>
-          <button class="btn btn-secondary" onclick="stopStreaming()">
-            Disconnect
-          </button>
-        </div>
       </div>
 
       <div class="console-section">
@@ -592,17 +568,6 @@
         document.getElementById("messageCount").textContent = "0";
         logToConsole("info", "Console cleared");
       }
-
-      // Volume control
-      const volumeSlider = document.getElementById("volumeSlider");
-      const volumeValue = document.getElementById("volumeValue");
-      const audioElement = document.getElementById("player");
-
-      volumeSlider.addEventListener("input", (e) => {
-        const volume = e.target.value;
-        audioElement.volume = volume / 100;
-        volumeValue.textContent = `${volume}%`;
-      });
 
       // WebSocket connection
       const ws = new WebSocket(
@@ -738,10 +703,10 @@
               // 8-bit PCM (64 kbps)
               finalPCM = rawPCM8;
             } else {
-                // Convert 8-bit values to 16-bit signed PCM
+              // Convert 8-bit values to 16-bit signed PCM
               const rawPCM16 = new Int16Array(rawPCM8.length);
               for (let i = 0; i < rawPCM8.length; i++) {
-                 // Map [0,255] → [-32768,32767]
+                // Map [0,255] → [-32768,32767]
                 rawPCM16[i] = (rawPCM8[i] - 128) << 8;
               }
               finalPCM = new Uint8Array(rawPCM16.buffer);
