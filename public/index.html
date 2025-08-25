@@ -3,38 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Audio Streaming - Professional Console</title>
+    <title>Live Audio Streaming - Modern Console</title>
     <style>
       :root {
-        --primary-bg: #0d1117;
-        --secondary-bg: #161b22;
-        --tertiary-bg: #21262d;
-        --accent-color: #58a6ff;
-        --success-color: #238636;
-        --warning-color: #d29922;
-        --error-color: #f85149;
-        --text-primary: #f0f6fc;
-        --text-secondary: #8b949e;
-        --border-color: #30363d;
-        --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        --glass-bg: rgba(255, 255, 255, 0.1);
-        --glass-border: rgba(255, 255, 255, 0.2);
-      }
-
-      [data-theme="light"] {
-        --primary-bg: #ffffff;
-        --secondary-bg: #f6f8fa;
-        --tertiary-bg: #f1f3f4;
-        --accent-color: #0969da;
-        --success-color: #1a7f37;
-        --warning-color: #9a6700;
-        --error-color: #d1242f;
-        --text-primary: #24292f;
-        --text-secondary: #656d76;
-        --border-color: #d0d7de;
-        --shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        --glass-bg: rgba(0, 0, 0, 0.05);
-        --glass-border: rgba(0, 0, 0, 0.1);
+        --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-bg: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --tertiary-bg: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --dark-bg: #1a1a2e;
+        --darker-bg: #16213e;
+        --darkest-bg: #0f172a;
+        --accent-color: #00d4ff;
+        --success-color: #00ff88;
+        --warning-color: #ffb800;
+        --error-color: #ff4757;
+        --info-color: #7c4dff;
+        --text-primary: #ffffff;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --border-color: #334155;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.2);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+        --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.4);
       }
 
       * {
@@ -44,220 +35,275 @@
       }
 
       body {
-        font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
-          monospace;
-        background: linear-gradient(
-          135deg,
-          var(--primary-bg) 0%,
-          var(--secondary-bg) 100%
-        );
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--darkest-bg);
         color: var(--text-primary);
         height: 100vh;
         display: flex;
         overflow: hidden;
       }
 
-      .sidebar {
-        width: 320px;
-        background: var(--tertiary-bg);
-        backdrop-filter: blur(20px);
+      .left-panel {
+        width: 400px;
+        background: var(--darker-bg);
         border-right: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-lg);
       }
 
       .header {
-        padding: 20px;
-        border-bottom: 1px solid var(--border-color);
-        background: var(--glass-bg);
+        padding: 24px;
+        background: var(--primary-bg);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        z-index: 1;
+      }
+
+      .header-content {
+        position: relative;
+        z-index: 2;
       }
 
       .header h1 {
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: var(--accent-color);
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        background: linear-gradient(45deg, #ffffff, #e0e7ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
 
       .status-indicator {
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        color: var(--text-secondary);
+        gap: 12px;
+        font-size: 14px;
+        color: var(--text-primary);
+        font-weight: 500;
       }
 
       .status-dot {
-        width: 8px;
-        height: 8px;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
         background: var(--error-color);
         animation: pulse 2s infinite;
+        box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
       }
 
       .status-dot.connected {
         background: var(--success-color);
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
       }
 
       @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
       }
 
       .controls-section {
-        padding: 20px;
+        padding: 5px;
         border-bottom: 1px solid var(--border-color);
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
       }
 
       .section-title {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 16px;
         color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
 
       .theme-toggle {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 8px;
-        padding: 8px 12px;
+        background: var(--tertiary-bg);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
         color: var(--text-primary);
         cursor: pointer;
-        transition: all 0.2s ease;
-        margin-bottom: 16px;
-        font-size: 12px;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        width: 100%;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
       }
 
       .theme-toggle:hover {
-        background: var(--glass-border);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .theme-toggle::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .theme-toggle:hover::before {
+        left: 100%;
       }
 
       .stream-select {
         width: 100%;
-        padding: 12px;
-        background: var(--secondary-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
+        padding: 16px;
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
         color: var(--text-primary);
-        font-size: 14px;
-        transition: all 0.2s ease;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
       }
 
       .stream-select:focus {
         outline: none;
         border-color: var(--accent-color);
-        box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+        box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
       }
 
-      .main-content {
+      .stats-section {
+        flex: 1;
+        padding: 24px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .stat-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 5px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--secondary-bg);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .stat-value {
+        font-size: 32px;
+        font-weight: 900;
+        background: var(--secondary-bg);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+      }
+
+      .current-stream {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .current-stream-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+      }
+
+      .current-stream-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--accent-color);
+      }
+
+      .right-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--dark-bg);
+      }
+
+      .console-section {
         flex: 1;
         display: flex;
         flex-direction: column;
       }
 
-      .top-bar {
-        height: 60px;
-        background: var(--tertiary-bg);
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 24px;
-      }
-
-      .audio-section {
-        display: flex;
-        padding: 40px;
-        background: var(--primary-bg);
-      }
-
-      .audio-player {
-        width: 100%;
-        max-width: 600px;
-        height: 60px;
-        background: var(--secondary-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        margin-bottom: 24px;
-      }
-
-      .player-controls {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-      }
-
-      .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .btn-primary {
-        background: var(--accent-color);
-        color: white;
-      }
-
-      .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
-      }
-
-      .btn-secondary {
-        background: var(--glass-bg);
-        color: var(--text-primary);
-        border: 1px solid var(--border-color);
-      }
-
-      .btn-secondary:hover {
-        background: var(--glass-border);
-      }
-
-      .console-section {
-        height: 300px;
-        background: var(--tertiary-bg);
-        border-top: 1px solid var(--border-color);
-        display: flex;
-        flex-direction: column;
-      }
-
       .console-header {
-        height: 40px;
-        background: var(--secondary-bg);
-        border-bottom: 1px solid var(--border-color);
+        height: 70px;
+        background: var(--darker-bg);
+        border-bottom: 2px solid var(--border-color);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 16px;
-        font-size: 12px;
-        font-weight: 600;
+        padding: 0 32px;
+        box-shadow: var(--shadow-sm);
       }
 
       .console-tabs {
         display: flex;
-        gap: 16px;
+        gap: 32px;
       }
 
       .console-tab {
-        padding: 8px 0;
+        padding: 12px 0;
         cursor: pointer;
-        color: var(--text-secondary);
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s ease;
+        color: var(--text-muted);
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+        font-size: 16px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
       }
 
       .console-tab.active {
@@ -265,196 +311,196 @@
         border-bottom-color: var(--accent-color);
       }
 
+      .console-tab:hover:not(.active) {
+        color: var(--text-primary);
+      }
+
       .console-actions {
         display: flex;
-        gap: 8px;
+        gap: 12px;
       }
 
       .console-btn {
-        background: none;
-        border: none;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
         color: var(--text-secondary);
         cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        font-weight: 500;
       }
 
       .console-btn:hover {
-        background: var(--glass-bg);
+        background: var(--glass-border);
         color: var(--text-primary);
+        transform: translateY(-1px);
       }
 
       .console-content {
         flex: 1;
         overflow-y: auto;
-        padding: 12px 16px;
-        font-family: "SF Mono", monospace;
-        font-size: 12px;
-        line-height: 1.5;
+        padding: 24px 32px;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        background: var(--darkest-bg);
       }
 
       .log-entry {
-        margin-bottom: 8px;
-        padding: 6px 12px;
-        border-radius: 6px;
-        border-left: 3px solid transparent;
-        animation: fadeIn 0.3s ease;
+        margin-bottom: 12px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border-left: 4px solid transparent;
+        animation: slideIn 0.3s ease;
+        transition: all 0.2s ease;
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
       }
 
-      @keyframes fadeIn {
+      .log-entry:hover {
+        transform: translateX(4px);
+        box-shadow: var(--shadow-sm);
+      }
+
+      @keyframes slideIn {
         from {
           opacity: 0;
-          transform: translateY(10px);
+          transform: translateX(-20px);
         }
         to {
           opacity: 1;
-          transform: translateY(0);
+          transform: translateX(0);
         }
       }
 
       .log-entry.info {
-        background: rgba(88, 166, 255, 0.1);
-        border-left-color: var(--accent-color);
+        border-left-color: var(--info-color);
+        background: rgba(124, 77, 255, 0.1);
       }
 
       .log-entry.success {
-        background: rgba(35, 134, 54, 0.1);
         border-left-color: var(--success-color);
+        background: rgba(0, 255, 136, 0.1);
       }
 
       .log-entry.warning {
-        background: rgba(210, 153, 34, 0.1);
         border-left-color: var(--warning-color);
+        background: rgba(255, 184, 0, 0.1);
       }
 
       .log-entry.error {
-        background: rgba(248, 81, 73, 0.1);
         border-left-color: var(--error-color);
+        background: rgba(255, 71, 87, 0.1);
+      }
+
+      .log-entry.audio {
+        border-left-color: var(--accent-color);
+        background: rgba(0, 212, 255, 0.1);
+      }
+
+      .log-entry.websocket {
+        border-left-color: #ff6b6b;
+        background: rgba(255, 107, 107, 0.1);
       }
 
       .log-timestamp {
-        color: var(--text-secondary);
-        font-size: 11px;
-        margin-right: 12px;
+        color: var(--text-muted);
+        font-size: 12px;
+        margin-right: 16px;
+        font-weight: 500;
       }
 
       .log-type {
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 10px;
-        margin-right: 8px;
-        padding: 2px 6px;
-        border-radius: 3px;
-        background: var(--glass-bg);
-      }
-
-      .log-message {
-        color: var(--text-primary);
-      }
-
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 12px;
-        margin-bottom: 20px;
-      }
-
-      .stat-card {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 8px;
-        padding: 16px;
-        text-align: center;
-        transition: all 0.2s ease;
-      }
-
-      .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      }
-
-      .stat-value {
-        font-size: 24px;
         font-weight: 700;
-        color: var(--accent-color);
-        margin-bottom: 4px;
-      }
-
-      .stat-label {
-        font-size: 12px;
-        color: var(--text-secondary);
         text-transform: uppercase;
+        font-size: 11px;
+        margin-right: 12px;
+        padding: 4px 8px;
+        border-radius: 4px;
         letter-spacing: 0.5px;
       }
 
-      .volume-control {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 16px;
+      .log-type.info { background: var(--info-color); color: white; }
+      .log-type.success { background: var(--success-color); color: var(--darkest-bg); }
+      .log-type.warning { background: var(--warning-color); color: var(--darkest-bg); }
+      .log-type.error { background: var(--error-color); color: white; }
+      .log-type.audio { background: var(--accent-color); color: var(--darkest-bg); }
+      .log-type.websocket { background: #ff6b6b; color: white; }
+
+      .log-message {
+        color: var(--text-primary);
+        font-weight: 500;
       }
 
-      .volume-slider {
-        flex: 1;
-        height: 4px;
-        background: var(--border-color);
-        border-radius: 2px;
-        outline: none;
-        -webkit-appearance: none;
-      }
-
-      .volume-slider::-webkit-slider-thumb {
-        appearance: none;
-        width: 16px;
-        height: 16px;
-        background: var(--accent-color);
-        border-radius: 50%;
-        cursor: pointer;
+      .log-data {
+        margin-top: 8px;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        overflow-x: auto;
       }
 
       .hidden {
         display: none !important;
       }
 
-      /* Scrollbar styling */
+      /* Custom Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
       }
 
       ::-webkit-scrollbar-track {
-        background: var(--secondary-bg);
+        background: var(--darkest-bg);
+        border-radius: 4px;
       }
 
       ::-webkit-scrollbar-thumb {
-        background: var(--border-color);
+        background: linear-gradient(135deg, var(--accent-color), var(--info-color));
         border-radius: 4px;
       }
 
       ::-webkit-scrollbar-thumb:hover {
-        background: var(--text-secondary);
+        background: linear-gradient(135deg, var(--info-color), var(--accent-color));
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .left-panel {
+          width: 100%;
+          max-width: 350px;
+        }
+        
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   </head>
-  <body data-theme="dark">
-    <div class="sidebar">
+  <body>
+    <div class="left-panel">
       <div class="header">
-        <h1>🎵 Audio Stream Console</h1>
-        <div class="status-indicator">
-          <div class="status-dot" id="connectionStatus"></div>
-          <span id="statusText">Disconnected</span>
+        <div class="header-content">
+          <h1>🎵 Audio Stream Console</h1>
+          <div class="status-indicator">
+            <div class="status-dot" id="connectionStatus"></div>
+            <span id="statusText">Disconnected</span>
+          </div>
         </div>
       </div>
 
       <div class="controls-section">
         <div class="section-title">Settings</div>
-        <button class="theme-toggle" onclick="toggleTheme()">
-          🌓 Toggle Theme
+        <button class="theme-toggle" onclick="toggleRoomCreation()" id="toggleRoomCreation">
+          🎯 Enable Room Creation
         </button>
 
         <div class="section-title">Available Streams</div>
@@ -463,55 +509,45 @@
         </select>
       </div>
 
-      <div class="controls-section">
+      <div class="stats-section">
         <div class="section-title">Statistics</div>
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-value" id="streamCount">0</div>
-            <div class="stat-label">Streams</div>
+            <div class="stat-label">Active Streams</div>
           </div>
           <div class="stat-card">
             <div class="stat-value" id="messageCount">0</div>
-            <div class="stat-label">Messages</div>
+            <div class="stat-label">Total Messages</div>
           </div>
+          <div class="stat-card">
+            <div class="stat-value" id="audioPackets">0</div>
+            <div class="stat-label">Audio Packets</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="wsMessages">0</div>
+            <div class="stat-label">WebSocket Messages</div>
+          </div>
+        </div>
+
+        <div class="current-stream">
+          <div class="current-stream-label">Current Stream</div>
+          <div class="current-stream-name" id="currentStreamName">No stream selected</div>
         </div>
       </div>
     </div>
 
-    <div class="main-content">
-      <div class="top-bar">
-        <div>
-          <span id="currentStreamName">No stream selected</span>
-        </div>
-        <div class="player-controls">
-          <button class="btn btn-secondary" onclick="clearConsole()">
-            Clear Console
-          </button>
-        </div>
-      </div>
-
-      <div class="audio-section">
-        <audio class="audio-player" id="player" controls autoplay></audio>
-      </div>
-
+    <div class="right-panel">
       <div class="console-section">
         <div class="console-header">
           <div class="console-tabs">
-            <div class="console-tab active" data-tab="events">Events</div>
-            <div class="console-tab" data-tab="network">Network</div>
-            <div class="console-tab" data-tab="audio">Audio</div>
+            <div class="console-tab active" data-tab="events" onclick="switchTab('events')">Events</div>
+            <div class="console-tab" data-tab="websocket" onclick="switchTab('websocket')">WebSocket</div>
+            <div class="console-tab" data-tab="audio" onclick="switchTab('audio')">Audio</div>
           </div>
           <div class="console-actions">
-            <button class="console-btn" onclick="clearConsole()" title="Clear">
-              🗑️
-            </button>
-            <button
-              class="console-btn"
-              onclick="toggleConsole()"
-              title="Collapse"
-            >
-              ⬇️
-            </button>
+            <button class="console-btn" onclick="clearConsole()">🗑️ Clear</button>
+            <button class="console-btn" onclick="exportLogs()">💾 Export</button>
           </div>
         </div>
         <div class="console-content" id="consoleContent"></div>
@@ -519,101 +555,161 @@
     </div>
 
     <script>
-      // Theme toggle functionality
-      function toggleTheme() {
-        const body = document.body;
-        const currentTheme = body.getAttribute("data-theme");
-        const newTheme = currentTheme === "dark" ? "light" : "dark";
-        body.setAttribute("data-theme", newTheme);
-        logToConsole("info", `Theme switched to ${newTheme} mode`);
+      let messageCount = 0;
+      let audioPacketCount = 0;
+      let wsMessageCount = 0;
+      let currentTab = 'events';
+      let logs = { events: [], websocket: [], audio: [] };
+
+      function toggleRoomCreation() {
+        const button = document.getElementById("toggleRoomCreation");
+        const isEnabled = button.classList.toggle("enabled");
+        var status = isEnabled ? 1 : 0;
+        button.textContent = isEnabled ? "🎯 Disable Room Creation" : "🎯 Enable Room Creation";
+        
+        fetch("/roomStart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        }).then((response) => {
+          if (!response.ok) {
+            logToConsole("error", "Room creation toggle failed", response, 'events');
+            Toastify({
+              text: "Error toggling room creation",
+              duration: 3000,
+              backgroundColor: "linear-gradient(135deg, #ff4757, #ff3742)",
+            }).showToast();
+            throw new Error("Network response was not ok");
+          }
+          logToConsole("success", `Room creation ${isEnabled ? "enabled" : "disabled"} (server confirmed)`, null, 'events');
+          Toastify({
+            text: `Room creation ${isEnabled ? "enabled" : "disabled"}`,
+            duration: 3000,
+            backgroundColor: isEnabled ? "linear-gradient(135deg, #00ff88, #00e676)" : "linear-gradient(135deg, #ffb800, #ffa726)",
+          }).showToast();
+          return response.json();
+        });
       }
 
-      // Console logging functionality
-      let messageCount = 0;
-
-      function logToConsole(type, message, data = null) {
+      function logToConsole(type, message, data = null, tab = 'events') {
         messageCount++;
         document.getElementById("messageCount").textContent = messageCount;
-
-        const consoleContent = document.getElementById("consoleContent");
-        const logEntry = document.createElement("div");
-        logEntry.className = `log-entry ${type}`;
-
-        const timestamp = new Date().toLocaleTimeString();
-        const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
-
-        let logData = "";
-        if (data) {
-          logData = `<br><span style="color: var(--text-secondary); font-size: 11px;">${JSON.stringify(
-            data,
-            null,
-            2
-          )}</span>`;
+        
+        if (tab === 'audio') {
+          audioPacketCount++;
+          document.getElementById("audioPackets").textContent = audioPacketCount;
+        } else if (tab === 'websocket') {
+          wsMessageCount++;
+          document.getElementById("wsMessages").textContent = wsMessageCount;
         }
 
-        logEntry.innerHTML = `
-          <span class="log-timestamp">${timestamp}</span>
-          <span class="log-type">${typeLabel}</span>
-          <span class="log-message">${message}</span>
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = {
+          timestamp,
+          type,
+          message,
+          data
+        };
+
+        logs[tab].push(logEntry);
+        
+        if (currentTab === tab) {
+          renderLogEntry(logEntry);
+        }
+      }
+
+      function renderLogEntry(logEntry) {
+        const consoleContent = document.getElementById("consoleContent");
+        const logDiv = document.createElement("div");
+        logDiv.className = `log-entry ${logEntry.type}`;
+
+        let logData = "";
+        if (logEntry.data) {
+          logData = `<div class="log-data">${JSON.stringify(logEntry.data, null, 2)}</div>`;
+        }
+
+        logDiv.innerHTML = `
+          <span class="log-timestamp">${logEntry.timestamp}</span>
+          <span class="log-type ${logEntry.type}">${logEntry.type}</span>
+          <span class="log-message">${logEntry.message}</span>
           ${logData}
         `;
 
-        consoleContent.appendChild(logEntry);
+        consoleContent.appendChild(logDiv);
         consoleContent.scrollTop = consoleContent.scrollHeight;
       }
 
+      function switchTab(tab) {
+        currentTab = tab;
+        
+        // Update tab appearance
+        document.querySelectorAll('.console-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+        
+        // Clear and reload content
+        const consoleContent = document.getElementById("consoleContent");
+        consoleContent.innerHTML = "";
+        
+        logs[tab].forEach(log => renderLogEntry(log));
+      }
+
       function clearConsole() {
+        logs[currentTab] = [];
         document.getElementById("consoleContent").innerHTML = "";
-        messageCount = 0;
-        document.getElementById("messageCount").textContent = "0";
-        logToConsole("info", "Console cleared");
+        if (currentTab === 'events') {
+          messageCount = 0;
+          document.getElementById("messageCount").textContent = "0";
+        } else if (currentTab === 'audio') {
+          audioPacketCount = 0;
+          document.getElementById("audioPackets").textContent = "0";
+        } else if (currentTab === 'websocket') {
+          wsMessageCount = 0;
+          document.getElementById("wsMessages").textContent = "0";
+        }
+        logToConsole("info", `${currentTab.charAt(0).toUpperCase() + currentTab.slice(1)} console cleared`, null, currentTab);
+      }
+
+      function exportLogs() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", `console-logs-${new Date().toISOString()}.json`);
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+        logToConsole("success", "Logs exported successfully", null, 'events');
       }
 
       // WebSocket connection
       const ws = new WebSocket(
-        window.location.protocol.replace("http", "ws") +
-          "//" +
-          window.location.host +
-          "?ptpl=Ptpl123"
+        window.location.protocol.replace("http", "ws") + "//" + window.location.host + "?ptpl=Ptpl123"
       );
 
       const streamList = document.getElementById("streamSelect");
       const statusIndicator = document.getElementById("connectionStatus");
       const statusText = document.getElementById("statusText");
       const currentStreamName = document.getElementById("currentStreamName");
-      const micControls = document.getElementById("micControls");
 
       let currentStream = null;
-      let mediaSource = null;
-      let sourceBuffer = null;
-      let audioQueue = [];
-      let isBuffering = false;
       let rooms = [];
 
-      let micStream = null;
-      let micRecorder = null;
-      let isMicActive = false;
-
       ws.onopen = () => {
-        logToConsole("success", "WebSocket connection established");
+        logToConsole("success", "WebSocket connection established", null, 'events');
+        logToConsole("websocket", "Connection opened", { event: "open" }, 'websocket');
         statusIndicator.classList.add("connected");
         statusText.textContent = "Connected";
 
         const userId = Math.random().toString(36).substr(2, 9);
-        ws.send(
-          JSON.stringify({
-            type: "register-user",
-            id: userId,
-            name: "Professional Client",
-          })
-        );
-        logToConsole("info", `Registered as user: ${userId}`);
+        const registerMsg = { type: "register-user", id: userId, name: "Professional Client" };
+        ws.send(JSON.stringify(registerMsg));
+        logToConsole("info", `Registered as user: ${userId}`, null, 'events');
+        logToConsole("websocket", "Sent: register-user", registerMsg, 'websocket');
       };
 
       ws.onmessage = (event) => {
         try {
           const { type, ...message } = JSON.parse(event.data);
-          logToConsole("info", `Received: ${type}`, { type, ...message });
+          logToConsole("websocket", `Received: ${type}`, { type, ...message }, 'websocket');
 
           if (type == "add-stream") {
             rooms = [...rooms, ...message.stream];
@@ -623,7 +719,7 @@
               }
             });
             updateStreamList();
-            logToConsole("success", `Added ${message.stream.length} stream(s)`);
+            logToConsole("success", `Added ${message.stream.length} stream(s)`, message.stream, 'events');
           } else if (type == "remove-stream") {
             const roomId = message.stream[0].roomId;
             rooms = rooms.filter((room) => room.id !== roomId);
@@ -631,129 +727,39 @@
               stopStreaming();
             }
             updateStreamList();
-            logToConsole("warning", `Removed stream: ${roomId}`);
+            logToConsole("warning", `Removed stream: ${roomId}`, null, 'events');
           } else if (type == "audio-chunk") {
-            if (message.chunk.type == "audio-buffer" || false) {
-              handleVoiceChunk(message.chunk.data);
-              logToConsole("audio", "Received voice chunk");
-            } else {
-              handleAudioChunk(message.chunk);
-              logToConsole("audio", "Received audio chunk");
-            }
-          } else if (type == "error") {
-            logToConsole("error", `Server error: ${message.error}`);
-            alert(message.error);
+            logToConsole("audio", "Audio chunk received", { 
+              size: message.chunk.data ? message.chunk.data.length : 'unknown',
+              type: message.chunk.type || 'standard'
+            }, 'audio');
           } else if (type == "audio-chunk2") {
-            logToConsole("audio", "Processing PCM audio chunk");
-
-            // Decode base64 to binary
-            const binaryString = atob(message.chunk.data);
-            const rawPCM8 = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-              rawPCM8[i] = binaryString.charCodeAt(i);
-            }
-
-            /**
-             * WAV header generator
-             */
-            function createWavHeader(dataLength, options = {}) {
-              const numChannels = options.numChannels || 1;
-              const sampleRate = options.sampleRate || 8000;
-              const bitsPerSample = options.bitsPerSample || 8;
-              const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
-              const blockAlign = (numChannels * bitsPerSample) / 8;
-              const buffer = new ArrayBuffer(44);
-              const view = new DataView(buffer);
-
-              const writeString = (offset, str) => {
-                for (let i = 0; i < str.length; i++) {
-                  view.setUint8(offset + i, str.charCodeAt(i));
-                }
-              };
-
-              writeString(0, "RIFF");
-              view.setUint32(4, 36 + dataLength, true);
-              writeString(8, "WAVE");
-              writeString(12, "fmt ");
-              view.setUint32(16, 16, true); // Subchunk1Size
-              view.setUint16(20, 1, true); // AudioFormat PCM = 1
-              view.setUint16(22, numChannels, true);
-              view.setUint32(24, sampleRate, true);
-              view.setUint32(28, byteRate, true);
-              view.setUint16(32, blockAlign, true);
-              view.setUint16(34, bitsPerSample, true);
-              writeString(36, "data");
-              view.setUint32(40, dataLength, true);
-
-              return new Uint8Array(buffer);
-            }
-
-            /**
-             * Detect if data looks like 8-bit or 16-bit PCM
-             * (you may refine detection logic depending on server metadata)
-             */
-            let bitsPerSample = 8;
-            if (rawPCM8.length % 2 === 0) {
-              // If length is even, might be 16-bit samples
-              bitsPerSample = 16;
-            }
-
-            let finalPCM;
-            if (bitsPerSample === 8) {
-              // 8-bit PCM (64 kbps)
-              finalPCM = rawPCM8;
-            } else {
-              // Convert 8-bit values to 16-bit signed PCM
-              const rawPCM16 = new Int16Array(rawPCM8.length);
-              for (let i = 0; i < rawPCM8.length; i++) {
-                // Map [0,255] → [-32768,32767]
-                rawPCM16[i] = (rawPCM8[i] - 128) << 8;
-              }
-              finalPCM = new Uint8Array(rawPCM16.buffer);
-            }
-
-            // Create header
-            const header = createWavHeader(finalPCM.length, {
-              sampleRate: 8000,
-              numChannels: 1,
-              bitsPerSample: bitsPerSample,
-            });
-
-            // Combine header + PCM
-            const wavData = new Uint8Array(header.length + finalPCM.length);
-            wavData.set(header, 0);
-            wavData.set(finalPCM, header.length);
-
-            const blob = new Blob([wavData], { type: "audio/wav" });
-            const url = URL.createObjectURL(blob);
-            const audio = new Audio(url);
-            audio.play().catch((err) => {
-              logToConsole("error", `Audio play failed: ${err.message}`);
-            });
-
-            audio.onended = () => {
-              URL.revokeObjectURL(url);
-            };
+            logToConsole("audio", "PCM audio chunk received", {
+              format: "PCM 8kHz",
+              size: message.chunk.data ? message.chunk.data.length : 'unknown'
+            }, 'audio');
+          } else if (type == "error") {
+            logToConsole("error", `Server error: ${message.error}`, message, 'events');
           }
         } catch (error) {
-          logToConsole("error", `Failed to parse message: ${error.message}`);
-          return;
+          logToConsole("error", `Failed to parse message: ${error.message}`, { error: error.message, raw: event.data }, 'websocket');
         }
       };
 
       ws.onerror = (error) => {
-        logToConsole("error", "WebSocket connection error", error);
+        logToConsole("error", "WebSocket connection error", error, 'events');
+        logToConsole("websocket", "WebSocket error", { error }, 'websocket');
         statusIndicator.classList.remove("connected");
         statusText.textContent = "Error";
       };
 
-      ws.onclose = () => {
-        logToConsole("warning", "WebSocket connection closed");
+      ws.onclose = (e) => {
+        logToConsole("warning", "WebSocket connection closed", { code: e.code, reason: e.reason }, 'events');
+        logToConsole("websocket", "Connection closed", { code: e.code, reason: e.reason }, 'websocket');
         statusIndicator.classList.remove("connected");
         statusText.textContent = "Disconnected";
       };
 
-      // Update the list of available streams
       const updateStreamList = () => {
         streamList.innerHTML = `<option value="">Select a stream</option>`;
         rooms.forEach((room) => {
@@ -764,121 +770,45 @@
         });
 
         document.getElementById("streamCount").textContent = rooms.length;
-
         if (currentStream) {
           streamList.value = currentStream;
         }
       };
 
-      // Handle stream selection
       streamList.addEventListener("change", () => {
         const selectedStream = streamList.value;
         if (currentStream !== selectedStream) {
           stopStreaming();
           currentStream = selectedStream;
           if (currentStream) {
-            const selectedRoom = rooms.find(
-              (room) => room.id === currentStream
-            );
-            currentStreamName.textContent = selectedRoom
-              ? selectedRoom.name
-              : "Unknown Stream";
+            const selectedRoom = rooms.find((room) => room.id === currentStream);
+            currentStreamName.textContent = selectedRoom ? selectedRoom.name : "Unknown Stream";
             startStreaming();
-            micControls.style.display = "flex";
-            logToConsole(
-              "info",
-              `Selected stream: ${selectedRoom?.name || "Unknown"}`
-            );
+            logToConsole("info", `Selected stream: ${selectedRoom?.name || "Unknown"}`, selectedRoom, 'events');
           } else {
             currentStreamName.textContent = "No stream selected";
-            micControls.style.display = "none";
           }
         }
       });
 
-      const handleVoiceChunk = (data) => {
-        const audioBlob = new Blob([new Uint8Array(data)], {
-          type: "audio/webm",
-        });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        audio.play();
-        audio.onended = () => {
-          URL.revokeObjectURL(audioUrl);
-        };
-      };
-
-      // Start streaming function
       const startStreaming = async () => {
         if (!currentStream || ws.readyState !== WebSocket.OPEN) return;
 
-        logToConsole("info", `Starting stream: ${currentStream}`);
-
-        if (mediaSource) {
-          mediaSource.endOfStream();
-        }
-
-        mediaSource = new MediaSource();
-        audioElement.src = URL.createObjectURL(mediaSource);
-
-        mediaSource.addEventListener("sourceopen", () => {
-          sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
-          sourceBuffer.addEventListener("updateend", () => {
-            if (!isBuffering && audioQueue.length > 0) {
-              appendToBuffer();
-            }
-          });
-          logToConsole("success", "Media source opened and buffer created");
-        });
-
-        audioElement.oncanplay = () => {
-          audioElement.play().catch((err) => {
-            logToConsole("error", `Playback error: ${err.message}`);
-          });
-        };
-
-        ws.send(JSON.stringify({ type: "join-room", roomId: currentStream }));
-        logToConsole("success", `Joined room: ${currentStream}`);
+        logToConsole("info", `Starting stream: ${currentStream}`, null, 'events');
+        const joinMsg = { type: "join-room", roomId: currentStream };
+        ws.send(JSON.stringify(joinMsg));
+        logToConsole("websocket", "Sent: join-room", joinMsg, 'websocket');
+        logToConsole("success", `Joined room: ${currentStream}`, null, 'events');
       };
 
-      // Handle incoming audio chunks
-      const handleAudioChunk = (chunkBase64) => {
-        const chunk = new Uint8Array(chunkBase64.data);
-        audioQueue.push(chunk);
-
-        if (!sourceBuffer.updating && !isBuffering) {
-          appendToBuffer();
-        }
-      };
-
-      // Append audio chunks to the sourceBuffer
-      const appendToBuffer = () => {
-        if (audioQueue.length > 0 && sourceBuffer && !sourceBuffer.updating) {
-          const chunk = audioQueue.shift();
-          isBuffering = true;
-          sourceBuffer.appendBuffer(chunk);
-          isBuffering = false;
-        }
-      };
-
-      // Stop streaming and reset media source
       const stopStreaming = () => {
         if (currentStream) {
-          ws.send(
-            JSON.stringify({ type: "leave-room", roomId: currentStream })
-          );
-          logToConsole("info", `Left room: ${currentStream}`);
+          const leaveMsg = { type: "leave-room", roomId: currentStream };
+          ws.send(JSON.stringify(leaveMsg));
+          logToConsole("websocket", "Sent: leave-room", leaveMsg, 'websocket');
+          logToConsole("info", `Left room: ${currentStream}`, null, 'events');
           currentStream = null;
           currentStreamName.textContent = "No stream selected";
-        }
-        resetMediaSource();
-      };
-
-      const resetMediaSource = () => {
-        if (mediaSource) {
-          mediaSource?.endOfStream();
-          mediaSource = null;
-          logToConsole("info", "Media source reset");
         }
       };
 
@@ -890,7 +820,9 @@
 
       // Initialize with a welcome message
       setTimeout(() => {
-        logToConsole("info", "Audio Streaming Console initialized");
+        logToConsole("info", "Modern Audio Streaming Console initialized", null, 'events');
+        logToConsole("websocket", "WebSocket client ready", null, 'websocket');
+        logToConsole("audio", "Audio processing engine ready", null, 'audio');
       }, 100);
     </script>
   </body>
