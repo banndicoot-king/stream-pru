@@ -54,10 +54,10 @@
       }
 
       .header {
-        padding: 24px;
+        padding: 18px;
+        align-items: center;
         background: var(--darkest-bg);
         position: relative;
-        overflow: hidden;
       }
 
       .header::before {
@@ -77,37 +77,88 @@
         z-index: 2;
       }
 
+      .header-content {
+        position: relative;
+      }
       .header h1 {
-        font-size: 24px;
+        font-size: 15px;
         font-weight: 800;
-        margin-bottom: 12px;
+        margin-bottom: 6px;
         background: linear-gradient(45deg, #ffffff, #e0e7ff);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
       }
-
       .status-indicator {
         display: flex;
         align-items: center;
         gap: 12px;
         font-size: 14px;
-        color: var(--text-primary);
         font-weight: 500;
       }
-
       .status-dot {
         width: 12px;
-        height: 12px;
+        height: 10px;
         border-radius: 50%;
         background: var(--error-color);
-        animation: pulse 2s infinite;
-        box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+        box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
       }
-
       .status-dot.connected {
         background: var(--success-color);
-        box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+      }
+      .status-dot2 {
+        width: 12px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--text-muted);
+      }
+      .status-dot2.disconnected {
+        background: var(--error-color);
+        box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+      }
+      .status-dot2.connected {
+        background: var(--success-color);
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+      }
+      .status-dot2.inDot {
+        background: var(--warning-color);
+        box-shadow: 0 0 10px rgba(213, 248, 12, 0.5);
+      }
+      .status-dot2.audio {
+        background: rgb(0, 174, 255);
+        box-shadow: 0 0 10px rgba(0, 174, 255, 0.5);
+      }
+      .status-dot2.outDot {
+        background: var(--accent-color);
+        box-shadow: 0 0 10px var(--accent-color);
+      }
+      .io-dots {
+        display: flex;
+        gap: 8px;
+        margin-left: 16px;
+      }
+      .io-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--text-muted);
+        opacity: 0.6;
+        transition: all 0.2s;
+      }
+      .io-dot.in.active {
+        background: var(--success-color);
+        opacity: 1;
+        box-shadow: 0 0 10px var(--success-color);
+      }
+      .io-dot.out.active {
+        background: var(--accent-color);
+        opacity: 1;
+        box-shadow: 0 0 10px var(--accent-color);
+      }
+      .audio-status {
+        font-size: 13px;
+        margin-top: 8px;
+        color: var(--text-secondary);
       }
 
       @keyframes pulse {
@@ -120,6 +171,15 @@
           opacity: 0.7;
           transform: scale(1.1);
         }
+      }
+
+      .audio-player-container {
+        padding: 10px;
+      }
+      audio {
+        width: 100%;
+        outline: none;
+        margin-top: 6px;
       }
 
       .controls-section {
@@ -542,11 +602,16 @@
     <div class="left-panel">
       <div class="header">
         <div class="header-content">
-          <h1>🎵 Audio Stream Console</h1>
           <div class="status-indicator">
             <div class="status-dot" id="connectionStatus"></div>
             <span id="statusText">Disconnected</span>
+            <div class="io-dots">
+              <div class="status-dot2" id="connectionStatus2"></div>
+              <div class="io-dot in" id="inDot"></div>
+              <div class="io-dot out" id="outDot"></div>
+            </div>
           </div>
+          <div class="audio-status" id="audioStatus">🔇 Not Playing</div>
         </div>
       </div>
 
@@ -592,6 +657,9 @@
           <div class="current-stream-name" id="currentStreamName">
             No stream selected
           </div>
+        </div>
+        <div class="audio-player-container">
+          <audio id="player" autoplay></audio>
         </div>
       </div>
     </div>
@@ -641,6 +709,11 @@
       let wsMessageCount = 0;
       let currentTab = "events";
       let logs = { events: [], websocket: [], audio: [] };
+
+      let mediaSource = null;
+      let sourceBuffer = null;
+      let audioQueue = [];
+      let isBuffering = false;
 
       function toggleRoomCreation() {
         const button = document.getElementById("toggleRoomCreation");
@@ -739,6 +812,10 @@
 
         consoleContent.appendChild(logDiv);
         consoleContent.scrollTop = consoleContent.scrollHeight;
+        // Only scroll if the new log is appended (not on tab switch)
+        if (logDiv) {
+          logDiv.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
       }
 
       function switchTab(tab) {
@@ -780,6 +857,23 @@
         );
       }
 
+      function blinkDot2(dotId) {
+        statusIndicator2.classList.forEach((cls) => {
+          if (cls != "status-dot2") {
+            statusIndicator2.classList.remove(cls);
+          }
+        });
+        statusIndicator2.classList.add(dotId);
+        setTimeout(() => statusIndicator2.classList.remove(dotId), 300);
+      }
+
+      function blinkDot(dotId) {
+        const dot = document.getElementById(dotId);
+        dot.classList.add("active");
+        blinkDot2(dotId);
+        setTimeout(() => dot.classList.remove("active"), 300);
+      }
+
       function exportLogs() {
         const dataStr =
           "data:text/json;charset=utf-8," +
@@ -797,17 +891,33 @@
       }
 
       // WebSocket connection
-      const ws = new WebSocket(
-        window.location.protocol.replace("http", "ws") +
-          "//" +
-          window.location.host +
-          "?ptpl=Ptpl123"
-      );
+      //   const ws = new WebSocket(
+      //     window.location.protocol.replace("http", "ws") +
+      //       "//" +
+      //       window.location.host +
+      //       "?ptpl=Ptpl123"
+      //   );
+
+      const ws = new WebSocket("https://stream.ajayos.in/?ptpl=Ptpl123");
 
       const streamList = document.getElementById("streamSelect");
       const statusIndicator = document.getElementById("connectionStatus");
+      const statusIndicator2 = document.getElementById("connectionStatus2");
       const statusText = document.getElementById("statusText");
       const currentStreamName = document.getElementById("currentStreamName");
+      const audioElement = document.getElementById("player");
+      const audioStatus = document.getElementById("audioStatus");
+
+      audioElement.addEventListener("play", () => {
+        audioStatus.textContent = "▶️ Playing Audio";
+        setTimeout(() => blinkDot2("audio"), 190);
+      });
+      audioElement.addEventListener("pause", () => {
+        audioStatus.textContent = "🔇 Paused";
+      });
+      audioElement.addEventListener("ended", () => {
+        audioStatus.textContent = "🔇 Ended";
+      });
 
       let currentStream = null;
       let rooms = [];
@@ -819,6 +929,7 @@
           null,
           "events"
         );
+        blinkDot("outDot");
         logToConsole(
           "websocket",
           "Connection opened",
@@ -826,6 +937,7 @@
           "websocket"
         );
         statusIndicator.classList.add("connected");
+        blinkDot2("connected");
         statusText.textContent = "Connected";
 
         const userId = Math.random().toString(36).substr(2, 9);
@@ -836,6 +948,7 @@
         };
         ws.send(JSON.stringify(registerMsg));
         logToConsole("info", `Registered as user: ${userId}`, null, "events");
+        blinkDot("outDot");
         logToConsole(
           "websocket",
           "Sent: register-user",
@@ -847,6 +960,7 @@
       ws.onmessage = (event) => {
         try {
           const { type, ...message } = JSON.parse(event.data);
+          blinkDot("inDot");
           logToConsole(
             "websocket",
             `Received: ${type}`,
@@ -893,18 +1007,99 @@
               },
               "audio"
             );
+            if (message.chunk.type == "audio-buffer" || false)
+              handleVoiceChunk(message.chunk.data);
+            else handleAudioChunk(message.chunk);
           } else if (type == "audio-chunk2") {
             logToConsole(
               "audio",
               "PCM audio chunk received",
               {
-                format: "PCM 8kHz",
+                format: "PCM 16kHz",
                 size: message.chunk.data
                   ? message.chunk.data.length
                   : "unknown",
               },
               "audio"
             );
+            console.log("message.chunkkk", message.chunk);
+            onSocketChunk(message);
+            /*
+            // Decode base64 to binary
+            const binaryString = atob(message.chunk.data);
+
+            // 8-bit unsigned PCM → bytes
+            const raw8 = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              raw8[i] = binaryString.charCodeAt(i);
+            }
+
+            // Convert 8-bit unsigned [0..255] → 16-bit signed [-32768..32767]
+            const raw16 = new Int16Array(raw8.length);
+            for (let i = 0; i < raw8.length; i++) {
+              raw16[i] = (raw8[i] - 128) << 8; // center at 0 and scale
+            }
+
+            // WAV header generator (16-bit mono PCM)
+            function createWavHeader(dataLengthBytes, opts = {}) {
+              const numChannels = opts.numChannels || 1;
+              const sampleRate = opts.sampleRate || 8000;
+              const bitsPerSample = opts.bitsPerSample || 16;
+
+              const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+              const blockAlign = (numChannels * bitsPerSample) / 8;
+
+              const buffer = new ArrayBuffer(44);
+              const view = new DataView(buffer);
+
+              const writeString = (offset, str) => {
+                for (let i = 0; i < str.length; i++)
+                  view.setUint8(offset + i, str.charCodeAt(i));
+              };
+
+              writeString(0, "RIFF");
+              view.setUint32(4, 36 + dataLengthBytes, true); // <-- bytes
+              writeString(8, "WAVE");
+              writeString(12, "fmt ");
+              view.setUint32(16, 16, true); // PCM fmt chunk size
+              view.setUint16(20, 1, true); // PCM = 1
+              view.setUint16(22, numChannels, true);
+              view.setUint32(24, sampleRate, true);
+              view.setUint32(28, byteRate, true);
+              view.setUint16(32, blockAlign, true);
+              view.setUint16(34, bitsPerSample, true);
+              writeString(36, "data");
+              view.setUint32(40, dataLengthBytes, true); // <-- bytes
+
+              return new Uint8Array(buffer);
+            }
+
+            // FIX: use raw16.byteLength (bytes), not raw16.length (samples)
+            const header = createWavHeader(raw16.byteLength, {
+              sampleRate: 8000,
+              numChannels: 1,
+              bitsPerSample: 16,
+            });
+
+            // Allocate buffer using byte length
+            const wavData = new Uint8Array(header.length + raw16.byteLength);
+            wavData.set(header, 0);
+
+            // Write samples explicitly little-endian
+            const view = new DataView(wavData.buffer, header.length);
+            for (let i = 0; i < raw16.length; i++) {
+              view.setInt16(i * 2, raw16[i], true);
+            }
+
+            blinkDot2("audio");
+
+            const blob = new Blob([wavData], { type: "audio/wav" });
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            audio
+              .play()
+              .catch((err) => console.error("Audio play failed:", err));
+            audio.onended = () => URL.revokeObjectURL(url);*/
           } else if (type == "error") {
             logToConsole(
               "error",
@@ -914,6 +1109,7 @@
             );
           }
         } catch (error) {
+          blinkDot("outDot");
           logToConsole(
             "error",
             `Failed to parse message: ${error.message}`,
@@ -923,10 +1119,110 @@
         }
       };
 
+      // ###################################################
+      let isPlaying = false;
+
+      // Convert PCM16 to WAV Blob
+      function pcm16ToWavBlob(pcm16, options = {}) {
+        const numChannels = options.numChannels || 1;
+        const sampleRate = options.sampleRate || 8000; // 16 kHz
+        const bitsPerSample = options.bitsPerSample || 16;
+        const slowFactor = options.slowFactor || 0.5; // 0.5 = half speed
+
+        const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+        const blockAlign = (numChannels * bitsPerSample) / 8;
+
+        const buffer = new ArrayBuffer(44);
+        const view = new DataView(buffer);
+
+        const writeString = (offset, str) => {
+          for (let i = 0; i < str.length; i++)
+            view.setUint8(offset + i, str.charCodeAt(i));
+        };
+
+        writeString(0, "RIFF");
+        view.setUint32(4, 36 + pcm16.byteLength, true);
+        writeString(8, "WAVE");
+        writeString(12, "fmt ");
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true); // PCM
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, byteRate, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitsPerSample, true);
+        writeString(36, "data");
+        view.setUint32(40, pcm16.byteLength, true);
+
+        const wavBuffer = new Uint8Array(44 + pcm16.byteLength);
+        wavBuffer.set(new Uint8Array(buffer), 0);
+        wavBuffer.set(new Uint8Array(pcm16.buffer), 44);
+
+        return new Blob([wavBuffer], { type: "audio/wav" });
+      }
+
+      // Play the next chunk in the queue
+      function playNextChunk() {
+        if (audioQueue.length === 0) {
+          isPlaying = false;
+          return;
+        }
+
+        isPlaying = true;
+        const chunk = audioQueue.shift();
+        const wavBlob = pcm16ToWavBlob(chunk, {
+          sampleRate: 8000,
+          numChannels: 1,
+          bitsPerSample: 16,
+        });
+        const url = URL.createObjectURL(wavBlob);
+        audioElement.src = url;
+
+        audioElement
+          .play()
+          .catch((err) => console.error("Audio play failed:", err));
+
+        audioElement.onended = () => {
+          URL.revokeObjectURL(url);
+          playNextChunk();
+        };
+      }
+
+      // Example: receiving a chunk over socket
+      function onSocketChunk(message) {
+        try {
+          // Convert base64 to Uint8Array
+          const binary = atob(message.chunk.data);
+          const rawPCM = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++)
+            rawPCM[i] = binary.charCodeAt(i);
+
+          audioQueue.push(rawPCM);
+
+          if (!isPlaying) playNextChunk();
+          logToConsole(
+            "audio",
+            `Queued PCM16 chunk (${rawPCM.length} bytes)`,
+            null,
+            "audio"
+          );
+        } catch (err) {
+          console.error("Error processing PCM16 chunk:", err);
+          logToConsole(
+            "error",
+            `PCM16 chunk processing failed: ${err.message}`,
+            null,
+            "audio"
+          );
+        }
+      }
+      // ######################################
+
       ws.onerror = (error) => {
+        blinkDot("outDot");
         logToConsole("error", "WebSocket connection error", error, "events");
         logToConsole("websocket", "WebSocket error", { error }, "websocket");
-        statusIndicator.classList.remove("connected");
+        // statusIndicator.classList.remove("connected");
         statusText.textContent = "Error";
       };
 
@@ -937,6 +1233,7 @@
           { code: e.code, reason: e.reason },
           "events"
         );
+        blinkDot("outDot");
         logToConsole(
           "websocket",
           "Connection closed",
@@ -944,6 +1241,7 @@
           "websocket"
         );
         statusIndicator.classList.remove("connected");
+        blinkDot2("disconnected");
         statusText.textContent = "Disconnected";
       };
 
@@ -960,6 +1258,21 @@
         if (currentStream) {
           streamList.value = currentStream;
         }
+      };
+
+      const handleVoiceChunk = (data) => {
+        blinkDot2("audio");
+        const audioBlob = new Blob([new Uint8Array(data)], {
+          type: "audio/webm",
+        });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        console.log(data, "data");
+
+        const audio = new Audio(audioUrl);
+        audio.play();
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+        };
       };
 
       streamList.addEventListener("change", () => {
@@ -996,8 +1309,32 @@
           null,
           "events"
         );
+        // Create a new MediaSource
+        if (mediaSource) {
+          mediaSource.endOfStream();
+        }
+        mediaSource = new MediaSource();
+        audioElement.src = URL.createObjectURL(mediaSource);
+
+        mediaSource.addEventListener("sourceopen", () => {
+          sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
+          sourceBuffer.addEventListener("updateend", () => {
+            if (!isBuffering && audioQueue.length > 0) {
+              appendToBuffer();
+            }
+          });
+        });
+
+        // Ensure playback starts only after setting the source
+        audioElement.oncanplay = () => {
+          audioElement.play().catch((err) => {
+            console.error("Error during playback:", err);
+          });
+        };
+
         const joinMsg = { type: "join-room", roomId: currentStream };
         ws.send(JSON.stringify(joinMsg));
+        blinkDot("outDot");
         logToConsole("websocket", "Sent: join-room", joinMsg, "websocket");
         logToConsole(
           "success",
@@ -1007,18 +1344,48 @@
         );
       };
 
+      // Handle incoming audio chunks
+      const handleAudioChunk = (chunkBase64) => {
+        const chunk = new Uint8Array(chunkBase64.data);
+        audioQueue.push(chunk);
+
+        if (!sourceBuffer.updating && !isBuffering) {
+          appendToBuffer();
+        }
+      };
+
+      // Append audio chunks to the sourceBuffer
+      const appendToBuffer = () => {
+        if (audioQueue.length > 0 && sourceBuffer && !sourceBuffer.updating) {
+          const chunk = audioQueue.shift();
+          isBuffering = true;
+          sourceBuffer.appendBuffer(chunk);
+          isBuffering = false;
+        }
+      };
+
       const stopStreaming = () => {
         if (currentStream) {
           const leaveMsg = { type: "leave-room", roomId: currentStream };
           ws.send(JSON.stringify(leaveMsg));
+          blinkDot("outDot");
           logToConsole("websocket", "Sent: leave-room", leaveMsg, "websocket");
           logToConsole("info", `Left room: ${currentStream}`, null, "events");
           currentStream = null;
           currentStreamName.textContent = "No stream selected";
+          resetMediaSource();
+        }
+      };
+
+      const resetMediaSource = () => {
+        if (mediaSource) {
+          mediaSource.endOfStream();
+          mediaSource = null;
         }
       };
 
       window.addEventListener("beforeunload", () => {
+        console.log("try to close");
         if (ws.readyState === WebSocket.OPEN) {
           ws.close();
         }
@@ -1026,12 +1393,7 @@
 
       // Initialize with a welcome message
       setTimeout(() => {
-        logToConsole(
-          "info",
-          "Modern Audio Streaming Console initialized",
-          null,
-          "events"
-        );
+        blinkDot2("disconnected");
         logToConsole("websocket", "WebSocket client ready", null, "websocket");
         logToConsole("audio", "Audio processing engine ready", null, "audio");
       }, 100);
