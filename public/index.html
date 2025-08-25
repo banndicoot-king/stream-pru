@@ -445,6 +445,208 @@
         box-shadow: var(--shadow-sm);
       }
 
+      .popup {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        padding: 12px 16px;
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+      }
+
+      .room-popup-overlay {
+        position: fixed;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .room-popup-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .room-popup {
+        position: fixed;
+        bottom: -300px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        background: var(--darker-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: var(--shadow-xl);
+        z-index: 10000;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        overflow: hidden;
+      }
+
+      .room-popup.show {
+        bottom: 30px;
+      }
+
+      .room-popup-header {
+        background: var(--primary-bg);
+        padding: 16px 20px;
+        position: relative;
+      }
+
+      .room-popup-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+      }
+
+      .room-popup-title {
+        position: relative;
+        z-index: 2;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .room-popup-content {
+        padding: 20px;
+      }
+
+      .room-request-info {
+        margin-bottom: 20px;
+      }
+
+      .room-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--accent-color);
+        margin-bottom: 8px;
+        word-break: break-word;
+      }
+
+      .room-details {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+
+      .room-popup-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+
+      .room-popup-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 80px;
+      }
+
+      .room-popup-btn.accept {
+        background: var(--success-color);
+        color: var(--darkest-bg);
+      }
+
+      .room-popup-btn.accept:hover {
+        background: #00e676;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+      }
+
+      .room-popup-btn.decline {
+        background: var(--glass-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+      }
+
+      .room-popup-btn.decline:hover {
+        background: var(--error-color);
+        border-color: var(--error-color);
+        transform: translateY(-1px);
+      }
+
+      .room-popup-btn.dismiss {
+        background: var(--glass-bg);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+      }
+
+      .room-popup-btn.dismiss:hover {
+        background: var(--glass-border);
+        color: var(--text-primary);
+      }
+
+      /* Notification dot animation */
+      .room-popup-notification {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 12px;
+        height: 12px;
+        background: var(--success-color);
+        border-radius: 50%;
+        animation: notificationPulse 2s infinite;
+      }
+
+      @keyframes notificationPulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.2);
+        }
+      }
+
+      /* Mobile responsive */
+      @media (max-width: 480px) {
+        .room-popup {
+          width: 90%;
+          max-width: 350px;
+        }
+
+        .room-popup-actions {
+          flex-direction: column;
+        }
+
+        .room-popup-btn {
+          width: 100%;
+        }
+      }
+
+      /* a animation for the popup */
+
+      @keyframes popupIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Popup Animation */
+
       @keyframes slideIn {
         from {
           opacity: 0;
@@ -482,14 +684,19 @@
       }
 
       .log-entry.websocket {
-        border-left-color: #ff6b6b;
-        background: rgba(255, 107, 107, 0.1);
+        border-left-color: #8fff0e;
+        background: rgba(0, 255, 200, 0.1);
       }
 
       .log-timestamp {
         color: var(--text-muted);
         font-size: 12px;
-        margin-right: 16px;
+        font-weight: 500;
+      }
+
+      .log-time {
+        color: var(--text-muted);
+        font-size: 12px;
         font-weight: 500;
       }
 
@@ -661,6 +868,38 @@
         <div class="audio-player-container">
           <audio id="player" autoplay></audio>
         </div>
+        <div class="room-popup-overlay" id="roomPopupOverlay">
+          <div class="room-popup" id="roomPopup">
+            <div class="room-popup-header">
+              <h3 class="room-popup-title">
+                🎵 New Room Request
+                <div class="room-popup-notification"></div>
+              </h3>
+            </div>
+            <div class="room-popup-content">
+              <div class="room-request-info">
+                <div class="room-name" id="roomPopupName">Room Name</div>
+                <div class="room-details" id="roomPopupDetails">
+                  A new audio streaming room has been requested.
+                </div>
+              </div>
+              <div class="room-popup-actions">
+                <button
+                  class="room-popup-btn dismiss"
+                  onclick="dismissRoomPopup()"
+                >
+                  Dismiss
+                </button>
+                <button
+                  class="room-popup-btn accept"
+                  onclick="acceptRoomRequest()"
+                >
+                  Accept
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -774,7 +1013,13 @@
           document.getElementById("wsMessages").textContent = wsMessageCount;
         }
 
-        const timestamp = new Date().toLocaleTimeString();
+        // const timestamp = new Date().toLocaleTimeString();
+        const now = new Date();
+        const timestamp = `${now.toLocaleTimeString()} [${now
+          .getMilliseconds()
+          .toString()
+          .padStart(3, "0")}]`;
+
         const logEntry = {
           timestamp,
           type,
@@ -890,15 +1135,23 @@
         logToConsole("success", "Logs exported successfully", null, "events");
       }
 
-    //   WebSocket connection
-        const ws = new WebSocket(
-          window.location.protocol.replace("http", "ws") +
-            "//" +
-            window.location.host +
-            "?ptpl=Ptpl123"
-        );
+      //   WebSocket connection
+      // const ws = new WebSocket(
+      //   window.location.protocol.replace("http", "ws") +
+      //     "//" +
+      //     window.location.host +
+      //     "?ptpl=Ptpl123"
+      // );
+      var url = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+        ? "https://stream.ajayos.in/?ptpl=Ptpl123"
+        : window.location.protocol.replace("http", "ws") +
+          "//" +
+          window.location.host +
+          "?ptpl=Ptpl123";
 
-    //   const ws = new WebSocket("https://stream.ajayos.in/?ptpl=Ptpl123");
+      console.log(url);
+
+      const ws = new WebSocket(url);
 
       const streamList = document.getElementById("streamSelect");
       const statusIndicator = document.getElementById("connectionStatus");
@@ -973,6 +1226,16 @@
             rooms.forEach((room) => {
               if (room.id === undefined) {
                 room.id = room.roomId;
+
+                // ###################################
+                // Example room data structure:
+                const exampleRoomData = {
+                  ...room,
+                  requester: room.requester || "Anonymous User",
+                  timestamp: new Date().toISOString(),
+                };
+
+                showRoomRequestPopup(exampleRoomData);
               }
             });
             updateStreamList();
@@ -1118,6 +1381,126 @@
           );
         }
       };
+
+      // ###################################################
+      let currentRoomRequest = null;
+      let popupTimeout = null;
+
+      // Show room request popup
+      function showRoomRequestPopup(roomData) {
+        currentRoomRequest = roomData;
+
+        // Update popup content
+        document.getElementById("roomPopupName").textContent =
+          roomData.name || "Unknown Room";
+        document.getElementById(
+          "roomPopupDetails"
+        ).textContent = `Request from: ${
+          roomData.requester || "Unknown"
+        }\nRoom ID: ${roomData.id || "N/A"}`;
+
+        // Show popup with animation
+        const overlay = document.getElementById("roomPopupOverlay");
+        const popup = document.getElementById("roomPopup");
+
+        overlay.classList.add("show");
+        popup.classList.add("show");
+
+        // Auto-dismiss after 15 seconds
+        popupTimeout = setTimeout(() => {
+          dismissRoomPopup();
+        }, 15000);
+
+        // Log the event
+        logToConsole(
+          "info",
+          `Room request popup shown: ${roomData.name}`,
+          roomData,
+          "events"
+        );
+      }
+
+      // Close popup when clicking overlay
+      document
+        .getElementById("roomPopupOverlay")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            dismissRoomPopup();
+          }
+        });
+
+      // Handle escape key
+      document.addEventListener("keydown", function (e) {
+        if (
+          e.key === "Escape" &&
+          document.getElementById("roomPopupOverlay").classList.contains("show")
+        ) {
+          dismissRoomPopup();
+        }
+      });
+
+      // Accept room request
+      function acceptRoomRequest() {
+        if (currentRoomRequest) {
+          // Set the selected value
+          streamList.value = currentRoomRequest.value;
+          streamList.id = currentRoomRequest.id;
+
+          // Trigger change event so your existing listener runs
+          streamList.dispatchEvent(new Event("change"));
+          // Send acceptance to server
+          //   const acceptMsg = {
+          //     type: "join-room",
+          //     roomId: currentRoomRequest.id,
+          //   };
+
+          //   if (ws.readyState === WebSocket.OPEN) {
+          //     ws.send(JSON.stringify(acceptMsg));
+          //     logToConsole(
+          //       "websocket",
+          //       "Sent: accept-room-request",
+          //       acceptMsg,
+          //       "websocket"
+          //     );
+          //   }
+
+        //   logToConsole(
+        //     "success",
+        //     `Accepted room request: ${currentRoomRequest.name}`,
+        //     currentRoomRequest,
+        //     "events"
+        //   );
+
+          // Show success toast
+          Toastify({
+            text: `Room "${currentRoomRequest.name}" accepted!`,
+            duration: 3000,
+            backgroundColor: "linear-gradient(135deg, #00ff88, #00e676)",
+          }).showToast();
+        }
+
+        dismissRoomPopup();
+      }
+
+      // Dismiss popup
+      function dismissRoomPopup() {
+        const overlay = document.getElementById("roomPopupOverlay");
+        const popup = document.getElementById("roomPopup");
+
+        overlay.classList.remove("show");
+        popup.classList.remove("show");
+
+        // Clear timeout
+        if (popupTimeout) {
+          clearTimeout(popupTimeout);
+          popupTimeout = null;
+        }
+
+        // Reset after animation completes
+        setTimeout(() => {
+          currentRoomRequest = null;
+        }, 400);
+      }
 
       // ###################################################
       let isPlaying = false;
@@ -1333,7 +1716,8 @@
         };
 
         const joinMsg = { type: "join-room", roomId: currentStream };
-        ws.send(JSON.stringify(joinMsg));
+        // set the drop down have the seleted item
+        streamList.ws.send(JSON.stringify(joinMsg));
         blinkDot("outDot");
         logToConsole("websocket", "Sent: join-room", joinMsg, "websocket");
         logToConsole(
