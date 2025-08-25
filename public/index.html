@@ -876,7 +876,7 @@
 
       const resetMediaSource = () => {
         if (mediaSource) {
-          mediaSource.endOfStream();
+          mediaSource?.endOfStream();
           mediaSource = null;
           logToConsole("info", "Media source reset");
         }
