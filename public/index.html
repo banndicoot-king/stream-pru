@@ -35,7 +35,8 @@
       }
 
       body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
         background: var(--darkest-bg);
         color: var(--text-primary);
         height: 100vh;
@@ -54,19 +55,19 @@
 
       .header {
         padding: 24px;
-        background: var(--primary-bg);
+        background: var(--darkest-bg);
         position: relative;
         overflow: hidden;
       }
 
       .header::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--darkest-bg);
         backdrop-filter: blur(10px);
         z-index: 1;
       }
@@ -110,8 +111,15 @@
       }
 
       @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.7; transform: scale(1.1); }
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.1);
+        }
       }
 
       .controls-section {
@@ -153,13 +161,18 @@
       }
 
       .theme-toggle::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
         transition: left 0.5s;
       }
 
@@ -209,7 +222,7 @@
       }
 
       .stat-card::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -269,12 +282,19 @@
         display: flex;
         flex-direction: column;
         background: var(--dark-bg);
+        overflow: hidden;
+        width: 100%;
       }
 
       .console-section {
         flex: 1;
-        display: flex;
-        flex-direction: column;
+        overflow-y: auto; /* scroll vertically */
+        padding: 12px 16px;
+        font-family: "SF Mono", monospace;
+        font-size: 12px;
+        line-height: 1.5;
+        background: var(--darkest-bg);
+        width: 100%;
       }
 
       .console-header {
@@ -342,10 +362,11 @@
         flex: 1;
         overflow-y: auto;
         padding: 24px 32px;
-        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-family: "JetBrains Mono", "Fira Code", monospace;
         font-size: 14px;
         line-height: 1.6;
         background: var(--darkest-bg);
+        border: 1px solid var(--border-color);
       }
 
       .log-entry {
@@ -422,12 +443,30 @@
         letter-spacing: 0.5px;
       }
 
-      .log-type.info { background: var(--info-color); color: white; }
-      .log-type.success { background: var(--success-color); color: var(--darkest-bg); }
-      .log-type.warning { background: var(--warning-color); color: var(--darkest-bg); }
-      .log-type.error { background: var(--error-color); color: white; }
-      .log-type.audio { background: var(--accent-color); color: var(--darkest-bg); }
-      .log-type.websocket { background: #ff6b6b; color: white; }
+      .log-type.info {
+        background: var(--info-color);
+        color: white;
+      }
+      .log-type.success {
+        background: var(--success-color);
+        color: var(--darkest-bg);
+      }
+      .log-type.warning {
+        background: var(--warning-color);
+        color: var(--darkest-bg);
+      }
+      .log-type.error {
+        background: var(--error-color);
+        color: white;
+      }
+      .log-type.audio {
+        background: var(--accent-color);
+        color: var(--darkest-bg);
+      }
+      .log-type.websocket {
+        background: #ff6b6b;
+        color: white;
+      }
 
       .log-message {
         color: var(--text-primary);
@@ -459,12 +498,20 @@
       }
 
       ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, var(--accent-color), var(--info-color));
+        background: linear-gradient(
+          135deg,
+          var(--accent-color),
+          var(--info-color)
+        );
         border-radius: 4px;
       }
 
       ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, var(--info-color), var(--accent-color));
+        background: linear-gradient(
+          135deg,
+          var(--info-color),
+          var(--accent-color)
+        );
       }
 
       /* Responsive */
@@ -473,16 +520,22 @@
           width: 100%;
           max-width: 350px;
         }
-        
+
         .stats-grid {
           grid-template-columns: 1fr;
         }
       }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   </head>
   <body>
@@ -499,7 +552,11 @@
 
       <div class="controls-section">
         <div class="section-title">Settings</div>
-        <button class="theme-toggle" onclick="toggleRoomCreation()" id="toggleRoomCreation">
+        <button
+          class="theme-toggle"
+          onclick="toggleRoomCreation()"
+          id="toggleRoomCreation"
+        >
           🎯 Enable Room Creation
         </button>
 
@@ -532,7 +589,9 @@
 
         <div class="current-stream">
           <div class="current-stream-label">Current Stream</div>
-          <div class="current-stream-name" id="currentStreamName">No stream selected</div>
+          <div class="current-stream-name" id="currentStreamName">
+            No stream selected
+          </div>
         </div>
       </div>
     </div>
@@ -541,13 +600,35 @@
       <div class="console-section">
         <div class="console-header">
           <div class="console-tabs">
-            <div class="console-tab active" data-tab="events" onclick="switchTab('events')">Events</div>
-            <div class="console-tab" data-tab="websocket" onclick="switchTab('websocket')">WebSocket</div>
-            <div class="console-tab" data-tab="audio" onclick="switchTab('audio')">Audio</div>
+            <div
+              class="console-tab active"
+              data-tab="events"
+              onclick="switchTab('events')"
+            >
+              Events
+            </div>
+            <div
+              class="console-tab"
+              data-tab="websocket"
+              onclick="switchTab('websocket')"
+            >
+              WebSocket
+            </div>
+            <div
+              class="console-tab"
+              data-tab="audio"
+              onclick="switchTab('audio')"
+            >
+              Audio
+            </div>
           </div>
           <div class="console-actions">
-            <button class="console-btn" onclick="clearConsole()">🗑️ Clear</button>
-            <button class="console-btn" onclick="exportLogs()">💾 Export</button>
+            <button class="console-btn" onclick="clearConsole()">
+              🗑️ Clear
+            </button>
+            <button class="console-btn" onclick="exportLogs()">
+              💾 Export
+            </button>
           </div>
         </div>
         <div class="console-content" id="consoleContent"></div>
@@ -558,22 +639,29 @@
       let messageCount = 0;
       let audioPacketCount = 0;
       let wsMessageCount = 0;
-      let currentTab = 'events';
+      let currentTab = "events";
       let logs = { events: [], websocket: [], audio: [] };
 
       function toggleRoomCreation() {
         const button = document.getElementById("toggleRoomCreation");
         const isEnabled = button.classList.toggle("enabled");
         var status = isEnabled ? 1 : 0;
-        button.textContent = isEnabled ? "🎯 Disable Room Creation" : "🎯 Enable Room Creation";
-        
+        button.textContent = isEnabled
+          ? "🎯 Disable Room Creation"
+          : "🎯 Enable Room Creation";
+
         fetch("/roomStart", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status }),
         }).then((response) => {
           if (!response.ok) {
-            logToConsole("error", "Room creation toggle failed", response, 'events');
+            logToConsole(
+              "error",
+              "Room creation toggle failed",
+              response,
+              "events"
+            );
             Toastify({
               text: "Error toggling room creation",
               duration: 3000,
@@ -581,24 +669,34 @@
             }).showToast();
             throw new Error("Network response was not ok");
           }
-          logToConsole("success", `Room creation ${isEnabled ? "enabled" : "disabled"} (server confirmed)`, null, 'events');
+          logToConsole(
+            "success",
+            `Room creation ${
+              isEnabled ? "enabled" : "disabled"
+            } (server confirmed)`,
+            null,
+            "events"
+          );
           Toastify({
             text: `Room creation ${isEnabled ? "enabled" : "disabled"}`,
             duration: 3000,
-            backgroundColor: isEnabled ? "linear-gradient(135deg, #00ff88, #00e676)" : "linear-gradient(135deg, #ffb800, #ffa726)",
+            backgroundColor: isEnabled
+              ? "linear-gradient(135deg, #00ff88, #00e676)"
+              : "linear-gradient(135deg, #ffb800, #ffa726)",
           }).showToast();
           return response.json();
         });
       }
 
-      function logToConsole(type, message, data = null, tab = 'events') {
+      function logToConsole(type, message, data = null, tab = "events") {
         messageCount++;
         document.getElementById("messageCount").textContent = messageCount;
-        
-        if (tab === 'audio') {
+
+        if (tab === "audio") {
           audioPacketCount++;
-          document.getElementById("audioPackets").textContent = audioPacketCount;
-        } else if (tab === 'websocket') {
+          document.getElementById("audioPackets").textContent =
+            audioPacketCount;
+        } else if (tab === "websocket") {
           wsMessageCount++;
           document.getElementById("wsMessages").textContent = wsMessageCount;
         }
@@ -608,11 +706,11 @@
           timestamp,
           type,
           message,
-          data
+          data,
         };
 
         logs[tab].push(logEntry);
-        
+
         if (currentTab === tab) {
           renderLogEntry(logEntry);
         }
@@ -625,7 +723,11 @@
 
         let logData = "";
         if (logEntry.data) {
-          logData = `<div class="log-data">${JSON.stringify(logEntry.data, null, 2)}</div>`;
+          logData = `<div class="log-data">${JSON.stringify(
+            logEntry.data,
+            null,
+            2
+          )}</div>`;
         }
 
         logDiv.innerHTML = `
@@ -641,48 +743,65 @@
 
       function switchTab(tab) {
         currentTab = tab;
-        
+
         // Update tab appearance
-        document.querySelectorAll('.console-tab').forEach(t => t.classList.remove('active'));
-        document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-        
+        document
+          .querySelectorAll(".console-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
+
         // Clear and reload content
         const consoleContent = document.getElementById("consoleContent");
         consoleContent.innerHTML = "";
-        
-        logs[tab].forEach(log => renderLogEntry(log));
+
+        logs[tab].forEach((log) => renderLogEntry(log));
       }
 
       function clearConsole() {
         logs[currentTab] = [];
         document.getElementById("consoleContent").innerHTML = "";
-        if (currentTab === 'events') {
+        if (currentTab === "events") {
           messageCount = 0;
           document.getElementById("messageCount").textContent = "0";
-        } else if (currentTab === 'audio') {
+        } else if (currentTab === "audio") {
           audioPacketCount = 0;
           document.getElementById("audioPackets").textContent = "0";
-        } else if (currentTab === 'websocket') {
+        } else if (currentTab === "websocket") {
           wsMessageCount = 0;
           document.getElementById("wsMessages").textContent = "0";
         }
-        logToConsole("info", `${currentTab.charAt(0).toUpperCase() + currentTab.slice(1)} console cleared`, null, currentTab);
+        logToConsole(
+          "info",
+          `${
+            currentTab.charAt(0).toUpperCase() + currentTab.slice(1)
+          } console cleared`,
+          null,
+          currentTab
+        );
       }
 
       function exportLogs() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
-        const downloadAnchorNode = document.createElement('a');
+        const dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(JSON.stringify(logs, null, 2));
+        const downloadAnchorNode = document.createElement("a");
         downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", `console-logs-${new Date().toISOString()}.json`);
+        downloadAnchorNode.setAttribute(
+          "download",
+          `console-logs-${new Date().toISOString()}.json`
+        );
         document.body.appendChild(downloadAnchorNode);
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
-        logToConsole("success", "Logs exported successfully", null, 'events');
+        logToConsole("success", "Logs exported successfully", null, "events");
       }
 
       // WebSocket connection
       const ws = new WebSocket(
-        window.location.protocol.replace("http", "ws") + "//" + window.location.host + "?ptpl=Ptpl123"
+        window.location.protocol.replace("http", "ws") +
+          "//" +
+          window.location.host +
+          "?ptpl=Ptpl123"
       );
 
       const streamList = document.getElementById("streamSelect");
@@ -694,22 +813,46 @@
       let rooms = [];
 
       ws.onopen = () => {
-        logToConsole("success", "WebSocket connection established", null, 'events');
-        logToConsole("websocket", "Connection opened", { event: "open" }, 'websocket');
+        logToConsole(
+          "success",
+          "WebSocket connection established",
+          null,
+          "events"
+        );
+        logToConsole(
+          "websocket",
+          "Connection opened",
+          { event: "open" },
+          "websocket"
+        );
         statusIndicator.classList.add("connected");
         statusText.textContent = "Connected";
 
         const userId = Math.random().toString(36).substr(2, 9);
-        const registerMsg = { type: "register-user", id: userId, name: "Professional Client" };
+        const registerMsg = {
+          type: "register-user",
+          id: userId,
+          name: "Professional Client",
+        };
         ws.send(JSON.stringify(registerMsg));
-        logToConsole("info", `Registered as user: ${userId}`, null, 'events');
-        logToConsole("websocket", "Sent: register-user", registerMsg, 'websocket');
+        logToConsole("info", `Registered as user: ${userId}`, null, "events");
+        logToConsole(
+          "websocket",
+          "Sent: register-user",
+          registerMsg,
+          "websocket"
+        );
       };
 
       ws.onmessage = (event) => {
         try {
           const { type, ...message } = JSON.parse(event.data);
-          logToConsole("websocket", `Received: ${type}`, { type, ...message }, 'websocket');
+          logToConsole(
+            "websocket",
+            `Received: ${type}`,
+            { type, ...message },
+            "websocket"
+          );
 
           if (type == "add-stream") {
             rooms = [...rooms, ...message.stream];
@@ -719,7 +862,12 @@
               }
             });
             updateStreamList();
-            logToConsole("success", `Added ${message.stream.length} stream(s)`, message.stream, 'events');
+            logToConsole(
+              "success",
+              `Added ${message.stream.length} stream(s)`,
+              message.stream,
+              "events"
+            );
           } else if (type == "remove-stream") {
             const roomId = message.stream[0].roomId;
             rooms = rooms.filter((room) => room.id !== roomId);
@@ -727,35 +875,74 @@
               stopStreaming();
             }
             updateStreamList();
-            logToConsole("warning", `Removed stream: ${roomId}`, null, 'events');
+            logToConsole(
+              "warning",
+              `Removed stream: ${roomId}`,
+              null,
+              "events"
+            );
           } else if (type == "audio-chunk") {
-            logToConsole("audio", "Audio chunk received", { 
-              size: message.chunk.data ? message.chunk.data.length : 'unknown',
-              type: message.chunk.type || 'standard'
-            }, 'audio');
+            logToConsole(
+              "audio",
+              "Audio chunk received",
+              {
+                size: message.chunk.data
+                  ? message.chunk.data.length
+                  : "unknown",
+                type: message.chunk.type || "standard",
+              },
+              "audio"
+            );
           } else if (type == "audio-chunk2") {
-            logToConsole("audio", "PCM audio chunk received", {
-              format: "PCM 8kHz",
-              size: message.chunk.data ? message.chunk.data.length : 'unknown'
-            }, 'audio');
+            logToConsole(
+              "audio",
+              "PCM audio chunk received",
+              {
+                format: "PCM 8kHz",
+                size: message.chunk.data
+                  ? message.chunk.data.length
+                  : "unknown",
+              },
+              "audio"
+            );
           } else if (type == "error") {
-            logToConsole("error", `Server error: ${message.error}`, message, 'events');
+            logToConsole(
+              "error",
+              `Server error: ${message.error}`,
+              message,
+              "events"
+            );
           }
         } catch (error) {
-          logToConsole("error", `Failed to parse message: ${error.message}`, { error: error.message, raw: event.data }, 'websocket');
+          logToConsole(
+            "error",
+            `Failed to parse message: ${error.message}`,
+            { error: error.message, raw: event.data },
+            "websocket"
+          );
         }
       };
 
       ws.onerror = (error) => {
-        logToConsole("error", "WebSocket connection error", error, 'events');
-        logToConsole("websocket", "WebSocket error", { error }, 'websocket');
+        logToConsole("error", "WebSocket connection error", error, "events");
+        logToConsole("websocket", "WebSocket error", { error }, "websocket");
         statusIndicator.classList.remove("connected");
         statusText.textContent = "Error";
       };
 
       ws.onclose = (e) => {
-        logToConsole("warning", "WebSocket connection closed", { code: e.code, reason: e.reason }, 'events');
-        logToConsole("websocket", "Connection closed", { code: e.code, reason: e.reason }, 'websocket');
+        logToConsole(
+          "warning",
+          "WebSocket connection closed",
+          { code: e.code, reason: e.reason },
+          "events"
+        );
+        logToConsole(
+          "websocket",
+          "Connection closed",
+          { code: e.code, reason: e.reason },
+          "websocket"
+        );
         statusIndicator.classList.remove("connected");
         statusText.textContent = "Disconnected";
       };
@@ -781,10 +968,19 @@
           stopStreaming();
           currentStream = selectedStream;
           if (currentStream) {
-            const selectedRoom = rooms.find((room) => room.id === currentStream);
-            currentStreamName.textContent = selectedRoom ? selectedRoom.name : "Unknown Stream";
+            const selectedRoom = rooms.find(
+              (room) => room.id === currentStream
+            );
+            currentStreamName.textContent = selectedRoom
+              ? selectedRoom.name
+              : "Unknown Stream";
             startStreaming();
-            logToConsole("info", `Selected stream: ${selectedRoom?.name || "Unknown"}`, selectedRoom, 'events');
+            logToConsole(
+              "info",
+              `Selected stream: ${selectedRoom?.name || "Unknown"}`,
+              selectedRoom,
+              "events"
+            );
           } else {
             currentStreamName.textContent = "No stream selected";
           }
@@ -794,19 +990,29 @@
       const startStreaming = async () => {
         if (!currentStream || ws.readyState !== WebSocket.OPEN) return;
 
-        logToConsole("info", `Starting stream: ${currentStream}`, null, 'events');
+        logToConsole(
+          "info",
+          `Starting stream: ${currentStream}`,
+          null,
+          "events"
+        );
         const joinMsg = { type: "join-room", roomId: currentStream };
         ws.send(JSON.stringify(joinMsg));
-        logToConsole("websocket", "Sent: join-room", joinMsg, 'websocket');
-        logToConsole("success", `Joined room: ${currentStream}`, null, 'events');
+        logToConsole("websocket", "Sent: join-room", joinMsg, "websocket");
+        logToConsole(
+          "success",
+          `Joined room: ${currentStream}`,
+          null,
+          "events"
+        );
       };
 
       const stopStreaming = () => {
         if (currentStream) {
           const leaveMsg = { type: "leave-room", roomId: currentStream };
           ws.send(JSON.stringify(leaveMsg));
-          logToConsole("websocket", "Sent: leave-room", leaveMsg, 'websocket');
-          logToConsole("info", `Left room: ${currentStream}`, null, 'events');
+          logToConsole("websocket", "Sent: leave-room", leaveMsg, "websocket");
+          logToConsole("info", `Left room: ${currentStream}`, null, "events");
           currentStream = null;
           currentStreamName.textContent = "No stream selected";
         }
@@ -820,9 +1026,14 @@
 
       // Initialize with a welcome message
       setTimeout(() => {
-        logToConsole("info", "Modern Audio Streaming Console initialized", null, 'events');
-        logToConsole("websocket", "WebSocket client ready", null, 'websocket');
-        logToConsole("audio", "Audio processing engine ready", null, 'audio');
+        logToConsole(
+          "info",
+          "Modern Audio Streaming Console initialized",
+          null,
+          "events"
+        );
+        logToConsole("websocket", "WebSocket client ready", null, "websocket");
+        logToConsole("audio", "Audio processing engine ready", null, "audio");
       }, 100);
     </script>
   </body>
