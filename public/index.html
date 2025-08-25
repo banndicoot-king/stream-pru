@@ -3,112 +3,608 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Audio Streaming</title>
+    <title>Live Audio Streaming - Professional Console</title>
     <style>
-      body {
-        display: flex;
-        height: 100vh;
+      :root {
+        --primary-bg: #0d1117;
+        --secondary-bg: #161b22;
+        --tertiary-bg: #21262d;
+        --accent-color: #58a6ff;
+        --success-color: #238636;
+        --warning-color: #d29922;
+        --error-color: #f85149;
+        --text-primary: #f0f6fc;
+        --text-secondary: #8b949e;
+        --border-color: #30363d;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        --glass-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+      }
+
+      [data-theme="light"] {
+        --primary-bg: #ffffff;
+        --secondary-bg: #f6f8fa;
+        --tertiary-bg: #f1f3f4;
+        --accent-color: #0969da;
+        --success-color: #1a7f37;
+        --warning-color: #9a6700;
+        --error-color: #d1242f;
+        --text-primary: #24292f;
+        --text-secondary: #656d76;
+        --border-color: #d0d7de;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        --glass-bg: rgba(0, 0, 0, 0.05);
+        --glass-border: rgba(0, 0, 0, 0.1);
+      }
+
+      * {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
       }
-      .stream-list {
-        width: 250px;
-        background-color: #f0f0f0;
-        padding: 10px;
-        overflow-y: auto;
+
+      body {
+        font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
+          monospace;
+        background: linear-gradient(
+          135deg,
+          var(--primary-bg) 0%,
+          var(--secondary-bg) 100%
+        );
+        color: var(--text-primary);
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
       }
-      h1 {
-        margin-top: 0;
-      }
-      select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 20px;
-        border-radius: 5px;
-      }
-      .audio-player-container {
-        flex-grow: 1;
-        background-color: #fff;
+
+      .sidebar {
+        width: 320px;
+        background: var(--tertiary-bg);
+        backdrop-filter: blur(20px);
+        border-right: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        box-shadow: var(--shadow);
+      }
+
+      .header {
         padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--glass-bg);
       }
-      .controls {
-        margin-top: 20px;
+
+      .header h1 {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--accent-color);
       }
-      button {
+
+      .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--error-color);
+        animation: pulse 2s infinite;
+      }
+
+      .status-dot.connected {
+        background: var(--success-color);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .controls-section {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+      }
+
+      .theme-toggle {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 16px;
+        font-size: 12px;
+      }
+
+      .theme-toggle:hover {
+        background: var(--glass-border);
+        transform: translateY(-1px);
+      }
+
+      .stream-select {
+        width: 100%;
+        padding: 12px;
+        background: var(--secondary-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 14px;
+        transition: all 0.2s ease;
+      }
+
+      .stream-select:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+      }
+
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .top-bar {
+        height: 60px;
+        background: var(--tertiary-bg);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+      }
+
+      .audio-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        background: var(--primary-bg);
+      }
+
+      .audio-player {
+        width: 100%;
+        max-width: 600px;
+        height: 60px;
+        background: var(--secondary-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        margin-bottom: 24px;
+      }
+
+      .player-controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .btn {
         padding: 10px 20px;
         border: none;
-        border-radius: 5px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
         cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: var(--accent-color);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+      }
+
+      .btn-secondary {
+        background: var(--glass-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+      }
+
+      .btn-secondary:hover {
+        background: var(--glass-border);
+      }
+
+      .console-section {
+        height: 300px;
+        background: var(--tertiary-bg);
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .console-header {
+        height: 40px;
+        background: var(--secondary-bg);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .console-tabs {
+        display: flex;
+        gap: 16px;
+      }
+
+      .console-tab {
+        padding: 8px 0;
+        cursor: pointer;
+        color: var(--text-secondary);
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+      }
+
+      .console-tab.active {
+        color: var(--accent-color);
+        border-bottom-color: var(--accent-color);
+      }
+
+      .console-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .console-btn {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+
+      .console-btn:hover {
+        background: var(--glass-bg);
+        color: var(--text-primary);
+      }
+
+      .console-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px 16px;
+        font-family: "SF Mono", monospace;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .log-entry {
+        margin-bottom: 8px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border-left: 3px solid transparent;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .log-entry.info {
+        background: rgba(88, 166, 255, 0.1);
+        border-left-color: var(--accent-color);
+      }
+
+      .log-entry.success {
+        background: rgba(35, 134, 54, 0.1);
+        border-left-color: var(--success-color);
+      }
+
+      .log-entry.warning {
+        background: rgba(210, 153, 34, 0.1);
+        border-left-color: var(--warning-color);
+      }
+
+      .log-entry.error {
+        background: rgba(248, 81, 73, 0.1);
+        border-left-color: var(--error-color);
+      }
+
+      .log-timestamp {
+        color: var(--text-secondary);
+        font-size: 11px;
+        margin-right: 12px;
+      }
+
+      .log-type {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 10px;
+        margin-right: 8px;
+        padding: 2px 6px;
+        border-radius: 3px;
+        background: var(--glass-bg);
+      }
+
+      .log-message {
+        color: var(--text-primary);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        transition: all 0.2s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--accent-color);
+        margin-bottom: 4px;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .volume-control {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .volume-slider {
+        flex: 1;
+        height: 4px;
+        background: var(--border-color);
+        border-radius: 2px;
+        outline: none;
+        -webkit-appearance: none;
+      }
+
+      .volume-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        background: var(--accent-color);
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* Scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--secondary-bg);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
       }
     </style>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
     />
-
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   </head>
-  <body>
-    <div class="stream-list">
-      <!-- A BUTTON TO ACTIVE AND DEACTIVE USING RADIO BOX 
-			<div class="controls">
-				<label>
-					<input
-						type="checkbox"
-						id="roomEnable"
-						onclick="toggleRoomCreation()"
-					/>
-					Enable Room creation
-				</label>
-			</div>
-			-->
-      <h1>Live Audio Streaming</h1>
-      <h2>Available Streams:</h2>
-      <select id="streamSelect">
-        <option value="">Select a stream</option>
-      </select>
+  <body data-theme="dark">
+    <div class="sidebar">
+      <div class="header">
+        <h1>🎵 Audio Stream Console</h1>
+        <div class="status-indicator">
+          <div class="status-dot" id="connectionStatus"></div>
+          <span id="statusText">Disconnected</span>
+        </div>
+      </div>
+
+      <div class="controls-section">
+        <div class="section-title">Settings</div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          🌓 Toggle Theme
+        </button>
+
+        <div class="section-title">Available Streams</div>
+        <select class="stream-select" id="streamSelect">
+          <option value="">Select a stream</option>
+        </select>
+      </div>
+
+      <div class="controls-section">
+        <div class="section-title">Statistics</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="streamCount">0</div>
+            <div class="stat-label">Streams</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="messageCount">0</div>
+            <div class="stat-label">Messages</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="audio-player-container">
-      <audio id="player" autoplay></audio>
-      <div id="micControls" class="controls" style="display: none"></div>
+    <div class="main-content">
+      <div class="top-bar">
+        <div>
+          <span id="currentStreamName">No stream selected</span>
+        </div>
+        <div class="player-controls">
+          <button class="btn btn-secondary" onclick="clearConsole()">
+            Clear Console
+          </button>
+        </div>
+      </div>
+
+      <div class="audio-section">
+        <audio class="audio-player" id="player" controls autoplay></audio>
+
+        <div class="volume-control">
+          <span>🔊</span>
+          <input
+            type="range"
+            class="volume-slider"
+            id="volumeSlider"
+            min="0"
+            max="100"
+            value="50"
+          />
+          <span id="volumeValue">50%</span>
+        </div>
+
+        <div class="player-controls" id="micControls" style="display: none">
+          <button class="btn btn-primary" id="micButton">🎤 Start Mic</button>
+          <button class="btn btn-secondary" onclick="stopStreaming()">
+            Disconnect
+          </button>
+        </div>
+      </div>
+
+      <div class="console-section">
+        <div class="console-header">
+          <div class="console-tabs">
+            <div class="console-tab active" data-tab="events">Events</div>
+            <div class="console-tab" data-tab="network">Network</div>
+            <div class="console-tab" data-tab="audio">Audio</div>
+          </div>
+          <div class="console-actions">
+            <button class="console-btn" onclick="clearConsole()" title="Clear">
+              🗑️
+            </button>
+            <button
+              class="console-btn"
+              onclick="toggleConsole()"
+              title="Collapse"
+            >
+              ⬇️
+            </button>
+          </div>
+        </div>
+        <div class="console-content" id="consoleContent"></div>
+      </div>
     </div>
 
     <script>
-      function toggleRoomCreation() {
-        const isActive = document.getElementById("roomEnable").checked;
-        console.log(isActive, "isActive");
-        var status = isActive ? 1 : 0;
-        // fetch to backend
-        fetch("/roomStart", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status }),
-        }).then((response) => {
-          if (!response.ok) {
-            // toostify error
-            Toastify({
-              text: "Error toggling room creation",
-              duration: 3000,
-              backgroundColor: "red",
-            }).showToast();
-            throw new Error("Network response was not ok");
-          }
-          // toostify success
-          Toastify({
-            text: `Room creation ${isActive ? "enabled" : "disabled"}`,
-            duration: 3000,
-            backgroundColor: isActive ? "green" : "orange",
-          }).showToast();
-          return response.json();
-        });
+      // Theme toggle functionality
+      function toggleTheme() {
+        const body = document.body;
+        const currentTheme = body.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        body.setAttribute("data-theme", newTheme);
+        logToConsole("info", `Theme switched to ${newTheme} mode`);
       }
+
+      // Console logging functionality
+      let messageCount = 0;
+
+      function logToConsole(type, message, data = null) {
+        messageCount++;
+        document.getElementById("messageCount").textContent = messageCount;
+
+        const consoleContent = document.getElementById("consoleContent");
+        const logEntry = document.createElement("div");
+        logEntry.className = `log-entry ${type}`;
+
+        const timestamp = new Date().toLocaleTimeString();
+        const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+
+        let logData = "";
+        if (data) {
+          logData = `<br><span style="color: var(--text-secondary); font-size: 11px;">${JSON.stringify(
+            data,
+            null,
+            2
+          )}</span>`;
+        }
+
+        logEntry.innerHTML = `
+          <span class="log-timestamp">${timestamp}</span>
+          <span class="log-type">${typeLabel}</span>
+          <span class="log-message">${message}</span>
+          ${logData}
+        `;
+
+        consoleContent.appendChild(logEntry);
+        consoleContent.scrollTop = consoleContent.scrollHeight;
+      }
+
+      function clearConsole() {
+        document.getElementById("consoleContent").innerHTML = "";
+        messageCount = 0;
+        document.getElementById("messageCount").textContent = "0";
+        logToConsole("info", "Console cleared");
+      }
+
+      // Volume control
+      const volumeSlider = document.getElementById("volumeSlider");
+      const volumeValue = document.getElementById("volumeValue");
+      const audioElement = document.getElementById("player");
+
+      volumeSlider.addEventListener("input", (e) => {
+        const volume = e.target.value;
+        audioElement.volume = volume / 100;
+        volumeValue.textContent = `${volume}%`;
+      });
+
+      // WebSocket connection
       const ws = new WebSocket(
         window.location.protocol.replace("http", "ws") +
           "//" +
@@ -117,7 +613,10 @@
       );
 
       const streamList = document.getElementById("streamSelect");
-      const audioElement = document.getElementById("player");
+      const statusIndicator = document.getElementById("connectionStatus");
+      const statusText = document.getElementById("statusText");
+      const currentStreamName = document.getElementById("currentStreamName");
+      const micControls = document.getElementById("micControls");
 
       let currentStream = null;
       let mediaSource = null;
@@ -131,45 +630,56 @@
       let isMicActive = false;
 
       ws.onopen = () => {
-        console.log("WebSocket connection established");
+        logToConsole("success", "WebSocket connection established");
+        statusIndicator.classList.add("connected");
+        statusText.textContent = "Connected";
+
+        const userId = Math.random().toString(36).substr(2, 9);
         ws.send(
           JSON.stringify({
             type: "register-user",
-            id: Math.random().toString(36).substr(2, 9),
-            name: "test",
+            id: userId,
+            name: "Professional Client",
           })
         );
+        logToConsole("info", `Registered as user: ${userId}`);
       };
 
       ws.onmessage = (event) => {
         try {
           const { type, ...message } = JSON.parse(event.data);
+          logToConsole("info", `Received: ${type}`, { type, ...message });
 
           if (type == "add-stream") {
             rooms = [...rooms, ...message.stream];
-            // in the room if any id undefined then check roomId then change id to roomId
             rooms.forEach((room) => {
               if (room.id === undefined) {
                 room.id = room.roomId;
               }
             });
             updateStreamList();
+            logToConsole("success", `Added ${message.stream.length} stream(s)`);
           } else if (type == "remove-stream") {
             const roomId = message.stream[0].roomId;
             rooms = rooms.filter((room) => room.id !== roomId);
             if (currentStream === roomId) {
               stopStreaming();
             }
-
             updateStreamList();
+            logToConsole("warning", `Removed stream: ${roomId}`);
           } else if (type == "audio-chunk") {
-            if (message.chunk.type == "audio-buffer" || false)
+            if (message.chunk.type == "audio-buffer" || false) {
               handleVoiceChunk(message.chunk.data);
-            else handleAudioChunk(message.chunk);
+              logToConsole("audio", "Received voice chunk");
+            } else {
+              handleAudioChunk(message.chunk);
+              logToConsole("audio", "Received audio chunk");
+            }
           } else if (type == "error") {
+            logToConsole("error", `Server error: ${message.error}`);
             alert(message.error);
           } else if (type == "audio-chunk2") {
-            console.log("message.chunkkk", message.chunk);
+            logToConsole("audio", "Processing PCM audio chunk");
 
             // Decode base64 to binary
             const binaryString = atob(message.chunk.data);
@@ -228,10 +738,10 @@
               // 8-bit PCM (64 kbps)
               finalPCM = rawPCM8;
             } else {
-              // Convert 8-bit values to 16-bit signed PCM
+                // Convert 8-bit values to 16-bit signed PCM
               const rawPCM16 = new Int16Array(rawPCM8.length);
               for (let i = 0; i < rawPCM8.length; i++) {
-                // Map [0,255] → [-32768,32767]
+                 // Map [0,255] → [-32768,32767]
                 rawPCM16[i] = (rawPCM8[i] - 128) << 8;
               }
               finalPCM = new Uint8Array(rawPCM16.buffer);
@@ -253,7 +763,7 @@
             const url = URL.createObjectURL(blob);
             const audio = new Audio(url);
             audio.play().catch((err) => {
-              console.error("Audio play failed:", err);
+              logToConsole("error", `Audio play failed: ${err.message}`);
             });
 
             audio.onended = () => {
@@ -261,21 +771,25 @@
             };
           }
         } catch (error) {
+          logToConsole("error", `Failed to parse message: ${error.message}`);
           return;
         }
       };
 
       ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
+        logToConsole("error", "WebSocket connection error", error);
+        statusIndicator.classList.remove("connected");
+        statusText.textContent = "Error";
       };
 
       ws.onclose = () => {
-        console.log("WebSocket connection closed");
+        logToConsole("warning", "WebSocket connection closed");
+        statusIndicator.classList.remove("connected");
+        statusText.textContent = "Disconnected";
       };
 
       // Update the list of available streams
       const updateStreamList = () => {
-        var val = currentStream ? currentStream : "";
         streamList.innerHTML = `<option value="">Select a stream</option>`;
         rooms.forEach((room) => {
           const option = document.createElement("option");
@@ -283,6 +797,9 @@
           option.textContent = room.name;
           streamList.appendChild(option);
         });
+
+        document.getElementById("streamCount").textContent = rooms.length;
+
         if (currentStream) {
           streamList.value = currentStream;
         }
@@ -295,9 +812,20 @@
           stopStreaming();
           currentStream = selectedStream;
           if (currentStream) {
+            const selectedRoom = rooms.find(
+              (room) => room.id === currentStream
+            );
+            currentStreamName.textContent = selectedRoom
+              ? selectedRoom.name
+              : "Unknown Stream";
             startStreaming();
-            micControls.style.display = "block";
+            micControls.style.display = "flex";
+            logToConsole(
+              "info",
+              `Selected stream: ${selectedRoom?.name || "Unknown"}`
+            );
           } else {
+            currentStreamName.textContent = "No stream selected";
             micControls.style.display = "none";
           }
         }
@@ -308,8 +836,6 @@
           type: "audio/webm",
         });
         const audioUrl = URL.createObjectURL(audioBlob);
-        console.log(data, "data");
-
         const audio = new Audio(audioUrl);
         audio.play();
         audio.onended = () => {
@@ -321,13 +847,12 @@
       const startStreaming = async () => {
         if (!currentStream || ws.readyState !== WebSocket.OPEN) return;
 
-        // Create a new MediaSource
+        logToConsole("info", `Starting stream: ${currentStream}`);
+
         if (mediaSource) {
           mediaSource.endOfStream();
         }
-        // const stream = await navigator.mediaDevices.getUserMedia({
-        //   audio: true,
-        // });
+
         mediaSource = new MediaSource();
         audioElement.src = URL.createObjectURL(mediaSource);
 
@@ -338,18 +863,17 @@
               appendToBuffer();
             }
           });
+          logToConsole("success", "Media source opened and buffer created");
         });
 
-        // Ensure playback starts only after setting the source
         audioElement.oncanplay = () => {
           audioElement.play().catch((err) => {
-            console.error("Error during playback:", err);
+            logToConsole("error", `Playback error: ${err.message}`);
           });
         };
 
-        // Join the selected stream
         ws.send(JSON.stringify({ type: "join-room", roomId: currentStream }));
-        console.log("Listening to stream:", currentStream);
+        logToConsole("success", `Joined room: ${currentStream}`);
       };
 
       // Handle incoming audio chunks
@@ -378,7 +902,9 @@
           ws.send(
             JSON.stringify({ type: "leave-room", roomId: currentStream })
           );
+          logToConsole("info", `Left room: ${currentStream}`);
           currentStream = null;
+          currentStreamName.textContent = "No stream selected";
         }
         resetMediaSource();
       };
@@ -387,6 +913,7 @@
         if (mediaSource) {
           mediaSource.endOfStream();
           mediaSource = null;
+          logToConsole("info", "Media source reset");
         }
       };
 
@@ -395,6 +922,11 @@
           ws.close();
         }
       });
+
+      // Initialize with a welcome message
+      setTimeout(() => {
+        logToConsole("info", "Audio Streaming Console initialized");
+      }, 100);
     </script>
   </body>
 </html>
