@@ -890,15 +890,15 @@
         logToConsole("success", "Logs exported successfully", null, "events");
       }
 
-      // WebSocket connection
-      //   const ws = new WebSocket(
-      //     window.location.protocol.replace("http", "ws") +
-      //       "//" +
-      //       window.location.host +
-      //       "?ptpl=Ptpl123"
-      //   );
+    //   WebSocket connection
+        const ws = new WebSocket(
+          window.location.protocol.replace("http", "ws") +
+            "//" +
+            window.location.host +
+            "?ptpl=Ptpl123"
+        );
 
-      const ws = new WebSocket("https://stream.ajayos.in/?ptpl=Ptpl123");
+    //   const ws = new WebSocket("https://stream.ajayos.in/?ptpl=Ptpl123");
 
       const streamList = document.getElementById("streamSelect");
       const statusIndicator = document.getElementById("connectionStatus");
