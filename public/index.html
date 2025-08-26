@@ -2,13 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://static.ajayos.in/favicon/favicon.ico"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Audio Streaming - Modern Console</title>
+    <title>🎵 Live Audio Streaming</title>
     <style>
       :root {
         --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --secondary-bg: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         --tertiary-bg: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --success-bg: linear-gradient(135deg, #00ff88 0%, #00e676 100%);
+        --warning-bg: linear-gradient(135deg, #ffb800 0%, #ffa726 100%);
+        --error-bg: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
         --dark-bg: #1a1a2e;
         --darker-bg: #16213e;
         --darkest-bg: #0f172a;
@@ -16,6 +24,7 @@
         --success-color: #00ff88;
         --warning-color: #ffb800;
         --error-color: #ff4757;
+        --accent-hover-color: #764ba2;
         --info-color: #7c4dff;
         --text-primary: #ffffff;
         --text-secondary: #94a3b8;
@@ -45,7 +54,7 @@
       }
 
       .left-panel {
-        width: 400px;
+        width: 300px;
         background: var(--darker-bg);
         border-right: 1px solid var(--border-color);
         display: flex;
@@ -54,9 +63,9 @@
       }
 
       .header {
-        padding: 18px;
-        align-items: center;
+        padding: 16px;
         background: var(--darkest-bg);
+        border-bottom: 1px solid var(--border-color);
         position: relative;
       }
 
@@ -77,9 +86,6 @@
         z-index: 2;
       }
 
-      .header-content {
-        position: relative;
-      }
       .header h1 {
         font-size: 15px;
         font-weight: 800;
@@ -88,24 +94,29 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
+
       .status-indicator {
         display: flex;
         align-items: center;
-        gap: 12px;
-        font-size: 14px;
+        gap: 8px;
+        font-size: 12px;
         font-weight: 500;
       }
+
       .status-dot {
-        width: 12px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         background: var(--error-color);
-        box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+        box-shadow: 0 0 8px rgba(255, 71, 87, 0.5);
+        transition: all 0.3s ease;
       }
+
       .status-dot.connected {
         background: var(--success-color);
-        box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
       }
+
       .status-dot2 {
         width: 12px;
         height: 10px;
@@ -155,6 +166,7 @@
         opacity: 1;
         box-shadow: 0 0 10px var(--accent-color);
       }
+
       .audio-status {
         font-size: 13px;
         margin-top: 8px;
@@ -183,31 +195,44 @@
       }
 
       .controls-section {
-        padding: 5px;
+        padding: 16px;
         border-bottom: 1px solid var(--border-color);
         background: var(--glass-bg);
         backdrop-filter: blur(20px);
       }
 
       .section-title {
-        font-size: 16px;
+        font-size: 12px;
         font-weight: 700;
-        margin-bottom: 16px;
-        color: var(--text-primary);
+        margin-bottom: 12px;
+        color: var(--text-secondary);
         text-transform: uppercase;
         letter-spacing: 1px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
 
-      .theme-toggle {
+      .settings-icon {
+        cursor: pointer;
+        font-size: 16px;
+        transition: transform 0.3s ease;
+      }
+
+      .settings-icon:hover {
+        transform: rotate(90deg);
+      }
+
+      .room-toggle {
         background: var(--tertiary-bg);
         border: none;
-        border-radius: 12px;
-        padding: 12px 20px;
+        border-radius: 8px;
+        padding: 10px 16px;
         color: var(--text-primary);
         cursor: pointer;
         transition: all 0.3s ease;
-        margin-bottom: 20px;
-        font-size: 14px;
+        margin-bottom: 16px;
+        font-size: 12px;
         font-weight: 600;
         width: 100%;
         box-shadow: var(--shadow-sm);
@@ -215,12 +240,12 @@
         overflow: hidden;
       }
 
-      .theme-toggle:hover {
+      .room-toggle:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-lg);
       }
 
-      .theme-toggle::before {
+      .room-toggle::before {
         content: "";
         position: absolute;
         top: 0;
@@ -236,105 +261,264 @@
         transition: left 0.5s;
       }
 
-      .theme-toggle:hover::before {
+      .room-toggle:hover::before {
         left: 100%;
       }
 
       .stream-select {
         width: 100%;
-        padding: 16px;
+        padding: 12px;
         background: var(--dark-bg);
-        border: 2px solid var(--border-color);
-        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
         color: var(--text-primary);
-        font-size: 16px;
+        font-size: 14px;
         transition: all 0.3s ease;
-        box-shadow: var(--shadow-sm);
       }
 
       .stream-select:focus {
         outline: none;
         border-color: var(--accent-color);
-        box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
+        box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
       }
 
-      .stats-section {
-        flex: 1;
-        padding: 24px;
+      .file-upload-section {
+        padding: 16px;
+        border-bottom: 1px solid var(--border-color);
       }
 
-      .stats-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        margin-bottom: 24px;
+      .file-input-wrapper {
+        position: relative;
+        margin-bottom: 12px;
       }
 
-      .stat-card {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 5px;
+      .file-input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .file-input-display {
+        background: var(--dark-bg);
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        padding: 20px;
         text-align: center;
         transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
+        cursor: pointer;
       }
 
-      .stat-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--secondary-bg);
+      .file-input-display:hover {
+        border-color: var(--accent-color);
+        background: rgba(0, 212, 255, 0.05);
       }
 
-      .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-xl);
-        background: rgba(255, 255, 255, 0.08);
+      .file-input-display.has-file {
+        border-color: var(--success-color);
+        background: rgba(0, 255, 136, 0.05);
       }
 
-      .stat-value {
-        font-size: 32px;
-        font-weight: 900;
-        background: var(--secondary-bg);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+      .file-icon {
+        font-size: 24px;
         margin-bottom: 8px;
+        display: block;
       }
 
-      .stat-label {
+      .file-text {
         font-size: 12px;
         color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        margin-bottom: 4px;
+      }
+
+      .file-name {
+        font-size: 11px;
+        color: var(--accent-color);
         font-weight: 600;
       }
 
-      .current-stream {
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .action-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .action-btn.clear {
+        background: var(--warning-bg);
+        color: var(--darkest-bg);
+      }
+
+      .action-btn.stop {
+        background: var(--success-bg);
+        color: var(--darkest-bg);
+      }
+
+      .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .stats-compact {
+        flex: 1;
+      }
+
+      .stats-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        padding: 8px 12px;
+        background: var(--glass-bg);
+        border-radius: 8px;
+        border: 2px solid transparent;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        overflow: hidden;
+      }
+
+      @keyframes blink-border {
+        0% {
+          border-color: var(--accent-color);
+          box-shadow: 0 0 6px var(--accent-color);
+        }
+        50% {
+          border-color: var(--accent-hover-color);
+          box-shadow: 0 0 14px var(--accent-hover-color);
+        }
+        100% {
+          border-color: var(--accent-color);
+          box-shadow: 0 0 6px var(--accent-color);
+        }
+      }
+
+      .stats-row::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: var(--accent-hover-color);
+        transform: scaleY(0);
+        transform-origin: top;
+        transition: transform 0.3s ease;
+        border-radius: 3px;
+      }
+
+      .stats-row:hover {
+        background: var(--glass-hover-bg);
+        transform: translateY(-2px);
+        animation: blink-border 1.2s infinite alternate;
+      }
+
+      .stats-row:hover::after {
+        transform: scaleY(1);
+      }
+
+      .stat-compact-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .stat-compact-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--accent-color);
+        text-align: right;
+      }
+
+      .stat-compact-label:hover {
+        color: var(--accent-hover-color);
+      }
+
+      .current-stream-compact {
         background: var(--glass-bg);
         border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 20px;
-        margin-top: 20px;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 12px;
+        text-align: center;
       }
 
       .current-stream-label {
-        font-size: 12px;
-        color: var(--text-secondary);
+        font-size: 10px;
+        color: var(--text-muted);
         text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
       }
 
       .current-stream-name {
-        font-size: 18px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 600;
         color: var(--accent-color);
+      }
+
+      .stream-action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 6px;
+      }
+
+      .stream-btn {
+        padding: 5px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.25s ease, background 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      }
+
+      .stream-btn.clear {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        color: #fff;
+      }
+      .stream-btn.clear:hover:not(:disabled) {
+        background: linear-gradient(135deg, #fda085 0%, #f6d365 100%);
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 4px 10px rgba(253, 160, 133, 0.4);
+      }
+
+      .stream-btn.done {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+      }
+      .stream-btn.done:hover:not(:disabled) {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 4px 12px rgba(118, 75, 162, 0.45);
+      }
+
+      .stream-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
       }
 
       .right-panel {
@@ -343,47 +527,51 @@
         flex-direction: column;
         background: var(--dark-bg);
         overflow: hidden;
-        width: 100%;
+      }
+
+      .stats-section2 {
+        padding: 10px;
+        background: var(--darker-bg);
+        border-bottom: 2px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
 
       .console-section {
         flex: 1;
-        overflow-y: auto; /* scroll vertically */
-        padding: 12px 16px;
-        font-family: "SF Mono", monospace;
-        font-size: 12px;
-        line-height: 1.5;
-        background: var(--darkest-bg);
-        width: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
 
       .console-header {
-        height: 70px;
+        height: 60px;
         background: var(--darker-bg);
         border-bottom: 2px solid var(--border-color);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 32px;
+        padding: 0 24px;
         box-shadow: var(--shadow-sm);
       }
 
       .console-tabs {
         display: flex;
-        gap: 32px;
+        gap: 24px;
       }
 
       .console-tab {
-        padding: 12px 0;
+        padding: 8px 0;
         cursor: pointer;
         color: var(--text-muted);
-        border-bottom: 3px solid transparent;
+        border-bottom: 2px solid transparent;
         transition: all 0.3s ease;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
-        position: relative;
       }
 
       .console-tab.active {
@@ -397,7 +585,7 @@
 
       .console-actions {
         display: flex;
-        gap: 12px;
+        gap: 8px;
       }
 
       .console-btn {
@@ -405,10 +593,10 @@
         border: 1px solid var(--glass-border);
         color: var(--text-secondary);
         cursor: pointer;
-        padding: 8px 16px;
-        border-radius: 8px;
+        padding: 6px 12px;
+        border-radius: 6px;
         transition: all 0.3s ease;
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 500;
       }
 
@@ -421,19 +609,22 @@
       .console-content {
         flex: 1;
         overflow-y: auto;
-        padding: 24px 32px;
+        padding: 20px 24px;
         font-family: "JetBrains Mono", "Fira Code", monospace;
-        font-size: 14px;
-        line-height: 1.6;
+        font-size: 13px;
+        line-height: 1.5;
         background: var(--darkest-bg);
         border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin: 16px;
+        box-shadow: var(--shadow-lg);
       }
 
       .log-entry {
-        margin-bottom: 12px;
-        padding: 12px 16px;
-        border-radius: 8px;
-        border-left: 4px solid transparent;
+        margin-bottom: 8px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border-left: 3px solid transparent;
         animation: slideIn 0.3s ease;
         transition: all 0.2s ease;
         background: var(--glass-bg);
@@ -441,29 +632,119 @@
       }
 
       .log-entry:hover {
-        transform: translateX(4px);
+        transform: translateX(2px);
         box-shadow: var(--shadow-sm);
       }
 
-      .popup {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 8px;
-        padding: 12px 16px;
-        box-shadow: var(--shadow-lg);
-        z-index: 1000;
+      .log-entry.info {
+        border-left-color: var(--info-color);
+        background: rgba(124, 77, 255, 0.1);
+      }
+      .log-entry.success {
+        border-left-color: var(--success-color);
+        background: rgba(0, 255, 136, 0.1);
+      }
+      .log-entry.warning {
+        border-left-color: var(--warning-color);
+        background: rgba(255, 184, 0, 0.1);
+      }
+      .log-entry.error {
+        border-left-color: var(--error-color);
+        background: rgba(255, 71, 87, 0.1);
+      }
+      .log-entry.audio {
+        border-left-color: var(--accent-color);
+        background: rgba(0, 212, 255, 0.1);
+      }
+      .log-entry.websocket {
+        border-left-color: #8fff0e;
+        background: rgba(0, 255, 200, 0.1);
+      }
+      .log-entry.files {
+        border-left-color: #ffc400;
+        background: rgba(179, 255, 0, 0.1);
+      }
+      .log-entry.events {
+        border-left-color: hsl(323, 80%, 51%);
+        background: rgba(24, 245, 142, 0.1);
+      }
+
+      .log-timestamp {
+        color: var(--text-muted);
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      .log-type {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 10px;
+        margin-right: 8px;
+        padding: 2px 6px;
+        border-radius: 3px;
+        letter-spacing: 0.5px;
+      }
+
+      .log-type.info {
+        background: var(--info-color);
+        color: white;
+      }
+      .log-type.success {
+        background: var(--success-color);
+        color: var(--darkest-bg);
+      }
+      .log-type.warning {
+        background: var(--warning-color);
+        color: var(--darkest-bg);
+      }
+      .log-type.error {
+        background: var(--error-color);
+        color: white;
+      }
+      .log-type.audio {
+        background: var(--accent-color);
+        color: var(--darkest-bg);
+      }
+      .log-type.websocket {
+        background: #ff6b6b;
+        color: white;
+      }
+      .log-type.files {
+        background: #ff0080;
+        color: white;
+      }
+      .log-type.events {
+        background: #0afff3;
+        color: white;
+      }
+
+      .log-message {
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+
+      .log-data {
+        margin-top: 6px;
+        padding: 6px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 3px;
+        font-size: 11px;
+        color: var(--text-secondary);
+        overflow-x: auto;
       }
 
       .room-popup-overlay {
         position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
         z-index: 9999;
         opacity: 0;
         visibility: hidden;
         transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
       }
 
       .room-popup-overlay.show {
@@ -473,7 +754,7 @@
 
       .room-popup {
         position: fixed;
-        bottom: -300px;
+        bottom: -400px;
         left: 50%;
         transform: translateX(-50%);
         width: 400px;
@@ -487,36 +768,45 @@
       }
 
       .room-popup.show {
-        bottom: 30px;
+        bottom: 50px;
+        animation: ringAnimation 1s ease-in-out infinite;
+      }
+
+      @keyframes ringAnimation {
+        0% {
+          transform: translateX(-50%) scale(1);
+        }
+        10% {
+          transform: translateX(-50%) scale(1.05) rotate(2deg);
+        }
+        20% {
+          transform: translateX(-50%) scale(1) rotate(-2deg);
+        }
+        30% {
+          transform: translateX(-50%) scale(1.05) rotate(2deg);
+        }
+        40% {
+          transform: translateX(-50%) scale(1) rotate(0);
+        }
+        100% {
+          transform: translateX(-50%) scale(1);
+        }
       }
 
       .room-popup-header {
-        background: var(--primary-bg);
+        background: var(--secondary-bg);
         padding: 16px 20px;
         position: relative;
       }
 
-      .room-popup-header::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-      }
-
       .room-popup-title {
-        position: relative;
-        z-index: 2;
         font-size: 18px;
         font-weight: 700;
         color: var(--text-primary);
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
       }
 
       .room-popup-content {
@@ -528,7 +818,7 @@
       }
 
       .room-name {
-        font-size: 16px;
+        font-size: 18px;
         font-weight: 600;
         color: var(--accent-color);
         margin-bottom: 8px;
@@ -581,76 +871,141 @@
         transform: translateY(-1px);
       }
 
-      .room-popup-btn.dismiss {
+      /* New popup for settings */
+      .settings-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+      }
+
+      .settings-popup-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .settings-popup {
+        position: fixed;
+        bottom: -400px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        background: var(--darker-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: var(--shadow-xl);
+        z-index: 10000;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        overflow: hidden;
+      }
+
+      .settings-popup.show {
+        bottom: 50px;
+      }
+
+      .settings-popup-header {
+        background: var(--primary-bg);
+        padding: 16px 20px;
+        position: relative;
+      }
+
+      .settings-popup-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .settings-popup-content {
+        padding: 20px;
+      }
+
+      .settings-input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 16px;
+        background: var(--dark-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 14px;
+      }
+
+      .settings-popup-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+
+      .settings-popup-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 80px;
+      }
+
+      .settings-popup-btn.submit {
+        background: var(--success-color);
+        color: var(--darkest-bg);
+      }
+
+      .settings-popup-btn.submit:hover {
+        background: #00e676;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+      }
+
+      .settings-popup-btn.cancel {
         background: var(--glass-bg);
-        color: var(--text-secondary);
+        color: var(--text-primary);
         border: 1px solid var(--border-color);
       }
 
-      .room-popup-btn.dismiss:hover {
-        background: var(--glass-border);
-        color: var(--text-primary);
+      .settings-popup-btn.cancel:hover {
+        background: var(--error-color);
+        border-color: var(--error-color);
+        transform: translateY(-1px);
       }
 
-      /* Notification dot animation */
-      .room-popup-notification {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 12px;
-        height: 12px;
-        background: var(--success-color);
-        border-radius: 50%;
-        animation: notificationPulse 2s infinite;
+      .upload-progress {
+        margin-top: 8px;
+        height: 4px;
+        background: var(--dark-bg);
+        border-radius: 2px;
+        overflow: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease;
       }
 
-      @keyframes notificationPulse {
-        0%,
-        100% {
-          opacity: 1;
-          transform: scale(1);
-        }
-        50% {
-          opacity: 0.7;
-          transform: scale(1.2);
-        }
+      .upload-progress.show {
+        opacity: 1;
       }
 
-      /* Mobile responsive */
-      @media (max-width: 480px) {
-        .room-popup {
-          width: 90%;
-          max-width: 350px;
-        }
-
-        .room-popup-actions {
-          flex-direction: column;
-        }
-
-        .room-popup-btn {
-          width: 100%;
-        }
+      .upload-progress-bar {
+        height: 100%;
+        background: var(--success-bg);
+        width: 0%;
+        transition: width 0.3s ease;
       }
-
-      /* a animation for the popup */
-
-      @keyframes popupIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Popup Animation */
 
       @keyframes slideIn {
         from {
           opacity: 0;
-          transform: translateX(-20px);
+          transform: translateX(-10px);
         }
         to {
           opacity: 1;
@@ -658,121 +1013,37 @@
         }
       }
 
-      .log-entry.info {
-        border-left-color: var(--info-color);
-        background: rgba(124, 77, 255, 0.1);
-      }
-
-      .log-entry.success {
-        border-left-color: var(--success-color);
-        background: rgba(0, 255, 136, 0.1);
-      }
-
-      .log-entry.warning {
-        border-left-color: var(--warning-color);
-        background: rgba(255, 184, 0, 0.1);
-      }
-
-      .log-entry.error {
-        border-left-color: var(--error-color);
-        background: rgba(255, 71, 87, 0.1);
-      }
-
-      .log-entry.audio {
-        border-left-color: var(--accent-color);
-        background: rgba(0, 212, 255, 0.1);
-      }
-
-      .log-entry.websocket {
-        border-left-color: #8fff0e;
-        background: rgba(0, 255, 200, 0.1);
-      }
-
-      .log-timestamp {
-        color: var(--text-muted);
-        font-size: 12px;
-        font-weight: 500;
-      }
-
-      .log-time {
-        color: var(--text-muted);
-        font-size: 12px;
-        font-weight: 500;
-      }
-
-      .log-type {
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 11px;
-        margin-right: 12px;
-        padding: 4px 8px;
-        border-radius: 4px;
-        letter-spacing: 0.5px;
-      }
-
-      .log-type.info {
-        background: var(--info-color);
-        color: white;
-      }
-      .log-type.success {
-        background: var(--success-color);
-        color: var(--darkest-bg);
-      }
-      .log-type.warning {
-        background: var(--warning-color);
-        color: var(--darkest-bg);
-      }
-      .log-type.error {
-        background: var(--error-color);
-        color: white;
-      }
-      .log-type.audio {
-        background: var(--accent-color);
-        color: var(--darkest-bg);
-      }
-      .log-type.websocket {
-        background: #ff6b6b;
-        color: white;
-      }
-
-      .log-message {
-        color: var(--text-primary);
-        font-weight: 500;
-      }
-
-      .log-data {
-        margin-top: 8px;
-        padding: 8px;
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 4px;
-        font-size: 12px;
-        color: var(--text-secondary);
-        overflow-x: auto;
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.1);
+        }
       }
 
       .hidden {
         display: none !important;
       }
 
-      /* Custom Scrollbar */
       ::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
       }
-
       ::-webkit-scrollbar-track {
         background: var(--darkest-bg);
-        border-radius: 4px;
+        border-radius: 3px;
       }
-
       ::-webkit-scrollbar-thumb {
         background: linear-gradient(
           135deg,
           var(--accent-color),
           var(--info-color)
         );
-        border-radius: 4px;
+        border-radius: 3px;
       }
-
       ::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(
           135deg,
@@ -781,15 +1052,30 @@
         );
       }
 
-      /* Responsive */
       @media (max-width: 768px) {
         .left-panel {
           width: 100%;
+          max-width: 280px;
+        }
+        .room-popup {
+          width: 90%;
           max-width: 350px;
         }
-
-        .stats-grid {
-          grid-template-columns: 1fr;
+        .room-popup-actions {
+          flex-direction: column;
+        }
+        .room-popup-btn {
+          width: 100%;
+        }
+        .settings-popup {
+          width: 90%;
+          max-width: 350px;
+        }
+        .settings-popup-actions {
+          flex-direction: column;
+        }
+        .settings-popup-btn {
+          width: 100%;
         }
       }
     </style>
@@ -823,87 +1109,136 @@
       </div>
 
       <div class="controls-section">
-        <div class="section-title">Settings</div>
+        <div class="section-title">🎮 Room Control</div>
         <button
-          class="theme-toggle"
+          class="room-toggle"
           onclick="toggleRoomCreation()"
           id="toggleRoomCreation"
         >
           🎯 Enable Room Creation
         </button>
 
-        <div class="section-title">Available Streams</div>
+        <div class="section-title">📻 Available Streams</div>
         <select class="stream-select" id="streamSelect">
-          <option value="">Select a stream</option>
+          <option value="">Select a stream 🎧</option>
         </select>
+
+        <div class="stats-compact">
+          <div class="current-stream-compact">
+            <div class="current-stream-label">🎶 Current Stream</div>
+            <div class="current-stream-name" id="currentStreamName">
+              No stream selected
+            </div>
+
+            <div class="stream-action-buttons">
+              <button
+                class="stream-btn clear"
+                id="clearStreamBtn"
+                onclick="clearSelectedStream()"
+                disabled
+              >
+                🗑️ Clear
+              </button>
+              <button
+                class="stream-btn done"
+                id="stopStreamBtn"
+                onclick="sendStopSelectedStream()"
+                disabled
+              >
+                ⏹️ Stop
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="stats-section">
-        <div class="section-title">Statistics</div>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value" id="streamCount">0</div>
-            <div class="stat-label">Active Streams</div>
+      <div class="file-upload-section">
+        <div class="section-title">
+          📂 File Upload
+          <span class="settings-icon" onclick="openUploadSettings()">⚙️</span>
+        </div>
+        <div class="file-input-wrapper">
+          <input
+            type="file"
+            class="file-input"
+            id="fileInput"
+            accept="audio/*,.mp3,.wav,.ogg,.flac,.m4a"
+            multiple
+          />
+          <div class="file-input-display" id="fileInputDisplay">
+            <span class="file-icon">🎵</span>
+            <div class="file-text">Click to select audio files 🎤</div>
+            <div class="file-name" id="fileName"></div>
           </div>
-          <div class="stat-card">
-            <div class="stat-value" id="messageCount">0</div>
-            <div class="stat-label">Total Messages</div>
+          <div class="upload-progress" id="uploadProgress">
+            <div class="upload-progress-bar" id="uploadProgressBar"></div>
           </div>
-          <div class="stat-card">
-            <div class="stat-value" id="audioPackets">0</div>
-            <div class="stat-label">Audio Packets</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="wsMessages">0</div>
-            <div class="stat-label">WebSocket Messages</div>
-          </div>
+        </div>
+        <div class="action-buttons">
+          <button
+            class="action-btn clear"
+            onclick="clearFileSelection()"
+            id="clearBtn"
+            disabled
+          >
+            🗑️ Clear
+          </button>
+          <button
+            class="action-btn done"
+            onclick="uploadFiles()"
+            id="doneBtn"
+            disabled
+          >
+            🚀 Upload
+          </button>
         </div>
 
-        <div class="current-stream">
-          <div class="current-stream-label">Current Stream</div>
-          <div class="current-stream-name" id="currentStreamName">
-            No stream selected
-          </div>
-        </div>
         <div class="audio-player-container">
           <audio id="player" autoplay></audio>
         </div>
-        <div class="room-popup-overlay" id="roomPopupOverlay">
-          <div class="room-popup" id="roomPopup">
-            <div class="room-popup-header">
-              <h3 class="room-popup-title">
-                🎵 New Room Request
-                <div class="room-popup-notification"></div>
-              </h3>
-            </div>
-            <div class="room-popup-content">
-              <div class="room-request-info">
-                <div class="room-name" id="roomPopupName">Room Name</div>
-                <div class="room-details" id="roomPopupDetails">
-                  A new audio streaming room has been requested.
-                </div>
-              </div>
-              <div class="room-popup-actions">
-                <button
-                  class="room-popup-btn dismiss"
-                  onclick="dismissRoomPopup()"
-                >
-                  Dismiss
-                </button>
-                <button
-                  class="room-popup-btn accept"
-                  onclick="acceptRoomRequest()"
-                >
-                  Accept
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+
+        <audio id="callTone" autoplay muted loop>
+          <source
+            src="https://github.com/ajay-o-s/static-assets/raw/refs/heads/master/audio/stream/bell.mp3"
+            type="audio/mpeg"
+          />
+        </audio>
       </div>
     </div>
 
     <div class="right-panel">
+      <div class="stats-section2">
+        <div class="stats-row">
+          <span class="stat-compact-label">📡 Active Streams&nbsp;&nbsp;</span>
+          <span class="stat-compact-value" id="streamCount">&nbsp;0&nbsp;</span>
+        </div>
+        <div class="stats-row">
+          <span class="stat-compact-label">💬 Total Messages&nbsp;&nbsp;</span>
+          <span class="stat-compact-value" id="messageCount"
+            >&nbsp;0&nbsp;</span
+          >
+        </div>
+        <div class="stats-row">
+          <span class="stat-compact-label">🎵 Audio Packets&nbsp;&nbsp;</span>
+          <span class="stat-compact-value" id="audioPackets"
+            >&nbsp;0&nbsp;</span
+          >
+        </div>
+        <div class="stats-row">
+          <span class="stat-compact-label"
+            >🌐 WebSocket Messages&nbsp;&nbsp;</span
+          >
+          <span class="stat-compact-value" id="wsMessages">&nbsp;0&nbsp;</span>
+        </div>
+        <div class="stats-row">
+          <span class="stat-compact-label">📤 Files Uploaded&nbsp;&nbsp;</span>
+          <span class="stat-compact-value" id="fileUploadCount"
+            >&nbsp;0&nbsp;</span
+          >
+        </div>
+        <div class="stats-row"></div>
+        <div class="stats-row"></div>
+      </div>
       <div class="console-section">
         <div class="console-header">
           <div class="console-tabs">
@@ -912,21 +1247,28 @@
               data-tab="events"
               onclick="switchTab('events')"
             >
-              Events
+              📅 Events
             </div>
             <div
               class="console-tab"
               data-tab="websocket"
               onclick="switchTab('websocket')"
             >
-              WebSocket
+              🌐 WebSocket
             </div>
             <div
               class="console-tab"
               data-tab="audio"
               onclick="switchTab('audio')"
             >
-              Audio
+              🎧 Audio
+            </div>
+            <div
+              class="console-tab"
+              data-tab="files"
+              onclick="switchTab('files')"
+            >
+              📂 Files
             </div>
           </div>
           <div class="console-actions">
@@ -942,64 +1284,372 @@
       </div>
     </div>
 
+    <div class="room-popup-overlay" id="roomPopupOverlay">
+      <div class="room-popup" id="roomPopup">
+        <div class="room-popup-header">
+          <h3 class="room-popup-title">📞 Incoming Streaming Request</h3>
+        </div>
+        <div class="room-popup-content">
+          <div class="room-request-info">
+            <div class="room-name" id="roomPopupName">Room Name</div>
+            <div class="room-details" id="roomPopupDetails">
+              A new audio streaming room has been requested.
+            </div>
+          </div>
+          <div class="room-popup-actions">
+            <button class="room-popup-btn decline" onclick="dismissRoomPopup()">
+              ❌ Decline
+            </button>
+            <button class="room-popup-btn accept" onclick="acceptRoomRequest()">
+              ✅ Accept
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-popup-overlay" id="uploadSettingsOverlay">
+      <div class="settings-popup" id="uploadSettingsPopup">
+        <div class="settings-popup-header">
+          <h3 class="settings-popup-title">⚙️ Upload Settings</h3>
+        </div>
+        <div class="settings-popup-content">
+          <label for="packetSize">Packet Size (KB):</label>
+          <input
+            type="number"
+            id="packetSize"
+            class="settings-input"
+            value="64"
+            min="1"
+          />
+          <div class="settings-popup-actions">
+            <button
+              class="settings-popup-btn cancel"
+              onclick="dismissUploadSettings()"
+            >
+              ❌ Cancel
+            </button>
+            <button
+              class="settings-popup-btn submit"
+              onclick="submitUploadSettings()"
+            >
+              ✅ Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
+      // Application State
       let messageCount = 0;
       let audioPacketCount = 0;
       let wsMessageCount = 0;
+      let fileUploadCount = 0;
       let currentTab = "events";
-      let logs = { events: [], websocket: [], audio: [] };
-
+      let logs = { events: [], websocket: [], audio: [], files: [] };
+      let selectedFiles = [];
+      let currentStream = null;
+      let rooms = [];
+      let ws = null;
+      let currentRoomRequest = null;
+      let popupTimeout = null;
       let mediaSource = null;
       let sourceBuffer = null;
       let audioQueue = [];
       let isBuffering = false;
+      let isPlaying = false;
+      let chunkSize = 64 * 1024; // Default chunk size
 
-      function toggleRoomCreation() {
-        const button = document.getElementById("toggleRoomCreation");
-        const isEnabled = button.classList.toggle("enabled");
-        var status = isEnabled ? 1 : 0;
-        button.textContent = isEnabled
-          ? "🎯 Disable Room Creation"
-          : "🎯 Enable Room Creation";
+      // DOM Elements
+      const streamList = document.getElementById("streamSelect");
+      const statusIndicator = document.getElementById("connectionStatus");
+      const statusIndicator2 = document.getElementById("connectionStatus2");
+      const statusText = document.getElementById("statusText");
+      const currentStreamName = document.getElementById("currentStreamName");
+      const clearStreamBtn = document.getElementById("clearStreamBtn");
+      const doneStreamBtn = document.getElementById("stopStreamBtn");
+      const audioElement = document.getElementById("player");
+      const audioStatus = document.getElementById("audioStatus");
+      const fileInput = document.getElementById("fileInput");
 
-        fetch("/roomStart", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status }),
-        }).then((response) => {
-          if (!response.ok) {
-            logToConsole(
-              "error",
-              "Room creation toggle failed",
-              response,
-              "events"
-            );
-            Toastify({
-              text: "Error toggling room creation",
-              duration: 3000,
-              backgroundColor: "linear-gradient(135deg, #ff4757, #ff3742)",
-            }).showToast();
-            throw new Error("Network response was not ok");
-          }
+      // Audio Event Listeners
+      audioElement.addEventListener("play", () => {
+        audioStatus.textContent = "🎵 Playing Audio";
+        blinkDot2("audio");
+      });
+      audioElement.addEventListener("pause", () => {
+        audioStatus.textContent = "⏸️ Paused";
+      });
+      audioElement.addEventListener("ended", () => {
+        audioStatus.textContent = "🔇 Ended";
+      });
+
+      // Initialize WebSocket connection
+      function initializeWebSocket() {
+        const url = ["localhost", "127.0.0.1"].includes(
+          window.location.hostname
+        )
+          ? "wss://stream.ajayos.in/?ptpl=Ptpl123"
+          : window.location.protocol.replace("http", "ws") +
+            "//" +
+            window.location.host +
+            "?ptpl=Ptpl123";
+
+        ws = new WebSocket(url);
+        console.log(`🌐 WebSocket connecting to: ${url}`);
+
+        ws.onopen = () => {
           logToConsole(
             "success",
-            `Room creation ${
-              isEnabled ? "enabled" : "disabled"
-            } (server confirmed)`,
+            "✅ WebSocket connection established",
             null,
             "events"
           );
-          Toastify({
-            text: `Room creation ${isEnabled ? "enabled" : "disabled"}`,
-            duration: 3000,
-            backgroundColor: isEnabled
-              ? "linear-gradient(135deg, #00ff88, #00e676)"
-              : "linear-gradient(135deg, #ffb800, #ffa726)",
-          }).showToast();
-          return response.json();
-        });
+          logToConsole(
+            "websocket",
+            "🌐 Connection opened",
+            { event: "open" },
+            "websocket"
+          );
+          updateConnectionStatus(true);
+          blinkIODot("out");
+
+          const userId = Math.random().toString(36).substr(2, 9);
+          const registerMsg = {
+            type: "register-user",
+            id: userId,
+            name: "Professional Client",
+          };
+          sendWebSocketMessage(registerMsg);
+          logToConsole(
+            "info",
+            `👤 Registered as user: ${userId}`,
+            null,
+            "events"
+          );
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const { type, ...message } = JSON.parse(event.data);
+            blinkIODot("in");
+            logToConsole(
+              "websocket",
+              `📥 Received: ${type}`,
+              { type, ...message },
+              "websocket"
+            );
+
+            handleWebSocketMessage(type, message);
+          } catch (error) {
+            logToConsole(
+              "error",
+              `❌ Failed to parse message: ${error.message}`,
+              { error: error.message, raw: event.data },
+              "websocket"
+            );
+          }
+        };
+
+        ws.onerror = (error) => {
+          logToConsole(
+            "error",
+            "❌ WebSocket connection error",
+            error,
+            "events"
+          );
+          logToConsole(
+            "websocket",
+            "❌ WebSocket error",
+            { error },
+            "websocket"
+          );
+          updateConnectionStatus(false);
+        };
+
+        ws.onclose = (e) => {
+          logToConsole(
+            "warning",
+            "⚠️ WebSocket connection closed",
+            { code: e.code, reason: e.reason },
+            "events"
+          );
+          logToConsole(
+            "websocket",
+            "🌐 Connection closed",
+            { code: e.code, reason: e.reason },
+            "websocket"
+          );
+          updateConnectionStatus(false);
+        };
       }
 
+      // call tone play
+      function playCallTone() {
+        const audio = document.getElementById("callTone");
+        audio.muted = false;
+      }
+
+      // call tone stop
+      function stopCallTone() {
+        const audio = document.getElementById("callTone");
+        audio.muted = true;
+        audio.currentTime = 0; // rewind
+      }
+
+      // Handle WebSocket messages
+      function handleWebSocketMessage(type, message) {
+        switch (type) {
+          case "add-stream":
+            rooms = [...rooms, ...message.stream];
+            message.stream.forEach((room) => {
+              if (room.id === undefined) {
+                room.id = room.roomId;
+                showRoomRequestPopup({
+                  ...room,
+                  requester: room.requester || "Anonymous User",
+                  timestamp: new Date().toISOString(),
+                });
+              }
+            });
+            updateStreamList();
+            logToConsole(
+              "success",
+              `✅ Added ${message.stream.length} stream(s)`,
+              message.stream,
+              "events"
+            );
+            break;
+
+          case "remove-stream":
+            const roomId = message.stream[0].roomId;
+            rooms = rooms.filter((room) => room.id !== roomId);
+            if (currentStream === roomId) {
+              stopStreaming();
+            }
+            updateStreamList();
+            logToConsole(
+              "warning",
+              `⚠️ Removed stream: ${roomId}`,
+              null,
+              "events"
+            );
+            break;
+
+          case "audio-chunk":
+            logToConsole(
+              "audio",
+              "🎵 Audio chunk received",
+              {
+                size: message.chunk.data
+                  ? message.chunk.data.length
+                  : "unknown",
+                type: message.chunk.type || "standard",
+              },
+              "audio"
+            );
+            handleAudioChunk(message.chunk);
+            break;
+
+          case "audio-chunk2":
+            logToConsole(
+              "audio",
+              "🎧 PCM audio chunk received",
+              {
+                format: "PCM 16kHz",
+                size: message.chunk.data
+                  ? message.chunk.data.length
+                  : "unknown",
+              },
+              "audio"
+            );
+            handlePCMAudioChunk(message.chunk);
+            break;
+
+          case "file-upload-response":
+            logToConsole(
+              "files",
+              "📤 File upload response received",
+              message,
+              "files"
+            );
+            handleFileUploadResponse(message);
+            break;
+
+          case "error":
+            logToConsole(
+              "error",
+              `❌ Server error: ${message.error}`,
+              message,
+              "events"
+            );
+            showToast(`❌ Server error: ${message.error}`, "error");
+            break;
+
+          default:
+            logToConsole(
+              "info",
+              `ℹ️ Unknown message type: ${type}`,
+              message,
+              "events"
+            );
+        }
+      }
+
+      // Send WebSocket message
+      function sendWebSocketMessage(message, isJson = true) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(isJson ? JSON.stringify(message) : message);
+          blinkIODot("out");
+          logToConsole(
+            "websocket",
+            `📤 Sent: ${message.type}`,
+            message,
+            "websocket"
+          );
+          return true;
+        } else {
+          logToConsole("error", "❌ WebSocket not connected", null, "events");
+          showToast("❌ WebSocket not connected", "error");
+          return false;
+        }
+      }
+
+      // Update connection status
+      function updateConnectionStatus(connected) {
+        if (connected) {
+          statusIndicator.classList.add("connected");
+          statusIndicator2.classList.add("connected");
+          statusText.textContent = "Connected";
+        } else {
+          statusIndicator.classList.remove("connected");
+          statusIndicator2.classList.add("disconnected");
+          statusText.textContent = "Disconnected";
+        }
+      }
+
+      // Blink I/O dots
+      function blinkIODot(direction) {
+        const dot = document.getElementById(
+          direction === "in" ? "inDot" : "outDot"
+        );
+        dot.classList.add("active");
+        blinkDot2(direction === "in" ? "inDot" : "outDot");
+        setTimeout(() => dot.classList.remove("active"), 300);
+      }
+
+      function blinkDot2(dotId) {
+        statusIndicator2.classList.forEach((cls) => {
+          if (cls !== "status-dot2") {
+            statusIndicator2.classList.remove(cls);
+          }
+        });
+        statusIndicator2.classList.add(dotId);
+        setTimeout(() => statusIndicator2.classList.remove(dotId), 300);
+      }
+
+      // Logging system
       function logToConsole(type, message, data = null, tab = "events") {
         messageCount++;
         document.getElementById("messageCount").textContent = messageCount;
@@ -1011,22 +1661,19 @@
         } else if (tab === "websocket") {
           wsMessageCount++;
           document.getElementById("wsMessages").textContent = wsMessageCount;
+        } else if (tab === "files") {
+          fileUploadCount++;
+          document.getElementById("fileUploadCount").textContent =
+            fileUploadCount;
         }
 
-        // const timestamp = new Date().toLocaleTimeString();
         const now = new Date();
-        const timestamp = `${now.toLocaleTimeString()} [${now
+        const timestamp = `${now.toLocaleTimeString()}.${now
           .getMilliseconds()
           .toString()
-          .padStart(3, "0")}]`;
+          .padStart(3, "0")}`;
 
-        const logEntry = {
-          timestamp,
-          type,
-          message,
-          data,
-        };
-
+        const logEntry = { timestamp, type, message, data };
         logs[tab].push(logEntry);
 
         if (currentTab === tab) {
@@ -1034,6 +1681,7 @@
         }
       }
 
+      // Render log entry
       function renderLogEntry(logEntry) {
         const consoleContent = document.getElementById("consoleContent");
         const logDiv = document.createElement("div");
@@ -1057,31 +1705,26 @@
 
         consoleContent.appendChild(logDiv);
         consoleContent.scrollTop = consoleContent.scrollHeight;
-        // Only scroll if the new log is appended (not on tab switch)
-        if (logDiv) {
-          logDiv.scrollIntoView({ behavior: "smooth", block: "end" });
-        }
       }
 
+      // Switch console tabs
       function switchTab(tab) {
         currentTab = tab;
-
-        // Update tab appearance
         document
           .querySelectorAll(".console-tab")
           .forEach((t) => t.classList.remove("active"));
         document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
 
-        // Clear and reload content
         const consoleContent = document.getElementById("consoleContent");
         consoleContent.innerHTML = "";
-
         logs[tab].forEach((log) => renderLogEntry(log));
       }
 
+      // Clear console
       function clearConsole() {
         logs[currentTab] = [];
         document.getElementById("consoleContent").innerHTML = "";
+
         if (currentTab === "events") {
           messageCount = 0;
           document.getElementById("messageCount").textContent = "0";
@@ -1091,10 +1734,14 @@
         } else if (currentTab === "websocket") {
           wsMessageCount = 0;
           document.getElementById("wsMessages").textContent = "0";
+        } else if (currentTab === "files") {
+          fileUploadCount = 0;
+          document.getElementById("fileUploadCount").textContent = "0";
         }
+
         logToConsole(
           "info",
-          `${
+          `🧹 ${
             currentTab.charAt(0).toUpperCase() + currentTab.slice(1)
           } console cleared`,
           null,
@@ -1102,23 +1749,7 @@
         );
       }
 
-      function blinkDot2(dotId) {
-        statusIndicator2.classList.forEach((cls) => {
-          if (cls != "status-dot2") {
-            statusIndicator2.classList.remove(cls);
-          }
-        });
-        statusIndicator2.classList.add(dotId);
-        setTimeout(() => statusIndicator2.classList.remove(dotId), 300);
-      }
-
-      function blinkDot(dotId) {
-        const dot = document.getElementById(dotId);
-        dot.classList.add("active");
-        blinkDot2(dotId);
-        setTimeout(() => dot.classList.remove("active"), 300);
-      }
-
+      // Export logs
       function exportLogs() {
         const dataStr =
           "data:text/json;charset=utf-8," +
@@ -1132,377 +1763,309 @@
         document.body.appendChild(downloadAnchorNode);
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
-        logToConsole("success", "Logs exported successfully", null, "events");
-      }
-
-      //   WebSocket connection
-      // const ws = new WebSocket(
-      //   window.location.protocol.replace("http", "ws") +
-      //     "//" +
-      //     window.location.host +
-      //     "?ptpl=Ptpl123"
-      // );
-      var url = ["localhost", "127.0.0.1"].includes(window.location.hostname)
-        ? "https://stream.ajayos.in/?ptpl=Ptpl123"
-        : window.location.protocol.replace("http", "ws") +
-          "//" +
-          window.location.host +
-          "?ptpl=Ptpl123";
-
-      console.log(url);
-
-      const ws = new WebSocket(url);
-
-      const streamList = document.getElementById("streamSelect");
-      const statusIndicator = document.getElementById("connectionStatus");
-      const statusIndicator2 = document.getElementById("connectionStatus2");
-      const statusText = document.getElementById("statusText");
-      const currentStreamName = document.getElementById("currentStreamName");
-      const audioElement = document.getElementById("player");
-      const audioStatus = document.getElementById("audioStatus");
-
-      audioElement.addEventListener("play", () => {
-        audioStatus.textContent = "▶️ Playing Audio";
-        setTimeout(() => blinkDot2("audio"), 190);
-      });
-      audioElement.addEventListener("pause", () => {
-        audioStatus.textContent = "🔇 Paused";
-      });
-      audioElement.addEventListener("ended", () => {
-        audioStatus.textContent = "🔇 Ended";
-      });
-
-      let currentStream = null;
-      let rooms = [];
-
-      ws.onopen = () => {
         logToConsole(
           "success",
-          "WebSocket connection established",
+          "💾 Logs exported successfully",
           null,
           "events"
         );
-        blinkDot("outDot");
-        logToConsole(
-          "websocket",
-          "Connection opened",
-          { event: "open" },
-          "websocket"
-        );
-        statusIndicator.classList.add("connected");
-        blinkDot2("connected");
-        statusText.textContent = "Connected";
+      }
 
-        const userId = Math.random().toString(36).substr(2, 9);
-        const registerMsg = {
-          type: "register-user",
-          id: userId,
-          name: "Professional Client",
+      // Show toast notification
+      function showToast(message, type = "info") {
+        const bgColors = {
+          success: "linear-gradient(135deg, #00ff88, #00e676)",
+          warning: "linear-gradient(135deg, #ffb800, #ffa726)",
+          error: "linear-gradient(135deg, #ff4757, #ff3742)",
+          info: "linear-gradient(135deg, #667eea, #764ba2)",
         };
-        ws.send(JSON.stringify(registerMsg));
-        logToConsole("info", `Registered as user: ${userId}`, null, "events");
-        blinkDot("outDot");
-        logToConsole(
-          "websocket",
-          "Sent: register-user",
-          registerMsg,
-          "websocket"
-        );
-      };
 
-      ws.onmessage = (event) => {
-        try {
-          const { type, ...message } = JSON.parse(event.data);
-          blinkDot("inDot");
-          logToConsole(
-            "websocket",
-            `Received: ${type}`,
-            { type, ...message },
-            "websocket"
-          );
+        Toastify({
+          text: message,
+          duration: 3000,
+          backgroundColor: bgColors[type] || bgColors.info,
+        }).showToast();
+      }
 
-          if (type == "add-stream") {
-            rooms = [...rooms, ...message.stream];
-            rooms.forEach((room) => {
-              if (room.id === undefined) {
-                room.id = room.roomId;
+      // Toggle room creation
+      function toggleRoomCreation() {
+        const button = document.getElementById("toggleRoomCreation");
+        const isEnabled = button.textContent.includes("Disable");
+        const status = isEnabled ? 0 : 1;
 
-                // ###################################
-                // Example room data structure:
-                const exampleRoomData = {
-                  ...room,
-                  requester: room.requester || "Anonymous User",
-                  timestamp: new Date().toISOString(),
-                };
+        button.textContent = isEnabled
+          ? "🎯 Enable Room Creation"
+          : "🎯 Disable Room Creation";
 
-                showRoomRequestPopup(exampleRoomData);
-              }
-            });
-            updateStreamList();
+        fetch("/roomStart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              logToConsole(
+                "error",
+                "❌ Room creation toggle failed",
+                response,
+                "events"
+              );
+              showToast("❌ Error toggling room creation", "error");
+              throw new Error("Network response was not ok");
+            }
             logToConsole(
               "success",
-              `Added ${message.stream.length} stream(s)`,
-              message.stream,
-              "events"
-            );
-          } else if (type == "remove-stream") {
-            const roomId = message.stream[0].roomId;
-            rooms = rooms.filter((room) => room.id !== roomId);
-            if (currentStream === roomId) {
-              stopStreaming();
-            }
-            updateStreamList();
-            logToConsole(
-              "warning",
-              `Removed stream: ${roomId}`,
+              `✅ Room creation ${
+                status ? "enabled" : "disabled"
+              } (server confirmed)`,
               null,
               "events"
             );
-          } else if (type == "audio-chunk") {
-            logToConsole(
-              "audio",
-              "Audio chunk received",
-              {
-                size: message.chunk.data
-                  ? message.chunk.data.length
-                  : "unknown",
-                type: message.chunk.type || "standard",
-              },
-              "audio"
+            showToast(
+              `🎉 Room creation ${status ? "enabled" : "disabled"}`,
+              status ? "success" : "warning"
             );
-            if (message.chunk.type == "audio-buffer" || false)
-              handleVoiceChunk(message.chunk.data);
-            else handleAudioChunk(message.chunk);
-          } else if (type == "audio-chunk2") {
-            logToConsole(
-              "audio",
-              "PCM audio chunk received",
-              {
-                format: "PCM 16kHz",
-                size: message.chunk.data
-                  ? message.chunk.data.length
-                  : "unknown",
-              },
-              "audio"
-            );
-            console.log("message.chunkkk", message.chunk);
-            onSocketChunk(message);
-            /*
-            // Decode base64 to binary
-            const binaryString = atob(message.chunk.data);
-
-            // 8-bit unsigned PCM → bytes
-            const raw8 = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-              raw8[i] = binaryString.charCodeAt(i);
-            }
-
-            // Convert 8-bit unsigned [0..255] → 16-bit signed [-32768..32767]
-            const raw16 = new Int16Array(raw8.length);
-            for (let i = 0; i < raw8.length; i++) {
-              raw16[i] = (raw8[i] - 128) << 8; // center at 0 and scale
-            }
-
-            // WAV header generator (16-bit mono PCM)
-            function createWavHeader(dataLengthBytes, opts = {}) {
-              const numChannels = opts.numChannels || 1;
-              const sampleRate = opts.sampleRate || 8000;
-              const bitsPerSample = opts.bitsPerSample || 16;
-
-              const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
-              const blockAlign = (numChannels * bitsPerSample) / 8;
-
-              const buffer = new ArrayBuffer(44);
-              const view = new DataView(buffer);
-
-              const writeString = (offset, str) => {
-                for (let i = 0; i < str.length; i++)
-                  view.setUint8(offset + i, str.charCodeAt(i));
-              };
-
-              writeString(0, "RIFF");
-              view.setUint32(4, 36 + dataLengthBytes, true); // <-- bytes
-              writeString(8, "WAVE");
-              writeString(12, "fmt ");
-              view.setUint32(16, 16, true); // PCM fmt chunk size
-              view.setUint16(20, 1, true); // PCM = 1
-              view.setUint16(22, numChannels, true);
-              view.setUint32(24, sampleRate, true);
-              view.setUint32(28, byteRate, true);
-              view.setUint16(32, blockAlign, true);
-              view.setUint16(34, bitsPerSample, true);
-              writeString(36, "data");
-              view.setUint32(40, dataLengthBytes, true); // <-- bytes
-
-              return new Uint8Array(buffer);
-            }
-
-            // FIX: use raw16.byteLength (bytes), not raw16.length (samples)
-            const header = createWavHeader(raw16.byteLength, {
-              sampleRate: 8000,
-              numChannels: 1,
-              bitsPerSample: 16,
-            });
-
-            // Allocate buffer using byte length
-            const wavData = new Uint8Array(header.length + raw16.byteLength);
-            wavData.set(header, 0);
-
-            // Write samples explicitly little-endian
-            const view = new DataView(wavData.buffer, header.length);
-            for (let i = 0; i < raw16.length; i++) {
-              view.setInt16(i * 2, raw16[i], true);
-            }
-
-            blinkDot2("audio");
-
-            const blob = new Blob([wavData], { type: "audio/wav" });
-            const url = URL.createObjectURL(blob);
-            const audio = new Audio(url);
-            audio
-              .play()
-              .catch((err) => console.error("Audio play failed:", err));
-            audio.onended = () => URL.revokeObjectURL(url);*/
-          } else if (type == "error") {
+            return response.json();
+          })
+          .catch((error) => {
+            button.textContent = isEnabled
+              ? "🎯 Disable Room Creation"
+              : "🎯 Enable Room Creation";
             logToConsole(
               "error",
-              `Server error: ${message.error}`,
-              message,
+              `❌ Room toggle error: ${error.message}`,
+              null,
               "events"
             );
-          }
-        } catch (error) {
-          blinkDot("outDot");
-          logToConsole(
-            "error",
-            `Failed to parse message: ${error.message}`,
-            { error: error.message, raw: event.data },
-            "websocket"
-          );
-        }
-      };
-
-      // ###################################################
-      let currentRoomRequest = null;
-      let popupTimeout = null;
-
-      // Show room request popup
-      function showRoomRequestPopup(roomData) {
-        currentRoomRequest = roomData;
-
-        // Update popup content
-        document.getElementById("roomPopupName").textContent =
-          roomData.name || "Unknown Room";
-        document.getElementById(
-          "roomPopupDetails"
-        ).textContent = `Request from: ${
-          roomData.requester || "Unknown"
-        }\nRoom ID: ${roomData.id || "N/A"}`;
-
-        // Show popup with animation
-        const overlay = document.getElementById("roomPopupOverlay");
-        const popup = document.getElementById("roomPopup");
-
-        overlay.classList.add("show");
-        popup.classList.add("show");
-
-        // Auto-dismiss after 10 seconds
-        popupTimeout = setTimeout(() => {
-          dismissRoomPopup();
-        }, 10000);
+          });
       }
 
-      // Close popup when clicking overlay
-      document
-        .getElementById("roomPopupOverlay")
-        .addEventListener("click", function (e) {
-          if (e.target === this) {
-            dismissRoomPopup();
+      // Update stream list
+      // Update stream list incrementally
+      function updateStreamList() {
+        const streamCountEl = document.getElementById("streamCount");
+        const streamCountTopEl = document.getElementById("streamCountTop");
+
+        // Build a Set of current room IDs in <select>
+        const existingIds = new Set(
+          Array.from(streamList.options).map((opt) => opt.value)
+        );
+
+        // Add new rooms
+        rooms.forEach((room) => {
+          if (!existingIds.has(room.id)) {
+            const option = document.createElement("option");
+            option.value = room.id;
+            option.textContent = room.name;
+            streamList.appendChild(option);
+          } else {
+            // Update name if changed
+            const option = Array.from(streamList.options).find(
+              (opt) => opt.value === room.id
+            );
+            if (option && option.textContent !== room.name) {
+              option.textContent = room.name;
+            }
+          }
+          existingIds.delete(room.id); // Mark as handled
+        });
+
+        // Remove options that are no longer in rooms
+        existingIds.forEach((id) => {
+          if (id !== "") {
+            const opt = streamList.querySelector(`option[value="${id}"]`);
+            if (opt) opt.remove();
           }
         });
 
-      // Handle escape key
-      document.addEventListener("keydown", function (e) {
-        if (
-          e.key === "Escape" &&
-          document.getElementById("roomPopupOverlay").classList.contains("show")
-        ) {
-          dismissRoomPopup();
+        // Update stream count
+        streamCountEl.textContent = rooms.length;
+        streamCountTopEl.textContent = rooms.length;
+
+        // Restore selection if valid
+        if (currentStream) {
+          const option = streamList.querySelector(
+            `option[value="${currentStream}"]`
+          );
+          if (option) {
+            streamList.value = currentStream;
+          } else {
+            streamList.value = "";
+            currentStream = null;
+          }
+        }
+      }
+
+      // Handle stream selection
+      streamList.addEventListener("change", function () {
+        const selectedStream = this.value;
+        if (currentStream !== selectedStream) {
+          if (currentStream) stopStreaming();
+          currentStream = selectedStream;
+
+          if (currentStream) {
+            const selectedRoom = rooms.find(
+              (room) => room.id === currentStream
+            );
+            currentStreamName.textContent = selectedRoom
+              ? selectedRoom.name
+              : "Unknown Stream";
+            clearStreamBtn.disabled = false;
+            doneStreamBtn.disabled = false;
+
+            startStreaming();
+            logToConsole(
+              "info",
+              `🎧 Selected stream: ${selectedRoom?.name || "Unknown"}`,
+              selectedRoom,
+              "events"
+            );
+          } else {
+            clearStreamBtn.disabled = true;
+            doneStreamBtn.disabled = true;
+            currentStreamName.textContent = "No stream selected";
+            resetMediaSource();
+          }
         }
       });
 
-      // Accept room request
-      function acceptRoomRequest() {
-        if (currentRoomRequest) {
-          // Set the selected value
-          streamList.value = currentRoomRequest.value;
-          streamList.id = currentRoomRequest.id;
+      // Start streaming
+      function startStreaming() {
+        if (!currentStream || !ws || ws.readyState !== WebSocket.OPEN) return;
 
-          // Trigger change event so your existing listener runs
-          streamList.dispatchEvent(new Event("change"));
-          // Send acceptance to server
-          //   const acceptMsg = {
-          //     type: "join-room",
-          //     roomId: currentRoomRequest.id,
-          //   };
+        logToConsole(
+          "info",
+          `🎶 Starting stream: ${currentStream}`,
+          null,
+          "events"
+        );
 
-          //   if (ws.readyState === WebSocket.OPEN) {
-          //     ws.send(JSON.stringify(acceptMsg));
-          //     logToConsole(
-          //       "websocket",
-          //       "Sent: accept-room-request",
-          //       acceptMsg,
-          //       "websocket"
-          //     );
-          //   }
-
-          //   logToConsole(
-          //     "success",
-          //     `Accepted room request: ${currentRoomRequest.name}`,
-          //     currentRoomRequest,
-          //     "events"
-          //   );
-
-          // Show success toast
-          Toastify({
-            text: `Room "${currentRoomRequest.name}" accepted!`,
-            duration: 3000,
-            backgroundColor: "linear-gradient(135deg, #00ff88, #00e676)",
-          }).showToast();
+        // Initialize MediaSource
+        if (mediaSource) {
+          mediaSource.endOfStream();
         }
+        mediaSource = new MediaSource();
+        audioElement.src = URL.createObjectURL(mediaSource);
 
-        dismissRoomPopup();
+        mediaSource.addEventListener("sourceopen", () => {
+          sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
+          sourceBuffer.addEventListener("updateend", () => {
+            if (!isBuffering && audioQueue.length > 0) {
+              appendToBuffer();
+            }
+          });
+        });
+
+        audioElement.oncanplay = () => {
+          audioElement.play().catch((err) => {
+            console.error("Error during playback:", err);
+            logToConsole(
+              "error",
+              `❌ Playback error: ${err.message}`,
+              null,
+              "audio"
+            );
+          });
+        };
+
+        const joinMsg = { type: "join-room", roomId: currentStream };
+        sendWebSocketMessage(joinMsg);
+        logToConsole(
+          "success",
+          `✅ Joined room: ${currentStream}`,
+          null,
+          "events"
+        );
       }
 
-      // Dismiss popup
-      function dismissRoomPopup() {
-        const overlay = document.getElementById("roomPopupOverlay");
-        const popup = document.getElementById("roomPopup");
-
-        overlay.classList.remove("show");
-        popup.classList.remove("show");
-
-        // Clear timeout
-        if (popupTimeout) {
-          clearTimeout(popupTimeout);
-          popupTimeout = null;
+      // Stop streaming
+      function stopStreaming() {
+        if (currentStream) {
+          const leaveMsg = { type: "leave-room", roomId: currentStream };
+          sendWebSocketMessage(leaveMsg);
+          logToConsole(
+            "info",
+            `👋 Left room: ${currentStream}`,
+            null,
+            "events"
+          );
+          currentStream = null;
+          clearStreamBtn.disabled = true;
+          doneStreamBtn.disabled = true;
+          currentStreamName.textContent = "No stream selected";
+          resetMediaSource();
         }
-
-        // Reset after animation completes
-        setTimeout(() => {
-          currentRoomRequest = null;
-        }, 400);
       }
 
-      // ###################################################
-      let isPlaying = false;
+      // Reset MediaSource
+      function resetMediaSource() {
+        if (mediaSource) {
+          mediaSource.endOfStream();
+          mediaSource = null;
+          sourceBuffer = null;
+          audioQueue = [];
+          isBuffering = false;
+        }
+      }
+
+      // Handle audio chunk
+      function handleAudioChunk(chunk) {
+        if (chunk.type === "audio-buffer") {
+          handleVoiceChunk(chunk.data);
+        } else {
+          const chunkData = new Uint8Array(chunk.data);
+          audioQueue.push(chunkData);
+
+          if (!sourceBuffer.updating && !isBuffering) {
+            appendToBuffer();
+          }
+        }
+      }
+
+      // Append audio to buffer
+      function appendToBuffer() {
+        if (audioQueue.length > 0 && sourceBuffer && !sourceBuffer.updating) {
+          const chunk = audioQueue.shift();
+          isBuffering = true;
+          sourceBuffer.appendBuffer(chunk);
+          isBuffering = false;
+        }
+      }
+
+      // Handle PCM audio chunk
+      function handlePCMAudioChunk(chunk) {
+        try {
+          const binary = atob(chunk.data);
+          const rawPCM = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) {
+            rawPCM[i] = binary.charCodeAt(i);
+          }
+          audioQueue.push(rawPCM);
+
+          if (!isPlaying) {
+            playNextChunk();
+          }
+          logToConsole(
+            "audio",
+            `🎵 Queued PCM16 chunk (${rawPCM.length} bytes)`,
+            null,
+            "audio"
+          );
+        } catch (err) {
+          logToConsole(
+            "error",
+            `❌ PCM16 chunk processing failed: ${err.message}`,
+            null,
+            "audio"
+          );
+        }
+      }
 
       // Convert PCM16 to WAV Blob
       function pcm16ToWavBlob(pcm16, options = {}) {
         const numChannels = options.numChannels || 1;
-        const sampleRate = options.sampleRate || 8000; // 16 kHz
+        const sampleRate = options.sampleRate || 16000;
         const bitsPerSample = options.bitsPerSample || 16;
-        const slowFactor = options.slowFactor || 0.5; // 0.5 = half speed
 
         const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
         const blockAlign = (numChannels * bitsPerSample) / 8;
@@ -1536,7 +2099,7 @@
         return new Blob([wavBuffer], { type: "audio/wav" });
       }
 
-      // Play the next chunk in the queue
+      // Play next audio chunk
       function playNextChunk() {
         if (audioQueue.length === 0) {
           isPlaying = false;
@@ -1553,9 +2116,15 @@
         const url = URL.createObjectURL(wavBlob);
         audioElement.src = url;
 
-        audioElement
-          .play()
-          .catch((err) => console.error("Audio play failed:", err));
+        audioElement.play().catch((err) => {
+          console.error("Audio play failed:", err);
+          logToConsole(
+            "error",
+            `❌ Audio play failed: ${err.message}`,
+            null,
+            "audio"
+          );
+        });
 
         audioElement.onended = () => {
           URL.revokeObjectURL(url);
@@ -1563,216 +2132,393 @@
         };
       }
 
-      // Example: receiving a chunk over socket
-      function onSocketChunk(message) {
-        try {
-          // Convert base64 to Uint8Array
-          const binary = atob(message.chunk.data);
-          const rawPCM = new Uint8Array(binary.length);
-          for (let i = 0; i < binary.length; i++)
-            rawPCM[i] = binary.charCodeAt(i);
-
-          audioQueue.push(rawPCM);
-
-          if (!isPlaying) playNextChunk();
-          logToConsole(
-            "audio",
-            `Queued PCM16 chunk (${rawPCM.length} bytes)`,
-            null,
-            "audio"
-          );
-        } catch (err) {
-          console.error("Error processing PCM16 chunk:", err);
-          logToConsole(
-            "error",
-            `PCM16 chunk processing failed: ${err.message}`,
-            null,
-            "audio"
-          );
-        }
-      }
-      // ######################################
-
-      ws.onerror = (error) => {
-        blinkDot("outDot");
-        logToConsole("error", "WebSocket connection error", error, "events");
-        logToConsole("websocket", "WebSocket error", { error }, "websocket");
-        // statusIndicator.classList.remove("connected");
-        statusText.textContent = "Error";
-      };
-
-      ws.onclose = (e) => {
-        logToConsole(
-          "warning",
-          "WebSocket connection closed",
-          { code: e.code, reason: e.reason },
-          "events"
-        );
-        blinkDot("outDot");
-        logToConsole(
-          "websocket",
-          "Connection closed",
-          { code: e.code, reason: e.reason },
-          "websocket"
-        );
-        statusIndicator.classList.remove("connected");
-        blinkDot2("disconnected");
-        statusText.textContent = "Disconnected";
-      };
-
-      const updateStreamList = () => {
-        streamList.innerHTML = `<option value="">Select a stream</option>`;
-        rooms.forEach((room) => {
-          const option = document.createElement("option");
-          option.value = room.id;
-          option.textContent = room.name;
-          streamList.appendChild(option);
-        });
-
-        document.getElementById("streamCount").textContent = rooms.length;
-        if (currentStream) {
-          streamList.value = currentStream;
-        }
-      };
-
-      const handleVoiceChunk = (data) => {
-        blinkDot2("audio");
+      // Handle voice chunk
+      function handleVoiceChunk(data) {
         const audioBlob = new Blob([new Uint8Array(data)], {
           type: "audio/webm",
         });
         const audioUrl = URL.createObjectURL(audioBlob);
-        console.log(data, "data");
-
         const audio = new Audio(audioUrl);
         audio.play();
         audio.onended = () => {
           URL.revokeObjectURL(audioUrl);
         };
-      };
+      }
 
-      streamList.addEventListener("change", () => {
-        const selectedStream = streamList.value;
-        if (currentStream !== selectedStream) {
-          stopStreaming();
-          currentStream = selectedStream;
-          if (currentStream) {
-            const selectedRoom = rooms.find(
-              (room) => room.id === currentStream
-            );
-            currentStreamName.textContent = selectedRoom
-              ? selectedRoom.name
-              : "Unknown Stream";
-            startStreaming();
-            logToConsole(
-              "info",
-              `Selected stream: ${selectedRoom?.name || "Unknown"}`,
-              selectedRoom,
-              "events"
-            );
+      // File handling
+      fileInput.addEventListener("change", function (e) {
+        selectedFiles = Array.from(e.target.files);
+        updateFileDisplay();
+        updateActionButtons();
+        logToConsole(
+          "files",
+          `📂 Selected ${selectedFiles.length} file(s)`,
+          selectedFiles.map((f) => ({
+            name: f.name,
+            size: f.size,
+            type: f.type,
+          })),
+          "files"
+        );
+      });
+
+      function updateFileDisplay() {
+        const display = document.getElementById("fileInputDisplay");
+        const fileName = document.getElementById("fileName");
+
+        if (selectedFiles.length > 0) {
+          display.classList.add("has-file");
+          if (selectedFiles.length === 1) {
+            fileName.textContent = selectedFiles[0].name;
           } else {
-            currentStreamName.textContent = "No stream selected";
+            fileName.textContent = `${selectedFiles.length} files selected`;
           }
+        } else {
+          display.classList.remove("has-file");
+          fileName.textContent = "";
+        }
+      }
+
+      function updateActionButtons() {
+        const clearBtn = document.getElementById("clearBtn");
+        const doneBtn = document.getElementById("doneBtn");
+        const hasFiles = selectedFiles.length > 0;
+
+        clearBtn.disabled = !hasFiles;
+        doneBtn.disabled = !hasFiles;
+      }
+
+      function clearFileSelection() {
+        selectedFiles = [];
+        document.getElementById("fileInput").value = "";
+        updateFileDisplay();
+        updateActionButtons();
+        hideUploadProgress();
+        logToConsole("files", "🗑️ File selection cleared", null, "files");
+        showToast("🧹 File selection cleared", "info");
+      }
+
+      async function uploadFiles() {
+        if (
+          selectedFiles.length === 0 ||
+          !ws ||
+          ws.readyState !== WebSocket.OPEN ||
+          !currentStream
+        ) {
+          showToast(
+            "⚠️ No files selected, no room selected, or WebSocket not connected",
+            "warning"
+          );
+          return;
+        }
+
+        showUploadProgress();
+
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          await uploadSingleFile(file, i + 1, selectedFiles.length);
+        }
+
+        hideUploadProgress();
+        showToast(
+          `🎉 Successfully uploaded ${selectedFiles.length} file(s)`,
+          "success"
+        );
+        clearFileSelection();
+      }
+
+      async function clearSelectedStream() {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          const clearMsg = {
+            event: "clear",
+            room_id: currentStream,
+          };
+          sendWebSocketMessage(clearMsg, true);
+          logToConsole(
+            "info",
+            "🗑️ Sent clear audio to " + currentStream,
+            { roomId: currentStream },
+            "events"
+          );
+          showToast("🧹 Cleared audio stream", "info");
+        }
+      }
+
+      async function sendStopSelectedStream() {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          const stopMsg = {
+            event: "stop",
+            room_id: currentStream,
+          };
+          sendWebSocketMessage(stopMsg, true);
+          logToConsole(
+            "info",
+            "⏹️ Sent stop audio to " + currentStream,
+            { roomId: currentStream },
+            "events"
+          );
+          showToast("⏹️ Stopped audio stream", "info");
+        }
+      }
+
+      async function uploadSingleFile(file, index, total) {
+        const totalChunks = Math.ceil(file.size / chunkSize);
+
+        logToConsole(
+          "files",
+          `📤 Uploading file: ${file.name} (${totalChunks} chunks)`,
+          { name: file.name, size: file.size, type: file.type },
+          "files"
+        );
+
+        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+          const start = chunkIndex * chunkSize;
+          const end = Math.min(start + chunkSize, file.size);
+          const chunk = file.slice(start, end);
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const base64Data = btoa(
+              String.fromCharCode(...new Uint8Array(e.target.result))
+            );
+
+            const uploadMsg = {
+              type: "audio-upload",
+              roomId: currentStream,
+              fileName: file.name,
+              fileSize: file.size,
+              fileType: file.type,
+              chunkIndex: chunkIndex,
+              totalChunks: totalChunks,
+              chunkData: base64Data,
+              isComplete: chunkIndex === totalChunks - 1,
+            };
+
+            sendWebSocketMessage(uploadMsg);
+          };
+
+          reader.readAsArrayBuffer(chunk);
+
+          const progress =
+            (((index - 1) * totalChunks + chunkIndex + 1) /
+              (total * totalChunks)) *
+            100;
+          updateUploadProgress(progress);
+
+          await new Promise((resolve) => setTimeout(resolve, 10));
+        }
+      }
+
+      function handleFileUploadResponse(response) {
+        if (response.success) {
+          logToConsole(
+            "files",
+            `✅ File upload successful: ${response.fileName}`,
+            response,
+            "files"
+          );
+        } else {
+          logToConsole(
+            "files",
+            `❌ File upload failed: ${response.fileName} - ${response.error}`,
+            response,
+            "files"
+          );
+          showToast(`❌ Upload failed: ${response.error}`, "error");
+        }
+      }
+
+      function showUploadProgress() {
+        document.getElementById("uploadProgress").classList.add("show");
+      }
+
+      function hideUploadProgress() {
+        document.getElementById("uploadProgress").classList.remove("show");
+        updateUploadProgress(0);
+      }
+
+      function updateUploadProgress(percentage) {
+        document.getElementById(
+          "uploadProgressBar"
+        ).style.width = `${percentage}%`;
+      }
+
+      // Room request popup
+      function showRoomRequestPopup(roomData) {
+        // if user in a room skip it
+        if (currentStream) {
+          return;
+        }
+        currentRoomRequest = roomData;
+
+        playCallTone();
+
+        document.getElementById("roomPopupName").textContent =
+          roomData.name || "Unknown Room";
+        document.getElementById(
+          "roomPopupDetails"
+        ).textContent = `🆔 Room ID: ${
+          roomData.id || "N/A"
+        }\n⏰ Time: ${new Date(roomData.timestamp).toLocaleString()}\n`;
+
+        const overlay = document.getElementById("roomPopupOverlay");
+        const popup = document.getElementById("roomPopup");
+
+        overlay.classList.add("show");
+        popup.classList.add("show");
+
+        popupTimeout = setTimeout(dismissRoomPopup, 15000);
+
+        logToConsole(
+          "events",
+          `🎉 Room request popup shown: ${roomData.name}`,
+          roomData,
+          "events"
+        );
+      }
+
+      function acceptRoomRequest() {
+        if (currentRoomRequest) {
+          streamList.value = currentRoomRequest.id;
+          streamList.dispatchEvent(new Event("change"));
+
+          logToConsole(
+            "success",
+            `✅ Accepted room request: ${currentRoomRequest.name}`,
+            currentRoomRequest,
+            "events"
+          );
+          showToast(
+            `🎉 Room "${currentRoomRequest.name}" accepted!`,
+            "success"
+          );
+        }
+
+        dismissRoomPopup();
+      }
+
+      function dismissRoomPopup() {
+        stopCallTone();
+        const overlay = document.getElementById("roomPopupOverlay");
+        const popup = document.getElementById("roomPopup");
+
+        overlay.classList.remove("show");
+        popup.classList.remove("show");
+
+        if (popupTimeout) {
+          clearTimeout(popupTimeout);
+          popupTimeout = null;
+        }
+
+        setTimeout(() => {
+          currentRoomRequest = null;
+        }, 400);
+      }
+
+      // Upload settings popup
+      function openUploadSettings() {
+        const overlay = document.getElementById("uploadSettingsOverlay");
+        const popup = document.getElementById("uploadSettingsPopup");
+        document.getElementById("packetSize").value = chunkSize / 1024;
+
+        overlay.classList.add("show");
+        popup.classList.add("show");
+      }
+
+      function submitUploadSettings() {
+        const packetSizeInput = document.getElementById("packetSize");
+        const newSize = parseInt(packetSizeInput.value);
+        if (newSize > 0) {
+          chunkSize = newSize * 1024;
+          showToast(`✅ Packet size set to ${newSize} KB`, "success");
+          logToConsole(
+            "info",
+            `⚙️ Updated packet size to ${newSize} KB`,
+            null,
+            "files"
+          );
+        } else {
+          showToast(`⚠️ Invalid packet size`, "warning");
+        }
+        dismissUploadSettings();
+      }
+
+      function dismissUploadSettings() {
+        const overlay = document.getElementById("uploadSettingsOverlay");
+        const popup = document.getElementById("uploadSettingsPopup");
+
+        overlay.classList.remove("show");
+        popup.classList.remove("show");
+      }
+
+      // Popup event listeners
+      document
+        .getElementById("roomPopupOverlay")
+        .addEventListener("click", function (e) {
+          if (e.target === this) dismissRoomPopup();
+        });
+
+      document
+        .getElementById("uploadSettingsOverlay")
+        .addEventListener("click", function (e) {
+          if (e.target === this) dismissUploadSettings();
+        });
+
+      document.addEventListener("keydown", function (e) {
+        if (
+          e.key === "Escape" &&
+          document.getElementById("roomPopupOverlay").classList.contains("show")
+        ) {
+          dismissRoomPopup();
+        }
+        if (
+          e.key === "Escape" &&
+          document
+            .getElementById("uploadSettingsOverlay")
+            .classList.contains("show")
+        ) {
+          dismissUploadSettings();
         }
       });
 
-      const startStreaming = async () => {
-        if (!currentStream || ws.readyState !== WebSocket.OPEN) return;
-
-        logToConsole(
-          "info",
-          `Starting stream: ${currentStream}`,
-          null,
-          "events"
-        );
-        // Create a new MediaSource
-        if (mediaSource) {
-          mediaSource.endOfStream();
-        }
-        mediaSource = new MediaSource();
-        audioElement.src = URL.createObjectURL(mediaSource);
-
-        mediaSource.addEventListener("sourceopen", () => {
-          sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
-          sourceBuffer.addEventListener("updateend", () => {
-            if (!isBuffering && audioQueue.length > 0) {
-              appendToBuffer();
-            }
-          });
-        });
-
-        // Ensure playback starts only after setting the source
-        audioElement.oncanplay = () => {
-          audioElement.play().catch((err) => {
-            console.error("Error during playback:", err);
-          });
-        };
-
-        const joinMsg = { type: "join-room", roomId: currentStream };
-        // set the drop down have the seleted item
-        streamList.ws.send(JSON.stringify(joinMsg));
-        blinkDot("outDot");
-        logToConsole("websocket", "Sent: join-room", joinMsg, "websocket");
-        logToConsole(
-          "success",
-          `Joined room: ${currentStream}`,
-          null,
-          "events"
-        );
-      };
-
-      // Handle incoming audio chunks
-      const handleAudioChunk = (chunkBase64) => {
-        const chunk = new Uint8Array(chunkBase64.data);
-        audioQueue.push(chunk);
-
-        if (!sourceBuffer.updating && !isBuffering) {
-          appendToBuffer();
-        }
-      };
-
-      // Append audio chunks to the sourceBuffer
-      const appendToBuffer = () => {
-        if (audioQueue.length > 0 && sourceBuffer && !sourceBuffer.updating) {
-          const chunk = audioQueue.shift();
-          isBuffering = true;
-          sourceBuffer.appendBuffer(chunk);
-          isBuffering = false;
-        }
-      };
-
-      const stopStreaming = () => {
-        if (currentStream) {
-          const leaveMsg = { type: "leave-room", roomId: currentStream };
-          ws.send(JSON.stringify(leaveMsg));
-          blinkDot("outDot");
-          logToConsole("websocket", "Sent: leave-room", leaveMsg, "websocket");
-          logToConsole("info", `Left room: ${currentStream}`, null, "events");
-          currentStream = null;
-          currentStreamName.textContent = "No stream selected";
-          resetMediaSource();
-        }
-      };
-
-      const resetMediaSource = () => {
-        if (mediaSource) {
-          mediaSource.endOfStream();
-          mediaSource = null;
-        }
-      };
-
+      // Window cleanup
       window.addEventListener("beforeunload", () => {
-        console.log("try to close");
-        if (ws.readyState === WebSocket.OPEN) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
           ws.close();
         }
       });
 
-      // Initialize with a welcome message
-      setTimeout(() => {
-        blinkDot2("disconnected");
-        logToConsole("websocket", "WebSocket client ready", null, "websocket");
-        logToConsole("audio", "Audio processing engine ready", null, "audio");
-      }, 100);
+      // Initialize application
+      function initializeApp() {
+        initializeWebSocket();
+        updateActionButtons();
+
+        setTimeout(() => {
+          logToConsole(
+            "success",
+            "🚀 Application initialized successfully",
+            null,
+            "events"
+          );
+          logToConsole(
+            "websocket",
+            "🌐 WebSocket client ready",
+            null,
+            "websocket"
+          );
+          logToConsole(
+            "audio",
+            "🎵 Audio processing engine ready with packet upload support",
+            null,
+            "audio"
+          );
+          logToConsole("files", "📂 File upload system ready", null, "files");
+          blinkDot2("disconnected");
+        }, 100);
+      }
+
+      // Start application
+      initializeApp();
     </script>
   </body>
 </html>
