@@ -8,7 +8,7 @@
       href="https://static.ajayos.in/favicon/favicon.ico"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🎵 Live Audio Streaming</title>
+    <title>Live Audio Streaming</title>
     <link rel="stylesheet" href="./styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,19 +35,19 @@
               <div class="io-dot out" id="outDot"></div>
             </div>
           </div>
-          <div class="audio-status" id="audioStatus">🔇 Not Playing</div>
+          <div class="audio-status" id="audioStatus">Not Playing</div>
         </div>
       </div>
 
       <div class="controls-section">
-        <div class="section-title">📻 Available Streams</div>
+        <div class="section-title">Available Streams</div>
         <select class="stream-select" id="streamSelect">
-          <option value="">Select a stream 🎧</option>
+          <option value="">Select a stream</option>
         </select>
 
         <div class="stats-compact">
           <div class="current-stream-compact">
-            <div class="current-stream-label">🎶 Current Stream</div>
+            <div class="current-stream-label">Current Stream</div>
             <div class="current-stream-name" id="currentStreamName">
               No stream selected
             </div>
@@ -56,18 +56,16 @@
               <button
                 class="stream-btn clear"
                 id="clearStreamBtn"
-                onclick="clearSelectedStream()"
                 disabled
               >
-                🗑️ Clear
+                Clear
               </button>
               <button
                 class="stream-btn done"
                 id="stopStreamBtn"
-                onclick="sendStopSelectedStream()"
                 disabled
               >
-                🏷️ Mark
+                Mark
               </button>
             </div>
           </div>
@@ -76,8 +74,8 @@
 
       <div class="file-upload-section">
         <div class="section-title">
-          📂 File Upload
-          <span class="settings-icon" onclick="openUploadSettings()">⚙️</span>
+          File Upload
+          <span class="settings-icon" id="uploadSettingsBtn">⚙</span>
         </div>
         <div class="file-input-wrapper">
           <input
@@ -88,8 +86,8 @@
             multiple
           />
           <div class="file-input-display" id="fileInputDisplay">
-            <span class="file-icon">🎵</span>
-            <div class="file-text">Click to select audio files 🎤</div>
+            <span class="file-icon">♪</span>
+            <div class="file-text">Click to select audio files</div>
             <div class="file-name" id="fileName"></div>
           </div>
           <div class="upload-progress" id="uploadProgress">
@@ -99,19 +97,17 @@
         <div class="action-buttons">
           <button
             class="action-btn clear"
-            onclick="clearFileSelection()"
             id="clearBtn"
             disabled
           >
-            🗑️ Clear
+            Clear
           </button>
           <button
             class="action-btn done"
-            onclick="uploadFiles()"
             id="doneBtn"
             disabled
           >
-            🚀 Upload
+            Upload
           </button>
         </div>
 
@@ -131,38 +127,30 @@
     <div class="right-panel">
       <div class="stats-section2">
         <div class="stats-row">
-          <span class="stat-compact-label">📡 Active Streams&nbsp;&nbsp;</span>
-          <span class="stat-compact-value" id="streamCount">&nbsp;0&nbsp;</span>
+          <span class="stat-compact-label">Active Streams</span>
+          <span class="stat-compact-value" id="streamCount">0</span>
         </div>
         <div class="stats-row">
-          <span class="stat-compact-label">💬 Total Messages&nbsp;&nbsp;</span>
-          <span class="stat-compact-value" id="messageCount"
-            >&nbsp;0&nbsp;</span
-          >
+          <span class="stat-compact-label">Total Messages</span>
+          <span class="stat-compact-value" id="messageCount">0</span>
         </div>
         <div class="stats-row">
-          <span class="stat-compact-label">🎵 Audio Packets&nbsp;&nbsp;</span>
-          <span class="stat-compact-value" id="audioPackets"
-            >&nbsp;0&nbsp;</span
-          >
+          <span class="stat-compact-label">Audio Packets</span>
+          <span class="stat-compact-value" id="audioPackets">0</span>
         </div>
         <div class="stats-row">
-          <span class="stat-compact-label"
-            >🌐 WebSocket Messages&nbsp;&nbsp;</span
-          >
-          <span class="stat-compact-value" id="wsMessages">&nbsp;0&nbsp;</span>
+          <span class="stat-compact-label">WebSocket Messages</span>
+          <span class="stat-compact-value" id="wsMessages">0</span>
         </div>
         <div class="stats-row">
-          <span class="stat-compact-label">📤 Files Uploaded&nbsp;&nbsp;</span>
-          <span class="stat-compact-value" id="fileUploadCount"
-            >&nbsp;0&nbsp;</span
-          >
+          <span class="stat-compact-label">Files Uploaded</span>
+          <span class="stat-compact-value" id="fileUploadCount">0</span>
         </div>
         <div class="stats-row">
-          <div class="eye">👁️</div>
+          <div class="eye">👁</div>
         </div>
         <div class="stats-row">
-          <div class="eye">👁️</div>
+          <div class="eye">👁</div>
         </div>
       </div>
       <div class="console-section">
@@ -171,38 +159,34 @@
             <div
               class="console-tab active"
               data-tab="events"
-              onclick="switchTab('events')"
             >
-              📅 Events
+              Events
             </div>
             <div
               class="console-tab"
               data-tab="websocket"
-              onclick="switchTab('websocket')"
             >
-              🌐 WebSocket
+              WebSocket
             </div>
             <div
               class="console-tab"
               data-tab="audio"
-              onclick="switchTab('audio')"
             >
-              🎧 Audio
+              Audio
             </div>
             <div
               class="console-tab"
               data-tab="files"
-              onclick="switchTab('files')"
             >
-              📂 Files
+              Files
             </div>
           </div>
           <div class="console-actions">
-            <button class="console-btn" onclick="clearConsole()">
-              🗑️ Clear
+            <button class="console-btn" id="clearConsoleBtn">
+              Clear
             </button>
-            <button class="console-btn" onclick="exportLogs()">
-              💾 Export
+            <button class="console-btn" id="exportLogsBtn">
+              Export
             </button>
           </div>
         </div>
@@ -210,10 +194,11 @@
       </div>
     </div>
 
+    <!-- Room Request Popup -->
     <div class="room-popup-overlay" id="roomPopupOverlay">
       <div class="room-popup" id="roomPopup">
         <div class="room-popup-header">
-          <h3 class="room-popup-title">📞 Incoming Streaming Request</h3>
+          <h3 class="room-popup-title">Incoming Streaming Request</h3>
         </div>
         <div class="room-popup-content">
           <div class="room-request-info">
@@ -223,21 +208,22 @@
             </div>
           </div>
           <div class="room-popup-actions">
-            <button class="room-popup-btn decline" onclick="dismissRoomPopup()">
-              ❌ Decline
+            <button class="room-popup-btn decline" id="declineRoomBtn">
+              Decline
             </button>
-            <button class="room-popup-btn accept" onclick="acceptRoomRequest()">
-              ✅ Accept
+            <button class="room-popup-btn accept" id="acceptRoomBtn">
+              Accept
             </button>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Upload Settings Popup -->
     <div class="settings-popup-overlay" id="uploadSettingsOverlay">
       <div class="settings-popup" id="uploadSettingsPopup">
         <div class="settings-popup-header">
-          <h3 class="settings-popup-title">⚙️ Upload Settings</h3>
+          <h3 class="settings-popup-title">Upload Settings</h3>
         </div>
         <div class="settings-popup-content">
           <label for="packetSize">Packet Size (KB):</label>
@@ -251,1301 +237,22 @@
           <div class="settings-popup-actions">
             <button
               class="settings-popup-btn cancel"
-              onclick="dismissUploadSettings()"
+              id="cancelUploadSettingsBtn"
             >
-              ❌ Cancel
+              Cancel
             </button>
             <button
               class="settings-popup-btn submit"
-              onclick="submitUploadSettings()"
+              id="submitUploadSettingsBtn"
             >
-              ✅ Submit
+              Submit
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <script>
-      // Application State
-      let messageCount = 0;
-      let audioPacketCount = 0;
-      let wsMessageCount = 0;
-      let fileUploadCount = 0;
-      let currentTab = "events";
-      let logs = { events: [], websocket: [], audio: [], files: [] };
-      let selectedFiles = [];
-      let currentStream = null;
-      let rooms = [];
-      let ws = null;
-      let currentRoomRequest = null;
-      let popupTimeout = null;
-      let mediaSource = null;
-      let sourceBuffer = null;
-      let audioQueue = [];
-      let isBuffering = false;
-      let isPlaying = false;
-      let chunkSize = 64 * 1024; // Default chunk size
-
-      // DOM Elements
-      const streamList = document.getElementById("streamSelect");
-      const statusIndicator = document.getElementById("connectionStatus");
-      const statusIndicator2 = document.getElementById("connectionStatus2");
-      const statusText = document.getElementById("statusText");
-      const currentStreamName = document.getElementById("currentStreamName");
-      const clearStreamBtn = document.getElementById("clearStreamBtn");
-      const doneStreamBtn = document.getElementById("stopStreamBtn");
-      const audioElement = document.getElementById("player");
-      const audioStatus = document.getElementById("audioStatus");
-      const fileInput = document.getElementById("fileInput");
-
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      let playTime = audioCtx.currentTime;
-
-      // Audio Event Listeners
-      audioElement.addEventListener("play", () => {
-        audioStatus.textContent = "🎵 Playing Audio";
-        blinkDot2("audio");
-      });
-      audioElement.addEventListener("pause", () => {
-        audioStatus.textContent = "⏸️ Paused";
-      });
-      audioElement.addEventListener("ended", () => {
-        audioStatus.textContent = "🔇 Ended";
-      });
-
-      // Initialize WebSocket connection
-      function initializeWebSocket() {
-        const url = ["localhost", "127.0.0.1"].includes(
-          window.location.hostname
-        )
-          ? "wss://stream-prutech.ajayos.in/?ptpl=Ptpl123"
-          : window.location.protocol.replace("http", "ws") +
-            "//" +
-            window.location.host +
-            "?ptpl=Ptpl123";
-
-        ws = new WebSocket(url);
-        console.log(`🌐 WebSocket connecting to: ${url}`);
-
-        ws.onopen = () => {
-          logToConsole(
-            "success",
-            "✅ WebSocket connection established",
-            null,
-            "events"
-          );
-          logToConsole(
-            "websocket",
-            "🌐 Connection opened",
-            { event: "open" },
-            "websocket"
-          );
-          updateConnectionStatus(true);
-          blinkIODot("out");
-
-          const userId = Math.random().toString(36).substr(2, 9);
-          const registerMsg = {
-            event: "register-user",
-            id: userId,
-            name: "Professional Client",
-          };
-          sendWebSocketMessage(registerMsg);
-          logToConsole(
-            "info",
-            `👤 Registered as user: ${userId}`,
-            null,
-            "events"
-          );
-        };
-
-        ws.onmessage = (event) => {
-          try {
-            const { event: type, ...message } = JSON.parse(event.data);
-            blinkIODot("in");
-            logToConsole(
-              "websocket",
-              `📥 Received: ${type}`,
-              { event: type, ...message },
-              "websocket"
-            );
-
-            handleWebSocketMessage(type, message);
-          } catch (error) {
-            logToConsole(
-              "error",
-              `❌ Failed to parse message: ${error.message}`,
-              { error: error.message, raw: event.data },
-              "websocket"
-            );
-          }
-        };
-
-        ws.onerror = (error) => {
-          logToConsole(
-            "error",
-            "❌ WebSocket connection error",
-            error,
-            "events"
-          );
-          logToConsole(
-            "websocket",
-            "❌ WebSocket error",
-            { error },
-            "websocket"
-          );
-          updateConnectionStatus(false);
-        };
-
-        ws.onclose = (e) => {
-          logToConsole(
-            "warning",
-            "⚠️ WebSocket connection closed",
-            { code: e.code, reason: e.reason },
-            "events"
-          );
-          logToConsole(
-            "websocket",
-            "🌐 Connection closed",
-            { code: e.code, reason: e.reason },
-            "websocket"
-          );
-          updateConnectionStatus(false);
-        };
-      }
-
-      // call tone play
-      function playCallTone() {
-        const audio = document.getElementById("callTone");
-        audio.muted = false;
-      }
-
-      // call tone stop
-      function stopCallTone() {
-        const audio = document.getElementById("callTone");
-        audio.muted = true;
-        audio.currentTime = 0; // rewind
-      }
-
-      // Handle WebSocket messages
-      function handleWebSocketMessage(event, message) {
-        const eventType =
-          (typeof event === "string" ? event.toLowerCase().trim() : event) ||
-          (message.type && String(message.type).toLowerCase().trim());
-        console.log("WebSocket message received:", {
-          event: eventType,
-          message,
-        });
-        switch (eventType) {
-          case "add-stream":
-            rooms = [...rooms, ...message.stream];
-            message.stream.forEach((room) => {
-              if (room.id === undefined) {
-                room.id = room.room_id;
-                showRoomRequestPopup({
-                  ...room,
-                  requester: room.requester || "Anonymous User",
-                  timestamp: new Date().toISOString(),
-                });
-              }
-            });
-
-            updateStreamList();
-            logToConsole(
-              "success",
-              `✅ Added ${message.stream.length} stream(s)`,
-              message.stream,
-              "events"
-            );
-            break;
-
-          case "remove-stream":
-            const room_id = message?.room_id;
-            console.log("Removing stream:", room_id);
-            if (!room_id) {
-              logToConsole(
-                "error",
-                "❌ Invalid room ID in remove-stream message",
-                message,
-                "events"
-              );
-              return;
-            }
-            showToast(`${message.reason}`, "error");
-            rooms = rooms.filter((room) => room.id !== room_id);
-            if (currentStream === room_id) {
-              stopStreaming();
-            }
-            updateStreamList();
-            logToConsole(
-              "warning",
-              `⚠️ Removed stream: ${room_id}`,
-              null,
-              "events"
-            );
-            break;
-
-          case "media":
-            logToConsole(
-              "audio",
-              "🎧 PCM audio chunk received",
-              {
-                // format: "PCM 16kHz",
-                chunk: message.media.chunk || "",
-                size: message.media.payload
-                  ? message.media.payload.length
-                  : "unknown",
-              },
-              "audio"
-            );
-            if (message.media.testtime) {
-              function parseISTTestTime(str) {
-                if (!str) return null;
-
-                // Must be at least 17 digits
-                if (str.length < 17) return null;
-
-                const year = parseInt(str.slice(0, 4), 10);
-                const month = parseInt(str.slice(4, 6), 10) - 1; // JS months 0–11
-                const day = parseInt(str.slice(6, 8), 10);
-                const hour = parseInt(str.slice(8, 10), 10);
-                const minute = parseInt(str.slice(10, 12), 10);
-                const second = parseInt(str.slice(12, 14), 10);
-
-                // take only first 3 digits of ms (JS Date supports max ms)
-                const millis = parseInt(str.slice(14, 17), 10);
-
-                if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
-
-                // Directly construct as IST (local India time)
-                return new Date(year, month, day, hour, minute, second, millis);
-              }
-
-              function computeDelayIST(testtimeStr) {
-                const streamerTs = parseISTTestTime(testtimeStr);
-                if (!streamerTs) {
-                  return { streamerTs: null, now: new Date(), delayMs: null };
-                }
-
-                const now = new Date();
-                const delayMs = now.getTime() - streamerTs.getTime();
-
-                return { streamerTs, now, delayMs };
-              }
-
-              const { streamerTs, now, delayMs } = computeDelayIST(
-                message.media.testtime
-              );
-
-              if (streamerTs) {
-                logToConsole(
-                  "audio",
-                  `🕒 Stream delay: ${delayMs} ms` +
-                    `\n[Client received: ${now.toISOString()}]` +
-                    `\n[Streamer sent (IST raw): ${message.media.testtime}]` +
-                    `\n[Parsed IST: ${streamerTs.toLocaleString("en-IN", {
-                      timeZone: "Asia/Kolkata",
-                    })}]`,
-                  {
-                    delayMs,
-                    clientReceiveTs: now.getTime(),
-                    streamerTs: streamerTs.getTime(),
-                  },
-                  "audio"
-                );
-              } else {
-                console.warn(
-                  "⚠️ Could not parse testtime:",
-                  message.media.testtime
-                );
-              }
-            }
-
-            handlePCMAudioChunk(message.media);
-            break;
-
-          case "file-upload-response":
-            logToConsole(
-              "files",
-              "📤 File upload response received",
-              message,
-              "files"
-            );
-            handleFileUploadResponse(message);
-            break;
-
-          case "error":
-            logToConsole(
-              "error",
-              `❌ Server error: ${message.error}`,
-              message,
-              "events"
-            );
-            showToast(`❌ Server error: ${message.error}`, "error");
-            break;
-
-          default:
-            logToConsole("info", `Event => ${type}`, message, "events");
-        }
-      }
-
-      function msToLagString(ms) {
-        const absMs = Math.abs(ms);
-        const sign = ms < 0 ? "-" : "";
-        const min = Math.floor(absMs / 60000);
-        const sec = Math.floor((absMs % 60000) / 1000);
-        const remMs = absMs % 1000;
-        return `${sign}${min} min ${sec} sec ${remMs} ms`;
-      }
-
-      // Send WebSocket message
-      function sendWebSocketMessage(message, isJson = true) {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(isJson ? JSON.stringify(message) : message);
-          blinkIODot("out");
-          logToConsole(
-            "websocket",
-            `📤 Sent: ${message.type || message.event}`,
-            message,
-            "websocket"
-          );
-          return true;
-        } else {
-          logToConsole("error", "❌ WebSocket not connected", null, "events");
-          showToast("❌ WebSocket not connected", "error");
-          return false;
-        }
-      }
-
-      // Update connection status
-      function updateConnectionStatus(connected) {
-        if (connected) {
-          statusIndicator.classList.add("connected");
-          statusIndicator2.classList.add("connected");
-          statusText.textContent = "Connected";
-        } else {
-          statusIndicator.classList.remove("connected");
-          statusIndicator2.classList.add("disconnected");
-          statusText.textContent = "Disconnected";
-        }
-      }
-
-      // Blink I/O dots
-      function blinkIODot(direction) {
-        const dot = document.getElementById(
-          direction === "in" ? "inDot" : "outDot"
-        );
-        dot.classList.add("active");
-        blinkDot2(direction === "in" ? "inDot" : "outDot");
-        setTimeout(() => dot.classList.remove("active"), 300);
-      }
-
-      function blinkDot2(dotId) {
-        statusIndicator2.classList.forEach((cls) => {
-          if (cls !== "status-dot2") {
-            statusIndicator2.classList.remove(cls);
-          }
-        });
-        statusIndicator2.classList.add(dotId);
-        setTimeout(() => statusIndicator2.classList.remove(dotId), 300);
-      }
-
-      // Logging system
-      function logToConsole(type, message, data = null, tab = "events") {
-        messageCount++;
-        document.getElementById("messageCount").textContent = messageCount;
-
-        if (tab === "audio") {
-          audioPacketCount++;
-          document.getElementById("audioPackets").textContent =
-            audioPacketCount;
-        } else if (tab === "websocket") {
-          wsMessageCount++;
-          document.getElementById("wsMessages").textContent = wsMessageCount;
-        } else if (tab === "files") {
-          fileUploadCount++;
-          document.getElementById("fileUploadCount").textContent =
-            fileUploadCount;
-        }
-
-        const now = new Date();
-        const timestamp = `${now.toLocaleTimeString()}.${now
-          .getMilliseconds()
-          .toString()
-          .padStart(3, "0")}`;
-
-        const logEntry = { timestamp, type, message, data };
-        logs[tab].push(logEntry);
-
-        if (currentTab === tab) {
-          renderLogEntry(logEntry);
-        }
-      }
-
-      // Render log entry
-      function renderLogEntry(logEntry) {
-        const consoleContent = document.getElementById("consoleContent");
-        const logDiv = document.createElement("div");
-        logDiv.className = `log-entry ${logEntry.type}`;
-
-        let logData = "";
-        if (logEntry.data) {
-          logData = `<div class="log-data">${JSON.stringify(
-            logEntry.data,
-            null,
-            2
-          )}</div>`;
-        }
-
-        logDiv.innerHTML = `
-          <span class="log-timestamp">${logEntry.timestamp}</span>
-          <span class="log-type ${logEntry.type}">${logEntry.type}</span>
-          <span class="log-message">${logEntry.message}</span>
-          ${logData}
-        `;
-
-        consoleContent.appendChild(logDiv);
-        consoleContent.scrollTop = consoleContent.scrollHeight;
-      }
-
-      // Switch console tabs
-      function switchTab(tab) {
-        currentTab = tab;
-        document
-          .querySelectorAll(".console-tab")
-          .forEach((t) => t.classList.remove("active"));
-        document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
-
-        const consoleContent = document.getElementById("consoleContent");
-        consoleContent.innerHTML = "";
-        logs[tab].forEach((log) => renderLogEntry(log));
-      }
-
-      // Clear console
-      function clearConsole() {
-        logs[currentTab] = [];
-        document.getElementById("consoleContent").innerHTML = "";
-
-        if (currentTab === "events") {
-          messageCount = 0;
-          document.getElementById("messageCount").textContent = "0";
-        } else if (currentTab === "audio") {
-          audioPacketCount = 0;
-          document.getElementById("audioPackets").textContent = "0";
-        } else if (currentTab === "websocket") {
-          wsMessageCount = 0;
-          document.getElementById("wsMessages").textContent = "0";
-        } else if (currentTab === "files") {
-          fileUploadCount = 0;
-          document.getElementById("fileUploadCount").textContent = "0";
-        }
-
-        logToConsole(
-          "info",
-          `🧹 ${
-            currentTab.charAt(0).toUpperCase() + currentTab.slice(1)
-          } console cleared`,
-          null,
-          currentTab
-        );
-      }
-
-      // Export logs
-      function exportLogs() {
-        const dataStr =
-          "data:text/json;charset=utf-8," +
-          encodeURIComponent(JSON.stringify(logs, null, 2));
-        const downloadAnchorNode = document.createElement("a");
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute(
-          "download",
-          `console-logs-${new Date().toISOString()}.json`
-        );
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-        logToConsole(
-          "success",
-          "💾 Logs exported successfully",
-          null,
-          "events"
-        );
-      }
-
-      // Show toast notification
-      function showToast(message, type = "info") {
-        const bgColors = {
-          success: "linear-gradient(135deg, #00ff88, #00e676)",
-          warning: "linear-gradient(135deg, #ffb800, #ffa726)",
-          error: "linear-gradient(135deg, #ff4757, #ff3742)",
-          info: "linear-gradient(135deg, #667eea, #764ba2)",
-        };
-
-        Toastify({
-          text: message,
-          duration: 3000,
-          backgroundColor: bgColors[type] || bgColors.info,
-        }).showToast();
-      }
-
-      // Toggle room creation
-      function toggleRoomCreation() {
-        const button = document.getElementById("toggleRoomCreation");
-        const isEnabled = button.textContent.includes("Disable");
-        const status = isEnabled ? 0 : 1;
-
-        button.textContent = isEnabled
-          ? "🎯 Enable Room Creation"
-          : "🎯 Disable Room Creation";
-
-        fetch("/roomStart", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status }),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              logToConsole(
-                "error",
-                "❌ Room creation toggle failed",
-                response,
-                "events"
-              );
-              showToast("❌ Error toggling room creation", "error");
-              throw new Error("Network response was not ok");
-            }
-            logToConsole(
-              "success",
-              `✅ Room creation ${
-                status ? "enabled" : "disabled"
-              } (server confirmed)`,
-              null,
-              "events"
-            );
-            showToast(
-              `🎉 Room creation ${status ? "enabled" : "disabled"}`,
-              status ? "success" : "warning"
-            );
-            return response.json();
-          })
-          .catch((error) => {
-            button.textContent = isEnabled
-              ? "🎯 Disable Room Creation"
-              : "🎯 Enable Room Creation";
-            logToConsole(
-              "error",
-              `❌ Room toggle error: ${error.message}`,
-              null,
-              "events"
-            );
-          });
-      }
-
-      // Update stream list
-      // Rebuild the <select> fully with an optional preferred/default id
-      function updateStreamList(preferredId = null) {
-        var val = currentStream ? currentStream : "";
-        streamList.innerHTML = `<option value="">Select a stream</option>`;
-        rooms.forEach((room) => {
-          const option = document.createElement("option");
-          option.value = room.id;
-          option.textContent = room.name;
-          if (currentStream === room.id) {
-            option.selected = true;
-          }
-          streamList.appendChild(option);
-        });
-        if (currentStream) {
-          streamList.value = currentStream;
-        }
-        document.getElementById("streamCount").textContent = rooms.length;
-      }
-
-      // Handle stream selection
-      streamList.addEventListener("change", function () {
-        const selectedStream = this.value;
-        if (currentStream !== selectedStream) {
-          if (currentStream) stopStreaming();
-          currentStream = selectedStream;
-
-          if (currentStream) {
-            const selectedRoom = rooms.find(
-              (room) => room.id === currentStream
-            );
-            currentStreamName.textContent = selectedRoom
-              ? selectedRoom.name
-              : "Unknown Stream";
-            clearStreamBtn.disabled = false;
-            doneStreamBtn.disabled = false;
-
-            startStreaming();
-            logToConsole(
-              "info",
-              `🎧 Selected stream: ${selectedRoom?.name || "Unknown"}`,
-              selectedRoom,
-              "events"
-            );
-          } else {
-            clearStreamBtn.disabled = true;
-            doneStreamBtn.disabled = true;
-            currentStreamName.textContent = "No stream selected";
-            resetMediaSource();
-          }
-        }
-      });
-
-      // Start streaming
-      function startStreaming() {
-        if (!currentStream || !ws || ws.readyState !== WebSocket.OPEN) return;
-
-        logToConsole(
-          "info",
-          `🎶 Starting stream: ${currentStream}`,
-          null,
-          "events"
-        );
-
-        // Initialize MediaSource
-        if (mediaSource) {
-          mediaSource.endOfStream();
-        }
-        mediaSource = new MediaSource();
-        audioElement.src = URL.createObjectURL(mediaSource);
-
-        mediaSource.addEventListener("sourceopen", () => {
-          sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
-          sourceBuffer.addEventListener("updateend", () => {
-            if (!isBuffering && audioQueue.length > 0) {
-              appendToBuffer();
-            }
-          });
-        });
-
-        audioElement.oncanplay = () => {
-          audioElement.play().catch((err) => {
-            console.error("Error during playback:", err);
-            logToConsole(
-              "error",
-              `❌ Playback error: ${err.message}`,
-              null,
-              "audio"
-            );
-          });
-        };
-
-        const joinMsg = { event: "join-room", room_id: currentStream };
-        sendWebSocketMessage(joinMsg);
-        logToConsole(
-          "success",
-          `✅ Joined room: ${currentStream}`,
-          null,
-          "events"
-        );
-      }
-
-      // Stop streaming
-      function stopStreaming() {
-        if (currentStream) {
-          const leaveMsg = { event: "leave-room", room_id: currentStream };
-          sendWebSocketMessage(leaveMsg);
-          logToConsole(
-            "info",
-            `👋 Left room: ${currentStream}`,
-            null,
-            "events"
-          );
-          currentStream = null;
-          clearStreamBtn.disabled = true;
-          doneStreamBtn.disabled = true;
-          currentStreamName.textContent = "No stream selected";
-          resetMediaSource();
-        }
-      }
-
-      // Reset MediaSource
-      function resetMediaSource() {
-        if (mediaSource) {
-          mediaSource.endOfStream();
-          mediaSource = null;
-          sourceBuffer = null;
-          audioQueue = [];
-          isBuffering = false;
-        }
-      }
-
-      // Append audio to buffer
-      function appendToBuffer() {
-        if (audioQueue.length > 0 && sourceBuffer && !sourceBuffer.updating) {
-          const chunk = audioQueue.shift();
-          isBuffering = true;
-          sourceBuffer.appendBuffer(chunk);
-          isBuffering = false;
-        }
-      }
-
-      function handlePCMAudioChunk(chunk, options = {}) {
-        try {
-          const {
-            sampleRate = 8000,
-            numChannels = 1,
-            bitsPerSample = 16,
-          } = options;
-
-          if (!chunk.payload) throw new Error("Missing PCM payload");
-
-          // Decode base64 PCM
-          const binary = atob(chunk.payload);
-          const rawPCM = new Uint8Array(binary.length);
-          for (let i = 0; i < binary.length; i++) {
-            rawPCM[i] = binary.charCodeAt(i);
-          }
-
-          const bytesPerSample = bitsPerSample / 8;
-          const sampleCount = rawPCM.length / bytesPerSample;
-          const audioBuffer = audioCtx.createBuffer(
-            numChannels,
-            sampleCount,
-            sampleRate
-          );
-
-          // Fill audio buffer (16-bit signed PCM)
-          const channelData = audioBuffer.getChannelData(0);
-          for (let i = 0; i < sampleCount; i++) {
-            const sample = rawPCM[i * 2] | (rawPCM[i * 2 + 1] << 8);
-            channelData[i] =
-              sample < 0x8000 ? sample / 32768 : (sample - 65536) / 32768;
-          }
-
-          // Create source and schedule
-          const source = audioCtx.createBufferSource();
-          source.buffer = audioBuffer;
-          source.connect(audioCtx.destination);
-
-          if (playTime < audioCtx.currentTime) {
-            // playTime = audioCtx.currentTime;
-            playTime = audioCtx.currentTime + 0.05; // small safety buffer
-          }
-
-          // Log playback details
-          logToConsole(
-            "audio",
-            `🎵 Playing PCM chunk (${rawPCM.length} bytes, ${sampleRate} Hz, ${numChannels} channel(s), ${bitsPerSample}-bit)`,
-            null,
-            "audio"
-          );
-          source.start(playTime);
-          playTime += audioBuffer.duration;
-          //  playTime = audioCtx.currentTime + 0.05; // small safety buffer
-        } catch (err) {
-          console.error("❌ PCM chunk playback failed:", err);
-        }
-      }
-
-      function handlePCMAudioChunk2(chunk, options = {}) {
-        // 1
-        try {
-          // Validate chunk payload
-          if (!chunk.payload || typeof chunk.payload !== "string") {
-            throw new Error("Invalid or missing chunk payload");
-          }
-
-          // Audio parameters with defaults
-          const numChannels = options.numChannels || 1;
-          const sampleRate = options.sampleRate || 8000;
-          const bitsPerSample = options.bitsPerSample || 16;
-          const isSigned =
-            options.isSigned !== undefined ? options.isSigned : true; // Default to signed PCM
-          const isBigEndian = options.isBigEndian || false; // Default to little-endian
-
-          // Decode base64 to binary
-          const binary = atob(chunk.payload);
-          const rawPCM = new Uint8Array(binary.length);
-          for (let i = 0; i < binary.length; i++) {
-            rawPCM[i] = binary.charCodeAt(i);
-          }
-
-          // Validate PCM data length
-          const bytesPerSample = bitsPerSample / 8;
-          if (rawPCM.length % (bytesPerSample * numChannels) !== 0) {
-            throw new Error(
-              `Invalid PCM data length for ${bitsPerSample}-bit, ${numChannels}-channel audio`
-            );
-          }
-
-          // Convert raw PCM to WAV format
-          const sampleCount = rawPCM.length / (bytesPerSample * numChannels);
-          const wavBuffer = createWavBuffer(rawPCM, {
-            numChannels,
-            sampleRate,
-            bitsPerSample,
-            isSigned,
-            isBigEndian,
-          });
-
-          // Create a Blob from the WAV buffer and generate a URL
-          const blob = new Blob([wavBuffer], { type: "audio/wav" });
-          const url = URL.createObjectURL(blob);
-
-          // // Get the existing audio element
-          // const audioElement = document.getElementById("player");
-
-          // Set the source and play
-          audioElement.src = url;
-          audioElement.play().catch((err) => {
-            logToConsole(
-              "error",
-              `❌ Audio playback failed: ${err.message}`,
-              null,
-              "audio"
-            );
-          });
-
-          // Log playback details
-          logToConsole(
-            "audio",
-            `🎵 Playing PCM chunk (${
-              rawPCM.length
-            } bytes, ${sampleRate} Hz, ${numChannels} channel(s), ${bitsPerSample}-bit, ${
-              isSigned ? "signed" : "unsigned"
-            }, ${isBigEndian ? "big-endian" : "little-endian"})`,
-            null,
-            "audio"
-          );
-
-          // Clean up the URL after playback ends
-          audioElement.onended = () => {
-            URL.revokeObjectURL(url); // Free up memory
-          };
-        } catch (err) {
-          logToConsole(
-            "error",
-            `❌ PCM chunk processing failed: ${err.message}`,
-            null,
-            "audio"
-          );
-        }
-      }
-
-      // Helper function to create a WAV file buffer from PCM data
-      function createWavBuffer(
-        rawPCM,
-        { numChannels, sampleRate, bitsPerSample, isSigned, isBigEndian }
-      ) {
-        const bytesPerSample = bitsPerSample / 8;
-        const blockAlign = numChannels * bytesPerSample;
-        const byteRate = sampleRate * blockAlign;
-        const dataSize = rawPCM.length;
-        const buffer = new ArrayBuffer(44 + dataSize); // 44 bytes for WAV header
-        const view = new DataView(buffer);
-
-        // Write WAV header
-        writeString(view, 0, "RIFF");
-        view.setUint32(4, 36 + dataSize, true); // Chunk size
-        writeString(view, 8, "WAVE");
-        writeString(view, 12, "fmt ");
-        view.setUint32(16, 16, true); // Subchunk1 size (16 for PCM)
-        view.setUint16(20, 1, true); // Audio format (1 = PCM)
-        view.setUint16(22, numChannels, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, byteRate, true);
-        view.setUint16(32, blockAlign, true);
-        view.setUint16(34, bitsPerSample, true);
-        writeString(view, 36, "data");
-        view.setUint32(40, dataSize, true);
-
-        // Write PCM data
-        for (let i = 0; i < dataSize; i++) {
-          view.setUint8(44 + i, rawPCM[i]);
-        }
-
-        return buffer;
-      }
-
-      // Helper function to write string to DataView
-      function writeString(view, offset, string) {
-        for (let i = 0; i < string.length; i++) {
-          view.setUint8(offset + i, string.charCodeAt(i));
-        }
-      }
-
-      // File handling
-      fileInput.addEventListener("change", function (e) {
-        selectedFiles = Array.from(e.target.files);
-        updateFileDisplay();
-        updateActionButtons();
-        logToConsole(
-          "files",
-          `📂 Selected ${selectedFiles.length} file(s)`,
-          selectedFiles.map((f) => ({
-            name: f.name,
-            size: f.size,
-            type: f.type,
-          })),
-          "files"
-        );
-      });
-
-      function updateFileDisplay() {
-        const display = document.getElementById("fileInputDisplay");
-        const fileName = document.getElementById("fileName");
-
-        if (selectedFiles.length > 0) {
-          display.classList.add("has-file");
-          if (selectedFiles.length === 1) {
-            fileName.textContent = selectedFiles[0].name;
-          } else {
-            fileName.textContent = `${selectedFiles.length} files selected`;
-          }
-        } else {
-          display.classList.remove("has-file");
-          fileName.textContent = "";
-        }
-      }
-
-      function updateActionButtons() {
-        const clearBtn = document.getElementById("clearBtn");
-        const doneBtn = document.getElementById("doneBtn");
-        const hasFiles = selectedFiles.length > 0;
-
-        clearBtn.disabled = !hasFiles;
-        doneBtn.disabled = !hasFiles;
-      }
-
-      function clearFileSelection() {
-        selectedFiles = [];
-        document.getElementById("fileInput").value = "";
-        updateFileDisplay();
-        updateActionButtons();
-        hideUploadProgress();
-        logToConsole("files", "🗑️ File selection cleared", null, "files");
-        showToast("🧹 File selection cleared", "info");
-      }
-
-      async function uploadFiles() {
-        if (
-          selectedFiles.length === 0 ||
-          !ws ||
-          ws.readyState !== WebSocket.OPEN ||
-          !currentStream
-        ) {
-          showToast(
-            "⚠️ No files selected, no room selected, or WebSocket not connected",
-            "warning"
-          );
-          return;
-        }
-
-        showUploadProgress();
-
-        for (let i = 0; i < selectedFiles.length; i++) {
-          const file = selectedFiles[i];
-          await uploadSingleFile(file, i + 1, selectedFiles.length);
-        }
-
-        hideUploadProgress();
-        showToast(
-          `🎉 Successfully uploaded ${selectedFiles.length} file(s)`,
-          "success"
-        );
-        clearFileSelection();
-      }
-
-      async function clearSelectedStream() {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          const clearMsg = {
-            event: "clear",
-            room_id: currentStream,
-          };
-          sendWebSocketMessage(clearMsg, true);
-          logToConsole(
-            "info",
-            "🗑️ Sent clear audio to " + currentStream,
-            { room_id: currentStream },
-            "events"
-          );
-          showToast("🧹 Cleared audio stream", "info");
-        }
-      }
-
-      async function sendStopSelectedStream() {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          const stopMsg = {
-            event: "mark",
-            sequence_number: 15,
-            room_id: currentStream,
-            mark: {
-              name: "<label>",
-            },
-          };
-          sendWebSocketMessage(stopMsg, true);
-          logToConsole(
-            "info",
-            "🏷️ Marked audio to " + currentStream,
-            { room_id: currentStream },
-            "events"
-          );
-          showToast("🏷️ Marked audio stream", "info");
-        }
-      }
-
-      async function uploadSingleFile(file, index, total) {
-        const totalChunks = Math.ceil(file.size / chunkSize);
-
-        logToConsole(
-          "files",
-          `📤 Uploading file: ${file.name} (${totalChunks} chunks)`,
-          { name: file.name, size: file.size, type: file.type },
-          "files"
-        );
-
-        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-          const start = chunkIndex * chunkSize;
-          const end = Math.min(start + chunkSize, file.size);
-          const chunk = file.slice(start, end);
-
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const base64Data = btoa(
-              String.fromCharCode(...new Uint8Array(e.target.result))
-            );
-
-            const uploadMsg = {
-              event: "audio-upload",
-              room_id: currentStream,
-              fileName: file.name,
-              fileSize: file.size,
-              fileType: file.type,
-              chunkIndex: chunkIndex,
-              totalChunks: totalChunks,
-              chunkData: base64Data,
-              isComplete: chunkIndex === totalChunks - 1,
-            };
-
-            sendWebSocketMessage(uploadMsg);
-          };
-
-          reader.readAsArrayBuffer(chunk);
-
-          const progress =
-            (((index - 1) * totalChunks + chunkIndex + 1) /
-              (total * totalChunks)) *
-            100;
-          updateUploadProgress(progress);
-
-          await new Promise((resolve) => setTimeout(resolve, 10));
-        }
-      }
-
-      function handleFileUploadResponse(response) {
-        if (response.success) {
-          logToConsole(
-            "files",
-            `✅ File upload successful: ${response.fileName}`,
-            response,
-            "files"
-          );
-        } else {
-          logToConsole(
-            "files",
-            `❌ File upload failed: ${response.fileName} - ${response.error}`,
-            response,
-            "files"
-          );
-          showToast(`❌ Upload failed: ${response.error}`, "error");
-        }
-      }
-
-      function showUploadProgress() {
-        document.getElementById("uploadProgress").classList.add("show");
-      }
-
-      function hideUploadProgress() {
-        document.getElementById("uploadProgress").classList.remove("show");
-        updateUploadProgress(0);
-      }
-
-      function updateUploadProgress(percentage) {
-        document.getElementById(
-          "uploadProgressBar"
-        ).style.width = `${percentage}%`;
-      }
-
-      // Room request popup
-      function showRoomRequestPopup(roomData) {
-        // if user in a room skip it
-        if (currentStream) {
-          return;
-        }
-        currentRoomRequest = roomData;
-
-        playCallTone();
-
-        document.getElementById("roomPopupName").textContent =
-          roomData.name || "Unknown Room";
-        document.getElementById(
-          "roomPopupDetails"
-        ).textContent = `🆔 Room ID: ${
-          roomData.id || "N/A"
-        }\n⏰ Time: ${new Date(roomData.timestamp).toLocaleString()}\n`;
-
-        const overlay = document.getElementById("roomPopupOverlay");
-        const popup = document.getElementById("roomPopup");
-
-        overlay.classList.add("show");
-        popup.classList.add("show");
-
-        popupTimeout = setTimeout(dismissRoomPopup, 15000);
-
-        logToConsole(
-          "events",
-          `🎉 Room request popup shown: ${roomData.name}`,
-          roomData,
-          "events"
-        );
-      }
-
-      function acceptRoomRequest() {
-        if (currentRoomRequest) {
-          streamList.value = currentRoomRequest.id;
-          streamList.dispatchEvent(new Event("change"));
-
-          logToConsole(
-            "success",
-            `✅ Accepted room request: ${currentRoomRequest.name}`,
-            currentRoomRequest,
-            "events"
-          );
-          showToast(
-            `🎉 Room "${currentRoomRequest.name}" accepted!`,
-            "success"
-          );
-        }
-
-        dismissRoomPopup();
-      }
-
-      function dismissRoomPopup() {
-        stopCallTone();
-        const overlay = document.getElementById("roomPopupOverlay");
-        const popup = document.getElementById("roomPopup");
-
-        overlay.classList.remove("show");
-        popup.classList.remove("show");
-
-        if (popupTimeout) {
-          clearTimeout(popupTimeout);
-          popupTimeout = null;
-        }
-
-        setTimeout(() => {
-          currentRoomRequest = null;
-        }, 400);
-      }
-
-      // Upload settings popup
-      function openUploadSettings() {
-        const overlay = document.getElementById("uploadSettingsOverlay");
-        const popup = document.getElementById("uploadSettingsPopup");
-        document.getElementById("packetSize").value = chunkSize / 1024;
-
-        overlay.classList.add("show");
-        popup.classList.add("show");
-      }
-
-      function submitUploadSettings() {
-        const packetSizeInput = document.getElementById("packetSize");
-        const newSize = parseInt(packetSizeInput.value);
-        if (newSize > 0) {
-          chunkSize = newSize * 1024;
-          showToast(`✅ Packet size set to ${newSize} KB`, "success");
-          logToConsole(
-            "info",
-            `⚙️ Updated packet size to ${newSize} KB`,
-            null,
-            "files"
-          );
-        } else {
-          showToast(`⚠️ Invalid packet size`, "warning");
-        }
-        dismissUploadSettings();
-      }
-
-      function dismissUploadSettings() {
-        const overlay = document.getElementById("uploadSettingsOverlay");
-        const popup = document.getElementById("uploadSettingsPopup");
-
-        overlay.classList.remove("show");
-        popup.classList.remove("show");
-      }
-
-      // Popup event listeners
-      document
-        .getElementById("roomPopupOverlay")
-        .addEventListener("click", function (e) {
-          if (e.target === this) dismissRoomPopup();
-        });
-
-      document
-        .getElementById("uploadSettingsOverlay")
-        .addEventListener("click", function (e) {
-          if (e.target === this) dismissUploadSettings();
-        });
-
-      document.addEventListener("keydown", function (e) {
-        if (
-          e.key === "Escape" &&
-          document.getElementById("roomPopupOverlay").classList.contains("show")
-        ) {
-          dismissRoomPopup();
-        }
-        if (
-          e.key === "Escape" &&
-          document
-            .getElementById("uploadSettingsOverlay")
-            .classList.contains("show")
-        ) {
-          dismissUploadSettings();
-        }
-      });
-
-      // Window cleanup
-      window.addEventListener("beforeunload", () => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.close();
-        }
-      });
-
-      // Initialize application
-      function initializeApp() {
-        initializeWebSocket();
-        updateActionButtons();
-
-        setTimeout(() => {
-          logToConsole(
-            "success",
-            "🚀 Application initialized successfully",
-            null,
-            "events"
-          );
-          logToConsole(
-            "websocket",
-            "🌐 WebSocket client ready",
-            null,
-            "websocket"
-          );
-          logToConsole(
-            "audio",
-            "🎵 Audio processing engine ready with packet upload support",
-            null,
-            "audio"
-          );
-          logToConsole("files", "📂 File upload system ready", null, "files");
-          blinkDot2("disconnected");
-        }, 100);
-      }
-
-      // Start application
-      initializeApp();
-    </script>
+    <script src="./websocket-client.js"></script>
+    <script src="./app.js"></script>
   </body>
 </html>
