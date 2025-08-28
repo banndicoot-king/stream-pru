@@ -212,6 +212,9 @@ class WebSocketClient {
             case 'file-upload-response':
                 this.emit('fileUploadResponse', data);
                 break;
+            case 'dtmf':
+                this.emit('dtmf', data);
+                break;
             case 'error':
                 this.emit('serverError', data);
                 break;

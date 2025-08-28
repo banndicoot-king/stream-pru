@@ -153,7 +153,13 @@ function handleStart(ws, msg) {
 
   streams.set(room_id, room);
 
-  broadcast({ event: "add-stream", stream: [{ name: room_id, room_id }] }, ws);
+  broadcast(
+    {
+      event: "add-stream",
+      stream: [{ name: room_id, room_id, call_id, cli, dni }],
+    },
+    ws
+  );
 
   console.log(`Stream started: ${room_id}`);
 }

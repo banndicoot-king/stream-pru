@@ -270,6 +270,10 @@ class StreamingApp {
       this.handleStreamRemoved(data);
     });
 
+    this.wsClient.on("dtmf", (data) => {
+      this.handleDtmf(data);
+    });
+
     this.wsClient.on("audioData", (data) => {
       this.handleAudioData(data);
     });
@@ -318,6 +322,18 @@ class StreamingApp {
       "success", // ✅ Log type
       ` Added ${data.stream.length} stream(s)`, // 📝 Message
       data.stream, // 📦 Data
+      "events" // 🖥️ Log tab
+    );
+  }
+
+  handleDtmf(data) {
+    // log the data.dtmf.digit
+    console.log("DTMF digit received:", data.dtmf.digit);
+    this.showToast(`DTMF digit received: ${data.dtmf.digit} `, "info");
+    this.logToConsole(
+      "success", // ✅ Log type
+      `DTMF digit received: ${data.dtmf.digit} `, // 📝 Message
+      data, // 📦 Data
       "events" // 🖥️ Log tab
     );
   }
@@ -837,14 +853,27 @@ class StreamingApp {
 
       const reader = new FileReader();
       reader.onload = (e) => {
-        const base64Data = btoa(
-          String.fromCharCode(...new Uint8Array(e.target.result))
-        );
+        const arrayBuffer = e.target.result;
+        const pcm = new Int16Array(arrayBuffer); // 16-bit signed PCM assumption
 
-        // 🕒 Timestamp (epoch ms or your own counter)
+        // 🎚️ Normalize (optional: boost quiet voices)
+        let maxAmp = 0;
+        for (let i = 0; i < pcm.length; i++) {
+          maxAmp = Math.max(maxAmp, Math.abs(pcm[i]));
+        }
+        const gain = maxAmp > 0 ? 32767 / maxAmp : 1; // scale to full range
+        for (let i = 0; i < pcm.length; i++) {
+          pcm[i] = Math.max(-32768, Math.min(32767, pcm[i] * gain));
+        }
+
+        // 🔡 Encode back to base64
+        const uint8 = new Uint8Array(pcm.buffer);
+        const base64Data = btoa(String.fromCharCode(...uint8));
+
+        // 🕒 Timestamp (ms)
         const timestamp = Date.now();
 
-        // 📦 Wrap in "audio" event object
+        // 📦 Wrap packet as "audio"
         const uploadData = {
           event: "audio",
           sequence_number: sequenceNumber++, // auto-increment
@@ -868,7 +897,7 @@ class StreamingApp {
         100;
       this.updateUploadProgress(progress);
 
-      // ⏳ Small pause
+      // ⏳ Small pause to keep UI smooth
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
   }
