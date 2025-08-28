@@ -189,7 +189,8 @@ wss.on("connection", (ws, req) => {
 
       async function stop(msg) {
         var stop_v = msg?.stop || {};
-        var { call_id, room_id } = stop_v;
+        var { reason } = stop_v;
+        var room_id = msg?.room_id;
 
         if (streams[room_id]) {
           delete streams[room_id];
@@ -202,7 +203,9 @@ wss.on("connection", (ws, req) => {
             client.send(
               JSON.stringify({
                 type: "remove-stream",
-                stream: [{ room_id }],
+                room_id,
+                reason,
+                data: msg,
               })
             );
           }

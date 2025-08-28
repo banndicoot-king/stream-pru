@@ -1576,7 +1576,18 @@
             break;
 
           case "remove-stream":
-            const room_id = message.stream[0].room_id;
+            const room_id = message?.room_id;
+            console.log("Removing stream:", room_id);
+            if (!room_id) {
+              logToConsole(
+                "error",
+                "❌ Invalid room ID in remove-stream message",
+                message,
+                "events"
+              );
+              return;
+            }
+            showToast(`${message.reason}`, "error");
             rooms = rooms.filter((room) => room.id !== room_id);
             if (currentStream === room_id) {
               stopStreaming();
