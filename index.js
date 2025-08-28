@@ -3,7 +3,6 @@ const path = require("path");
 const http = require("http");
 const WebSocket = require("ws");
 const express = require("express");
-const ffmpeg = require("fluent-ffmpeg");
 
 const app = express();
 
@@ -19,14 +18,8 @@ let users = {}; // { userId: { name } }
 
 var room_send = [];
 
-var isRoomCreate = true;
-
-var timeCreate = null;
-
-
 // WebSocket Authentication Middleware
 function authenticate(req) {
-  console.log(req.headers);
   const authHeader = req.headers["authorization"] || "";
   var url_auth = req.url;
   if (url_auth.includes("?")) {
@@ -67,6 +60,7 @@ function authenticate(req) {
   console.log(req.headers);
   return true;
 }
+var buffer = [];
 
 wss.on("connection", (ws, req) => {
   if (!authenticate(req)) {
@@ -78,61 +72,144 @@ wss.on("connection", (ws, req) => {
     console.log("Authorized");
   }
 
-  var voiceBuffer = [];
-  var id = "test";
-
-  ws.on("message", (message) => {
+  ws.on("message", async (message) => {
     try {
       var m;
 
       try {
-        m = JSON.parse(message.toString() || message.toString() || message);
-        console.log(m, "m");
-        id = m?.roomId || "mk";
-        // console.log("m set");
-        // Send response after successful parse and roomId assignment
-        const response = {
-          status: isRoomCreate ? true : false,
-          message: isRoomCreate
-            ? "Room created successfully"
-            : "Room creation failed",
-          roomId: id,
-        };
-        timeCreate = Date.now();
-        // ws.send(JSON.stringify(response));
+        m = JSON.parse(message.toString() || message);
       } catch (error) {
-        console.log("hit");
-        const endTime = Date.now();
-        if(timeCreate) {
-          const diff = endTime - timeCreate; // in milliseconds
-          console.log(`Time taken: ${diff} ms`);
-          timeCreate = null;
-        }
-        //console.log(message.toString(), "message.toString()");
+        return;
+      }
 
-        // const filePath = path.join(__dirname, "audios", "Taka.mp3");
+      var event = m?.event || "";
+      event = String(event).toLowerCase();
 
-        //console.log(message);
-        ws.send(message);
+      var events = {
+        start: start,
+        stop: stop,
+        "register-user": registerUser,
+        "join-room": joinRoom,
+        "leave-room": leaveRoom,
+        media: handleMedia,
+      };
 
-        const bufferChunk = Buffer.from(message); // Actual audio buffer
-        voiceBuffer.push(bufferChunk); // 🔹 Store in buffer
+      var currentEventHandler = events[event];
 
-        // 🔹 Save to "out.mp3" (replaces old file each time)
-        //const audioPath = path.join(__dirname, "public", `${id}_out.wav`);
-        //fs.writeFileSync(audioPath, Buffer.concat(voiceBuffer));
-        //fs.writeFileSync(path.join(__dirname, "public", `${id}_out.txt`),  message.toString("hex"));
+      if (currentEventHandler) {
+        await currentEventHandler(m);
+      } else {
+        console.log("Unknown event:", event);
+      }
 
-        const message2 = JSON.stringify({
-          type: "audio-chunk2",
-          chunk: {
-            type: "buffer",
-            data: Buffer.from(message).toString("base64"),
-          },
+      async function start(msg) {
+        var start_v = msg?.start || {};
+        var {
+          call_id,
+          room_id,
+          cli,
+          dni,
+          media_format = {},
+          custom_parameters = [],
+        } = start_v;
+
+        streams[room_id] = {
+          name: room_id,
+          id: room_id,
+          call_id,
+          room_id,
+          listeners: new Set(),
+          cli,
+          dni,
+          media_format,
+          custom_parameters,
+        };
+
+        streams[room_id].listeners.add(ws);
+
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN && client !== ws) {
+            client.send(
+              JSON.stringify({
+                type: "add-stream",
+                stream: [{ name: room_id, room_id }],
+              })
+            );
+          }
         });
+      }
 
-        // save the chunk to the buffer
+      async function registerUser(data) {
+        const { id, name } = data;
+        users[ws] = { name, id };
 
+        if (!id || !name) {
+          console.log("Invalid user data");
+          return;
+        }
+
+        const streamList =
+          Object.keys(streams).map((id) => ({
+            id,
+            name: streams[id].name,
+          })) || [];
+        ws.send(JSON.stringify({ event: "add-stream", stream: streamList }));
+
+        users[ws] = { id, name };
+      }
+
+      async function joinRoom(msg) {
+        const { room_id } = msg;
+        if (!room_id) {
+          console.log("Invalid room ID");
+          return;
+        }
+
+        for (const streamId in streams) {
+          streams[streamId].listeners.delete(ws);
+        }
+        if (streams[room_id]) {
+          streams[room_id].listeners.add(ws);
+        }
+        ws.send(JSON.stringify({ event: "joined-room", room_id: room_id }));
+      }
+
+      async function leaveRoom(msg) {
+        const { room_id } = msg;
+        if (!room_id) {
+          console.log("Invalid room ID");
+          return;
+        }
+
+        if (streams[room_id]) {
+          streams[room_id].listeners.delete(ws);
+        }
+        ws.send(JSON.stringify({ event: "left-room", room_id: room_id }));
+      }
+
+      async function stop(msg) {
+        var stop_v = msg?.stop || {};
+        var { call_id, room_id } = stop_v;
+
+        if (streams[room_id]) {
+          delete streams[room_id];
+        }
+
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN && client !== ws) {
+            // delete from the room
+
+            client.send(
+              JSON.stringify({
+                type: "remove-stream",
+                stream: [{ room_id }],
+              })
+            );
+          }
+        });
+      }
+
+      async function handleMedia(msg) {
         const roomId = Object.keys(streams).find((roomId) =>
           streams[roomId].listeners.has(ws)
         );
@@ -142,232 +219,29 @@ wss.on("connection", (ws, req) => {
           listeners.forEach((listenerWs) => {
             if (listenerWs.readyState === WebSocket.OPEN && listenerWs !== ws) {
               //listenerWs.send(message);
-              listenerWs.send(message2);
-            }
-          });
-        }
-
-        return;
-      }
-
-      if (!m) return;
-      //console.log("m", message.toString());
-      var { type, ...data } = m;
-      type = type ? type : "register-stream";
-      switch (type) {
-        case "register-stream": {
-          const { roomId, CallId: name } = data;
-          streams[roomId] = { name, listeners: new Set() };
-          streams[roomId].listeners.add(ws);
-          // send all users to new stream name and id
-
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && client !== ws) {
-              client.send(
+              listenerWs.send(
                 JSON.stringify({
-                  type: "add-stream",
-                  stream: [{ roomId, name }],
+                  event: "media",
+                  media: {
+                    ...msg.media,
+                    media_format: streams[roomId]?.media_format,
+                  },
                 })
               );
             }
           });
-
-          // sendAudioChunk(ws);
-          break;
-        }
-
-        case "register-user": {
-          const { id, name } = data;
-          users[ws] = { name, id };
-          // send all streams to user
-          const streamList =
-            Object.keys(streams).map((id) => ({
-              id,
-              name: streams[id].name,
-            })) || [];
-          ws.send(JSON.stringify({ type: "add-stream", stream: streamList }));
-          break;
-        }
-
-        case "join-room": {
-          const { roomId } = data;
-          for (const streamId in streams) {
-            streams[streamId].listeners.delete(ws);
-          }
-
-          if (streams[roomId]) {
-            streams[roomId].listeners.add(ws);
-          }
-          break;
-        }
-
-        case "leave-room": {
-          for (const streamId in streams) {
-            streams[streamId].listeners.delete(ws);
-          }
-
-          // save to path
-
-          for (const streamId in streams) {
-            if (streams[streamId].listeners.size === 0) {
-              delete streams[streamId];
-              ws.send(
-                JSON.stringify({
-                  type: "remove-stream",
-                  stream: [{ roomId: streamId }],
-                })
-              );
-            }
-          }
-          break;
-        }
-
-        case "all-send": {
-          const bf = Buffer.from(data.chunk.data, "base64").toString("base64");
-          // send the audio to all as all sockets without checking the room
-          const message_ = JSON.stringify({
-            type: "audio-chunk2",
-            chunk: {
-              type: "buffer",
-              data: bf,
-            },
-          });
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && client !== ws) {
-              client.send(message_);
-            }
-          });
-        }
-
-        case "all-send2": {
-          // send the audio to all as all sockets without checking the room
-          const message_ = JSON.stringify({
-            type: "audio-chunk3",
-            ...data,
-          });
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && client !== ws) {
-              client.send(message_);
-            }
-          });
-        }
-        case "test-audio": {
-          try {
-            const roomId = Object.keys(streams).find((roomId) =>
-              streams[roomId].listeners.has(ws)
-            );
-
-            if (!roomId) {
-              ws.send(
-                JSON.stringify({ type: "error", message: "Not in a room" })
-              );
-              return;
-            } else {
-              const message_ = JSON.stringify({
-                type: "audio-chunk2",
-                chunk: {
-                  type: "buffer",
-                  data: Buffer.from(message).toString("base64"),
-                },
-              });
-              const listeners = Array.from(streams[roomId]?.listeners || []);
-              listeners.forEach((listenerWs) => {
-                if (
-                  listenerWs.readyState === WebSocket.OPEN &&
-                  listenerWs !== ws
-                ) {
-                  listenerWs.send(message_);
-                }
-              });
-            }
-
-            const timestamp = Date.now();
-            const filePath = path.join(
-              __dirname,
-              "test",
-              `audio_${timestamp}.mp3`
-            );
-            // fs.writeFile(filePath, Buffer.from(message), (err) => {
-            //   if (err) {
-            //     console.error("Error saving audio file:", err);
-            //     ws.send(
-            //       JSON.stringify({
-            //         type: "error",
-            //         message: "Failed to save audio",
-            //       })
-            //     );
-            //   } else {
-            //     console.log(`Audio saved as ${filePath}`);
-            //   }
-            // });
-          } catch (error) {
-            console.error("Error saving audio file:", error);
-          }
-          break;
-        }
-
-        case "delete-stream": {
-          const { roomId } = data;
-          delete streams[roomId];
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && client !== ws) {
-              client.send(
-                JSON.stringify({
-                  type: "remove-stream",
-                  stream: [{ roomId }],
-                })
-              );
-            }
-          });
-          break;
-        }
-
-        case "audio-chunk": {
-          const { chunk } = data;
-
-          const roomId = Object.keys(streams).find((roomId) =>
-            streams[roomId].listeners.has(ws)
-          );
-
-          if (!roomId) {
-            ws.send(
-              JSON.stringify({ type: "error", message: "Not in a room" })
-            );
-            return;
-          } else {
-            const message = JSON.stringify({ type: "audio-chunk", chunk });
-            const listeners = Array.from(streams[roomId]?.listeners || []);
-            listeners.forEach((listenerWs) => {
-              if (
-                listenerWs.readyState === WebSocket.OPEN &&
-                listenerWs !== ws
-              ) {
-                listenerWs.send(message);
-              }
-            });
-          }
-
-          break;
-        }
-
-        case "audio-chunk4": {
-          const { chunk } = data;
-          console.log("audio-chunk4", chunk);
-          const message = JSON.stringify({ type: "audio-chunk3", chunk });
-          ws.send(message);
-          break;
-        }
-
-        default: {
-          console.log("Unknown message type:", message);
         }
       }
     } catch (error) {
-      console.error("WebSocket message error:", error);
+      console.error("Error processing message:", error);
+      ws.send(
+        JSON.stringify({ type: "error", message: "Error processing message" })
+      );
     }
   });
 
   ws.on("close", () => {
+    buffer = [];
     const user = users[ws];
     if (user) {
       delete users[ws];
@@ -385,7 +259,7 @@ wss.on("connection", (ws, req) => {
               client.send(
                 JSON.stringify({
                   type: "remove-stream",
-                  stream: [{ roomId: streamId }],
+                  stream: [{ room_id: streamId }],
                 })
               );
             }
@@ -405,18 +279,6 @@ wss.on("close", () => {
 
 const PORT = 3031;
 
-app.post("/roomStart", (req, res) => {
-  const { status = 0 } = req.body;
-  isRoomCreate = status === 1 ? true : false;
-
-  res.json({
-    status: isRoomCreate ? true : false,
-    message: isRoomCreate
-      ? "Room created successfully"
-      : "Room creation failed",
-  });
-});
-
 app.post("/audio/:id", (req, res) => {
   const { id } = req.params;
 
@@ -429,44 +291,14 @@ app.post("/audio/:id", (req, res) => {
   }
 
   room_send.push(id);
-  connect(id)
-    .then(() => {
-      res.status(200).json({ message: "Audio streaming started" });
-    })
-    .catch((err) => {
-      console.error("Error starting audio streaming:", err);
-      res.status(500).json({ message: "Failed to start audio streaming" });
-    });
-});
-
-app.get("/all", (req, res) => {
-  // collect all files names from pubic path
-  const mPath = path.join(__dirname, "public");
-  const files = fs.readdirSync(mPath);
-  // then send a html with files list and if click download like
-  const fileList = files
-    .map((file) => `<li><a href="/${file}" download>${file}</a></li>`)
-    .join("");
-  const html = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audio Files</title>
-</head>
-<body>
-  <h1>Audio Files</h1>
-  <ul>
-    ${fileList}
-  </ul>
-  <script>
-    // Add any client-side JavaScript if needed
-  </script>
-</body>
-</html>
-  `;
-  res.send(html);
+  // connect(id)
+  //   .then(() => {
+  res.status(200).json({ message: "Audio streaming started" });
+  // })
+  // .catch((err) => {
+  //   console.error("Error starting audio streaming:", err);
+  //   res.status(500).json({ message: "Failed to start audio streaming" });
+  // });
 });
 
 app.delete("/audio/:id", (req, res) => {
@@ -497,86 +329,3 @@ server.listen(PORT, () => {
     console.log(`HTTP Server running on http://${ip}:${PORT}`);
   });
 });
-
-async function connect(room_id) {
-  const ws = new WebSocket(`ws://localhost:${PORT}`, {
-    headers: {
-      ptpl: "Ptpl123", // Custom authentication header
-      key2: "key2 vale",
-
-      authorization: "Basic jkg",
-      authorization: "Bearer token",
-    },
-  });
-
-  ws.on("open", () => {
-    console.log("WebSocket connection established");
-  });
-
-  ws.on("error", (err) => {
-    console.error("WebSocket error:", err);
-  });
-
-  ws.on("close", () => {
-    console.log("WebSocket connection closed");
-  });
-
-  // Directory containing audio files
-  const audioDir = path.join(__dirname, "audios", "Taka.mp3");
-
-  const streamAudio = () => {
-    let currentTime = 0;
-
-    const processAudio = () => {
-      const ffmpegProcess = ffmpeg(audioDir)
-        .setStartTime(currentTime)
-        .setDuration(5) // Process 5-second segments
-        .outputOptions("-f", "mp3") // Ensure MP3 format
-        .outputOptions("-c:a", "libmp3lame") // Use MP3 encoder
-        .outputOptions("-b:a", "128k") // **Force 128kbps CBR**
-        .on("end", () => {
-          currentTime += 5;
-
-          ffmpeg.ffprobe(audioDir, (err, metadata) => {
-            if (err) return;
-
-            const duration = metadata.format.duration;
-            if (currentTime >= duration) {
-              currentTime = 0; // Restart song from beginning
-            }
-
-            // Set a 4.5-second gap before processing the next segment
-            setTimeout(processAudio, 4800); // 4500ms gap after each 5-second segment
-          });
-        })
-        .on("error", (err) => {
-          console.error("Error during streaming:", err);
-          setTimeout(processAudio, 1000); // Retry after 1 second delay
-        });
-
-      // Pipe the audio data directly to the socket
-      const ffmpegStream = ffmpegProcess.pipe();
-      const chunks = [];
-
-      ffmpegStream.on("data", (chunk) => {
-        chunks.push(chunk);
-      });
-
-      ffmpegStream.on("end", () => {
-        const combinedChunk = Buffer.concat(chunks);
-        if (room_send.includes(room_id)) {
-          ws.send(combinedChunk);
-        } else {
-          ws.close();
-        }
-      });
-
-      ffmpegStream.on("error", (err) => {
-        console.error("Streaming error:", err);
-        setTimeout(processAudio, 1000); // Retry after 1 second delay
-      });
-    };
-
-    processAudio();
-  };
-}

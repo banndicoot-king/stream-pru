@@ -173,6 +173,12 @@
         color: var(--text-secondary);
       }
 
+      .eye {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+      }
+
       @keyframes pulse {
         0%,
         100% {
@@ -182,6 +188,53 @@
         50% {
           opacity: 0.7;
           transform: scale(1.1);
+        }
+      }
+
+      .eye::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 50%;
+        background: #111;
+        transform: translateY(-100%);
+        animation: topLid 4s infinite;
+      }
+      .eye::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 50%;
+        background: #111;
+        transform: translateY(100%);
+        animation: bottomLid 4s infinite;
+      }
+
+      @keyframes topLid {
+        0%,
+        90%,
+        100% {
+          transform: translateY(-100%);
+        }
+        92%,
+        98% {
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes bottomLid {
+        0%,
+        90%,
+        100% {
+          transform: translateY(100%);
+        }
+        92%,
+        98% {
+          transform: translateY(0);
         }
       }
 
@@ -1109,15 +1162,6 @@
       </div>
 
       <div class="controls-section">
-        <div class="section-title">🎮 Room Control</div>
-        <button
-          class="room-toggle"
-          onclick="toggleRoomCreation()"
-          id="toggleRoomCreation"
-        >
-          🎯 Enable Room Creation
-        </button>
-
         <div class="section-title">📻 Available Streams</div>
         <select class="stream-select" id="streamSelect">
           <option value="">Select a stream 🎧</option>
@@ -1236,8 +1280,12 @@
             >&nbsp;0&nbsp;</span
           >
         </div>
-        <div class="stats-row"></div>
-        <div class="stats-row"></div>
+        <div class="stats-row">
+          <div class="eye">👁️</div>
+        </div>
+        <div class="stats-row">
+          <div class="eye">👁️</div>
+        </div>
       </div>
       <div class="console-section">
         <div class="console-header">
@@ -1390,7 +1438,7 @@
         const url = ["localhost", "127.0.0.1"].includes(
           window.location.hostname
         )
-          ? "wss://stream.ajayos.in/?ptpl=Ptpl123"
+          ? "wss://stream-prutech.ajayos.in/?ptpl=Ptpl123"
           : window.location.protocol.replace("http", "ws") +
             "//" +
             window.location.host +
@@ -1417,7 +1465,7 @@
 
           const userId = Math.random().toString(36).substr(2, 9);
           const registerMsg = {
-            type: "register-user",
+            event: "register-user",
             id: userId,
             name: "Professional Client",
           };
@@ -1432,7 +1480,7 @@
 
         ws.onmessage = (event) => {
           try {
-            const { type, ...message } = JSON.parse(event.data);
+            const { event: type, ...message } = JSON.parse(event.data);
             blinkIODot("in");
             logToConsole(
               "websocket",
@@ -1500,12 +1548,16 @@
 
       // Handle WebSocket messages
       function handleWebSocketMessage(type, message) {
+        type =
+          (typeof type === "string" ? type.toLowerCase().trim() : type) ||
+          (message.type && String(message.type).toLowerCase().trim());
+        console.log("WebSocket message received:", { type, message });
         switch (type) {
           case "add-stream":
             rooms = [...rooms, ...message.stream];
             message.stream.forEach((room) => {
               if (room.id === undefined) {
-                room.id = room.roomId;
+                room.id = room.room_id;
                 showRoomRequestPopup({
                   ...room,
                   requester: room.requester || "Anonymous User",
@@ -1513,6 +1565,7 @@
                 });
               }
             });
+
             updateStreamList();
             logToConsole(
               "success",
@@ -1523,48 +1576,34 @@
             break;
 
           case "remove-stream":
-            const roomId = message.stream[0].roomId;
-            rooms = rooms.filter((room) => room.id !== roomId);
-            if (currentStream === roomId) {
+            const room_id = message.stream[0].room_id;
+            rooms = rooms.filter((room) => room.id !== room_id);
+            if (currentStream === room_id) {
               stopStreaming();
             }
             updateStreamList();
             logToConsole(
               "warning",
-              `⚠️ Removed stream: ${roomId}`,
+              `⚠️ Removed stream: ${room_id}`,
               null,
               "events"
             );
             break;
 
-          case "audio-chunk":
-            logToConsole(
-              "audio",
-              "🎵 Audio chunk received",
-              {
-                size: message.chunk.data
-                  ? message.chunk.data.length
-                  : "unknown",
-                type: message.chunk.type || "standard",
-              },
-              "audio"
-            );
-            handleAudioChunk(message.chunk);
-            break;
-
-          case "audio-chunk2":
+          case "media":
             logToConsole(
               "audio",
               "🎧 PCM audio chunk received",
               {
-                format: "PCM 16kHz",
-                size: message.chunk.data
-                  ? message.chunk.data.length
+                // format: "PCM 16kHz",
+                chunk: message.media.chunk || "",
+                size: message.media.payload
+                  ? message.media.payload.length
                   : "unknown",
               },
               "audio"
             );
-            handlePCMAudioChunk(message.chunk);
+            handlePCMAudioChunk(message.media);
             break;
 
           case "file-upload-response":
@@ -1588,12 +1627,7 @@
             break;
 
           default:
-            logToConsole(
-              "info",
-              `ℹ️ Unknown message type: ${type}`,
-              message,
-              "events"
-            );
+            logToConsole("info", `Event => ${type}`, message, "events");
         }
       }
 
@@ -1604,7 +1638,7 @@
           blinkIODot("out");
           logToConsole(
             "websocket",
-            `📤 Sent: ${message.type}`,
+            `📤 Sent: ${message.type || message.event}`,
             message,
             "websocket"
           );
@@ -1841,59 +1875,23 @@
       }
 
       // Update stream list
-      // Update stream list incrementally
-      function updateStreamList() {
-        const streamCountEl = document.getElementById("streamCount");
-        const streamCountTopEl = document.getElementById("streamCountTop");
-
-        // Build a Set of current room IDs in <select>
-        const existingIds = new Set(
-          Array.from(streamList.options).map((opt) => opt.value)
-        );
-
-        // Add new rooms
+      // Rebuild the <select> fully with an optional preferred/default id
+      function updateStreamList(preferredId = null) {
+        var val = currentStream ? currentStream : "";
+        streamList.innerHTML = `<option value="">Select a stream</option>`;
         rooms.forEach((room) => {
-          if (!existingIds.has(room.id)) {
-            const option = document.createElement("option");
-            option.value = room.id;
-            option.textContent = room.name;
-            streamList.appendChild(option);
-          } else {
-            // Update name if changed
-            const option = Array.from(streamList.options).find(
-              (opt) => opt.value === room.id
-            );
-            if (option && option.textContent !== room.name) {
-              option.textContent = room.name;
-            }
+          const option = document.createElement("option");
+          option.value = room.id;
+          option.textContent = room.name;
+          if (currentStream === room.id) {
+            option.selected = true;
           }
-          existingIds.delete(room.id); // Mark as handled
+          streamList.appendChild(option);
         });
-
-        // Remove options that are no longer in rooms
-        existingIds.forEach((id) => {
-          if (id !== "") {
-            const opt = streamList.querySelector(`option[value="${id}"]`);
-            if (opt) opt.remove();
-          }
-        });
-
-        // Update stream count
-        streamCountEl.textContent = rooms.length;
-        streamCountTopEl.textContent = rooms.length;
-
-        // Restore selection if valid
         if (currentStream) {
-          const option = streamList.querySelector(
-            `option[value="${currentStream}"]`
-          );
-          if (option) {
-            streamList.value = currentStream;
-          } else {
-            streamList.value = "";
-            currentStream = null;
-          }
+          streamList.value = currentStream;
         }
+        document.getElementById("streamCount").textContent = rooms.length;
       }
 
       // Handle stream selection
@@ -1968,7 +1966,7 @@
           });
         };
 
-        const joinMsg = { type: "join-room", roomId: currentStream };
+        const joinMsg = { event: "join-room", room_id: currentStream };
         sendWebSocketMessage(joinMsg);
         logToConsole(
           "success",
@@ -1981,7 +1979,7 @@
       // Stop streaming
       function stopStreaming() {
         if (currentStream) {
-          const leaveMsg = { type: "leave-room", roomId: currentStream };
+          const leaveMsg = { event: "leave-room", room_id: currentStream };
           sendWebSocketMessage(leaveMsg);
           logToConsole(
             "info",
@@ -2008,20 +2006,6 @@
         }
       }
 
-      // Handle audio chunk
-      function handleAudioChunk(chunk) {
-        if (chunk.type === "audio-buffer") {
-          handleVoiceChunk(chunk.data);
-        } else {
-          const chunkData = new Uint8Array(chunk.data);
-          audioQueue.push(chunkData);
-
-          if (!sourceBuffer.updating && !isBuffering) {
-            appendToBuffer();
-          }
-        }
-      }
-
       // Append audio to buffer
       function appendToBuffer() {
         if (audioQueue.length > 0 && sourceBuffer && !sourceBuffer.updating) {
@@ -2032,117 +2016,254 @@
         }
       }
 
-      // Handle PCM audio chunk
-      function handlePCMAudioChunk(chunk) {
+      function handlePCMAudioChunk2(chunk, options = {}) {
         try {
-          const binary = atob(chunk.data);
+          // Validate chunk payload
+          if (!chunk.payload || typeof chunk.payload !== "string") {
+            throw new Error("Invalid or missing chunk payload");
+          }
+
+          // Audio parameters with defaults
+          const numChannels = options.numChannels || 1;
+          const sampleRate = options.sampleRate || 8000;
+          const bitsPerSample = options.bitsPerSample || 16;
+          const isSigned =
+            options.isSigned !== undefined ? options.isSigned : true; // Default to signed PCM
+          const isBigEndian = options.isBigEndian || false; // Default to little-endian
+
+          // Decode base64 to binary
+          const binary = atob(chunk.payload);
           const rawPCM = new Uint8Array(binary.length);
           for (let i = 0; i < binary.length; i++) {
             rawPCM[i] = binary.charCodeAt(i);
           }
-          audioQueue.push(rawPCM);
 
-          if (!isPlaying) {
-            playNextChunk();
+          // Validate PCM data length
+          const bytesPerSample = bitsPerSample / 8;
+          if (rawPCM.length % (bytesPerSample * numChannels) !== 0) {
+            throw new Error(
+              `Invalid PCM data length for ${bitsPerSample}-bit, ${numChannels}-channel audio`
+            );
           }
-          logToConsole(
-            "audio",
-            `🎵 Queued PCM16 chunk (${rawPCM.length} bytes)`,
-            null,
-            "audio"
-          );
+
+          // Create Web Audio API context
+          const audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)({ sampleRate });
+
+          // Resume audio context to avoid suspension
+          audioContext
+            .resume()
+            .then(() => {
+              // Convert raw PCM to Float32Array
+              const sampleCount =
+                rawPCM.length / (bytesPerSample * numChannels);
+              const audioBuffer = audioContext.createBuffer(
+                numChannels,
+                sampleCount,
+                sampleRate
+              );
+
+              // Process each channel
+              for (let channel = 0; channel < numChannels; channel++) {
+                const channelData = audioBuffer.getChannelData(channel);
+                for (let i = 0; i < sampleCount; i++) {
+                  let sample;
+                  const offset = (i * numChannels + channel) * bytesPerSample;
+
+                  if (bitsPerSample === 16) {
+                    if (isBigEndian) {
+                      sample = (rawPCM[offset] << 8) | rawPCM[offset + 1];
+                    } else {
+                      sample = rawPCM[offset] | (rawPCM[offset + 1] << 8);
+                    }
+                    // Handle signed vs unsigned
+                    if (isSigned) {
+                      sample = sample > 32767 ? sample - 65536 : sample; // Convert to signed
+                    } else {
+                      sample -= 32768; // Convert unsigned to signed
+                    }
+                    channelData[i] = sample / 32768; // Normalize to [-1, 1]
+                  } else if (bitsPerSample === 8) {
+                    sample = rawPCM[offset];
+                    sample = isSigned ? sample - 128 : sample; // Convert to signed
+                    channelData[i] = sample / 128; // Normalize to [-1, 1]
+                  } else {
+                    throw new Error(
+                      `Unsupported bitsPerSample: ${bitsPerSample}`
+                    );
+                  }
+                }
+              }
+
+              // Create and play buffer source
+              const source = audioContext.createBufferSource();
+              source.buffer = audioBuffer;
+              source.connect(audioContext.destination);
+              source.start(0); // Start immediately
+
+              logToConsole(
+                "audio",
+                `🎵 Playing PCM chunk (${
+                  rawPCM.length
+                } bytes, ${sampleRate} Hz, ${numChannels} channel(s), ${bitsPerSample}-bit, ${
+                  isSigned ? "signed" : "unsigned"
+                }, ${isBigEndian ? "big-endian" : "little-endian"})`,
+                null,
+                "audio"
+              );
+
+              // Clean up after playback
+              source.onended = () => {
+                source.disconnect();
+                audioContext
+                  .close()
+                  .catch((err) =>
+                    console.warn("Audio context close failed:", err)
+                  );
+              };
+            })
+            .catch((err) => {
+              logToConsole(
+                "error",
+                `❌ Audio context resume failed: ${err.message}`,
+                null,
+                "audio"
+              );
+            });
         } catch (err) {
           logToConsole(
             "error",
-            `❌ PCM16 chunk processing failed: ${err.message}`,
+            `❌ PCM chunk processing failed: ${err.message}`,
             null,
             "audio"
           );
         }
       }
 
-      // Convert PCM16 to WAV Blob
-      function pcm16ToWavBlob(pcm16, options = {}) {
-        const numChannels = options.numChannels || 1;
-        const sampleRate = options.sampleRate || 16000;
-        const bitsPerSample = options.bitsPerSample || 16;
+      function handlePCMAudioChunk(chunk, options = {}) {
+        try {
+          // Validate chunk payload
+          if (!chunk.payload || typeof chunk.payload !== "string") {
+            throw new Error("Invalid or missing chunk payload");
+          }
 
-        const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
-        const blockAlign = (numChannels * bitsPerSample) / 8;
+          // Audio parameters with defaults
+          const numChannels = options.numChannels || 1;
+          const sampleRate = options.sampleRate || 8000;
+          const bitsPerSample = options.bitsPerSample || 16;
+          const isSigned =
+            options.isSigned !== undefined ? options.isSigned : true; // Default to signed PCM
+          const isBigEndian = options.isBigEndian || false; // Default to little-endian
 
-        const buffer = new ArrayBuffer(44);
+          // Decode base64 to binary
+          const binary = atob(chunk.payload);
+          const rawPCM = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) {
+            rawPCM[i] = binary.charCodeAt(i);
+          }
+
+          // Validate PCM data length
+          const bytesPerSample = bitsPerSample / 8;
+          if (rawPCM.length % (bytesPerSample * numChannels) !== 0) {
+            throw new Error(
+              `Invalid PCM data length for ${bitsPerSample}-bit, ${numChannels}-channel audio`
+            );
+          }
+
+          // Convert raw PCM to WAV format
+          const sampleCount = rawPCM.length / (bytesPerSample * numChannels);
+          const wavBuffer = createWavBuffer(rawPCM, {
+            numChannels,
+            sampleRate,
+            bitsPerSample,
+            isSigned,
+            isBigEndian,
+          });
+
+          // Create a Blob from the WAV buffer and generate a URL
+          const blob = new Blob([wavBuffer], { type: "audio/wav" });
+          const url = URL.createObjectURL(blob);
+
+          // // Get the existing audio element
+          // const audioElement = document.getElementById("player");
+
+          // Set the source and play
+          audioElement.src = url;
+          audioElement.play().catch((err) => {
+            logToConsole(
+              "error",
+              `❌ Audio playback failed: ${err.message}`,
+              null,
+              "audio"
+            );
+          });
+
+          // Log playback details
+          logToConsole(
+            "audio",
+            `🎵 Playing PCM chunk (${
+              rawPCM.length
+            } bytes, ${sampleRate} Hz, ${numChannels} channel(s), ${bitsPerSample}-bit, ${
+              isSigned ? "signed" : "unsigned"
+            }, ${isBigEndian ? "big-endian" : "little-endian"})`,
+            null,
+            "audio"
+          );
+
+          // Clean up the URL after playback ends
+          audioElement.onended = () => {
+            URL.revokeObjectURL(url); // Free up memory
+          };
+        } catch (err) {
+          logToConsole(
+            "error",
+            `❌ PCM chunk processing failed: ${err.message}`,
+            null,
+            "audio"
+          );
+        }
+      }
+
+      // Helper function to create a WAV file buffer from PCM data
+      function createWavBuffer(
+        rawPCM,
+        { numChannels, sampleRate, bitsPerSample, isSigned, isBigEndian }
+      ) {
+        const bytesPerSample = bitsPerSample / 8;
+        const blockAlign = numChannels * bytesPerSample;
+        const byteRate = sampleRate * blockAlign;
+        const dataSize = rawPCM.length;
+        const buffer = new ArrayBuffer(44 + dataSize); // 44 bytes for WAV header
         const view = new DataView(buffer);
 
-        const writeString = (offset, str) => {
-          for (let i = 0; i < str.length; i++)
-            view.setUint8(offset + i, str.charCodeAt(i));
-        };
-
-        writeString(0, "RIFF");
-        view.setUint32(4, 36 + pcm16.byteLength, true);
-        writeString(8, "WAVE");
-        writeString(12, "fmt ");
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true); // PCM
+        // Write WAV header
+        writeString(view, 0, "RIFF");
+        view.setUint32(4, 36 + dataSize, true); // Chunk size
+        writeString(view, 8, "WAVE");
+        writeString(view, 12, "fmt ");
+        view.setUint32(16, 16, true); // Subchunk1 size (16 for PCM)
+        view.setUint16(20, 1, true); // Audio format (1 = PCM)
         view.setUint16(22, numChannels, true);
         view.setUint32(24, sampleRate, true);
         view.setUint32(28, byteRate, true);
         view.setUint16(32, blockAlign, true);
         view.setUint16(34, bitsPerSample, true);
-        writeString(36, "data");
-        view.setUint32(40, pcm16.byteLength, true);
+        writeString(view, 36, "data");
+        view.setUint32(40, dataSize, true);
 
-        const wavBuffer = new Uint8Array(44 + pcm16.byteLength);
-        wavBuffer.set(new Uint8Array(buffer), 0);
-        wavBuffer.set(new Uint8Array(pcm16.buffer), 44);
-
-        return new Blob([wavBuffer], { type: "audio/wav" });
-      }
-
-      // Play next audio chunk
-      function playNextChunk() {
-        if (audioQueue.length === 0) {
-          isPlaying = false;
-          return;
+        // Write PCM data
+        for (let i = 0; i < dataSize; i++) {
+          view.setUint8(44 + i, rawPCM[i]);
         }
 
-        isPlaying = true;
-        const chunk = audioQueue.shift();
-        const wavBlob = pcm16ToWavBlob(chunk, {
-          sampleRate: 8000,
-          numChannels: 1,
-          bitsPerSample: 16,
-        });
-        const url = URL.createObjectURL(wavBlob);
-        audioElement.src = url;
-
-        audioElement.play().catch((err) => {
-          console.error("Audio play failed:", err);
-          logToConsole(
-            "error",
-            `❌ Audio play failed: ${err.message}`,
-            null,
-            "audio"
-          );
-        });
-
-        audioElement.onended = () => {
-          URL.revokeObjectURL(url);
-          playNextChunk();
-        };
+        return buffer;
       }
 
-      // Handle voice chunk
-      function handleVoiceChunk(data) {
-        const audioBlob = new Blob([new Uint8Array(data)], {
-          type: "audio/webm",
-        });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        audio.play();
-        audio.onended = () => {
-          URL.revokeObjectURL(audioUrl);
-        };
+      // Helper function to write string to DataView
+      function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
       }
 
       // File handling
@@ -2237,7 +2358,7 @@
           logToConsole(
             "info",
             "🗑️ Sent clear audio to " + currentStream,
-            { roomId: currentStream },
+            { room_id: currentStream },
             "events"
           );
           showToast("🧹 Cleared audio stream", "info");
@@ -2254,7 +2375,7 @@
           logToConsole(
             "info",
             "⏹️ Sent stop audio to " + currentStream,
-            { roomId: currentStream },
+            { room_id: currentStream },
             "events"
           );
           showToast("⏹️ Stopped audio stream", "info");
@@ -2283,8 +2404,8 @@
             );
 
             const uploadMsg = {
-              type: "audio-upload",
-              roomId: currentStream,
+              event: "audio-upload",
+              room_id: currentStream,
               fileName: file.name,
               fileSize: file.size,
               fileType: file.type,
