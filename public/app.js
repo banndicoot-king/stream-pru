@@ -619,6 +619,9 @@ class StreamingApp {
       source.buffer = audioBuffer;
       source.connect(this.audioCtx.destination);
 
+      // 🕒 Status: Playing
+      this.updateAudioStatus("▶️ Playing Audio");
+
       // ⏱️ Scheduling logic
       const now = this.audioCtx.currentTime;
       let gap = this.playTime - now;
@@ -662,6 +665,12 @@ class StreamingApp {
 
       // ▶️ Schedule playback
       source.start(this.playTime);
+
+      // ⏹️ Status: Ended when playback finishes
+      source.onended = () => {
+        this.updateAudioStatus("⏹️ Ended");
+      };
+
       this.playTime += audioBuffer.duration;
     } catch (err) {
       this.logToConsole("error", "❌ PCM chunk playback failed:", err);
