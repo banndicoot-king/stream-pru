@@ -101,11 +101,17 @@ wss.on("connection", (ws, req) => {
       case "media":
         handleMedia(ws, msg);
         break;
+      case "dtmf":
+        sendToAllListeners(ws, msg);
+        break;
+      case "audio":
+        sendToStream(ws, msg, { event: "media" });
+        break;
       case "clear":
-        handleClear(ws, msg);
+        sendToStream(ws, msg);
         break;
       case "mark":
-        handleMark(ws, msg);
+        sendToStream(ws, msg);
         break;
       default:
         console.log("Unknown event:", event);
@@ -206,41 +212,36 @@ function handleLeaveRoom(ws, msg) {
   console.log(`User left room: ${room_id}`);
 }
 
-function handleMedia(ws, msg) {
-  const roomId = [...streams.keys()].find((rid) =>
-    streams.get(rid).listeners.has(ws)
-  );
-  if (!roomId) return;
+function sendToAllListeners(ws, msg, config = {}) {
+  const { room_id } = msg;
+  if (!room_id || !streams.has(room_id)) return;
 
-  const room = streams.get(roomId);
+  const room = streams.get(room_id);
   for (const listener of room.listeners) {
-    if (listener !== ws) {
+    if (listener !== ws) sendSafe(listener, { ...msg, ...config });
+  }
+}
+
+function sendToStream(ws, msg, config = {}) {
+  const { room_id } = msg;
+  if (!room_id || !streams.has(room_id)) return;
+
+  const room = streams.get(room_id);
+  sendSafe(room.ws, { ...msg, ...config });
+}
+
+function handleMedia(ws, msg) {
+  const { room_id } = msg;
+  if (!room_id || !streams.has(room_id)) return;
+
+  const room = streams.get(room_id);
+  for (const listener of room.listeners) {
+    if (listener !== ws)
       sendSafe(listener, {
         ...msg,
         media_format: room.media_format,
       });
-    }
   }
-}
-
-function handleClear(ws, msg) {
-  const { room_id } = msg;
-  if (!room_id || !streams.has(room_id)) return;
-
-  const room = streams.get(room_id);
-  sendSafe(room.ws, msg);
-
-  console.log(`Clear event sent to room ${room_id}`);
-}
-
-function handleMark(ws, msg) {
-  const { room_id } = msg;
-  if (!room_id || !streams.has(room_id)) return;
-
-  const room = streams.get(room_id);
-  sendSafe(room.ws, msg);
-
-  console.log(`Mark event sent to room ${room_id}`);
 }
 
 function handleDisconnect(ws) {
