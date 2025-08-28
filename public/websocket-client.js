@@ -1,4 +1,6 @@
 /**
+ * CODE BY AJAY O S
+ * 
  * WebSocket Client Module
  * Handles all WebSocket communication and message processing
  */

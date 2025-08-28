@@ -8,7 +8,7 @@
       href="https://static.ajayos.in/favicon/favicon.ico"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Audio Streaming</title>
+    <title>🎵 Live Audio Streaming</title>
     <link rel="stylesheet" href="./styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,37 +35,29 @@
               <div class="io-dot out" id="outDot"></div>
             </div>
           </div>
-          <div class="audio-status" id="audioStatus">Not Playing</div>
+          <div class="audio-status" id="audioStatus">🔇 Not Playing</div>
         </div>
       </div>
 
       <div class="controls-section">
-        <div class="section-title">Available Streams</div>
+        <div class="section-title">📻 Available Streams</div>
         <select class="stream-select" id="streamSelect">
-          <option value="">Select a stream</option>
+          <option value="">Select a stream 🎧</option>
         </select>
 
         <div class="stats-compact">
           <div class="current-stream-compact">
-            <div class="current-stream-label">Current Stream</div>
+            <div class="current-stream-label">🎶 Current Stream</div>
             <div class="current-stream-name" id="currentStreamName">
               No stream selected
             </div>
 
             <div class="stream-action-buttons">
-              <button
-                class="stream-btn clear"
-                id="clearStreamBtn"
-                disabled
-              >
-                Clear
+              <button class="stream-btn clear" id="clearStreamBtn" disabled>
+                🗑️ Clear
               </button>
-              <button
-                class="stream-btn done"
-                id="stopStreamBtn"
-                disabled
-              >
-                Mark
+              <button class="stream-btn mark" id="markStreamBtn" disabled>
+                🏷️ Mark
               </button>
             </div>
           </div>
@@ -74,8 +66,8 @@
 
       <div class="file-upload-section">
         <div class="section-title">
-          File Upload
-          <span class="settings-icon" id="uploadSettingsBtn">⚙</span>
+          📂 File Upload
+          <span class="settings-icon" id="uploadSettingsBtn">⚙️</span>
         </div>
         <div class="file-input-wrapper">
           <input
@@ -86,8 +78,8 @@
             multiple
           />
           <div class="file-input-display" id="fileInputDisplay">
-            <span class="file-icon">♪</span>
-            <div class="file-text">Click to select audio files</div>
+            <span class="file-icon">🎵</span>
+            <div class="file-text">Click to select audio files 🎤</div>
             <div class="file-name" id="fileName"></div>
           </div>
           <div class="upload-progress" id="uploadProgress">
@@ -95,19 +87,11 @@
           </div>
         </div>
         <div class="action-buttons">
-          <button
-            class="action-btn clear"
-            id="clearBtn"
-            disabled
-          >
-            Clear
+          <button class="action-btn clear" id="clearBtn" disabled>
+            🗑️ Clear
           </button>
-          <button
-            class="action-btn done"
-            id="doneBtn"
-            disabled
-          >
-            Upload
+          <button class="action-btn done" id="doneBtn" disabled>
+            🚀 Upload
           </button>
         </div>
 
@@ -117,7 +101,7 @@
 
         <audio id="callTone" autoplay muted loop>
           <source
-            src="https://github.com/ajay-o-s/static-assets/raw/refs/heads/master/audio/stream/bell.mp3"
+            src="https://static.ajayos.in/audio/stream/bell.mp3"
             type="audio/mpeg"
           />
         </audio>
@@ -127,67 +111,51 @@
     <div class="right-panel">
       <div class="stats-section2">
         <div class="stats-row">
-          <span class="stat-compact-label">Active Streams</span>
-          <span class="stat-compact-value" id="streamCount">0</span>
+          <span class="stat-compact-label">📡 Active Streams&nbsp;&nbsp;</span>
+          <span class="stat-compact-value" id="streamCount">&nbsp;0&nbsp;</span>
         </div>
         <div class="stats-row">
-          <span class="stat-compact-label">Total Messages</span>
-          <span class="stat-compact-value" id="messageCount">0</span>
+          <span class="stat-compact-label">💬 Total Messages&nbsp;&nbsp;</span>
+          <span class="stat-compact-value" id="messageCount"
+            >&nbsp;0&nbsp;</span
+          >
         </div>
         <div class="stats-row">
-          <span class="stat-compact-label">Audio Packets</span>
-          <span class="stat-compact-value" id="audioPackets">0</span>
+          <span class="stat-compact-label">🎵 Audio Packets&nbsp;&nbsp;</span>
+          <span class="stat-compact-value" id="audioPackets"
+            >&nbsp;0&nbsp;</span
+          >
         </div>
         <div class="stats-row">
-          <span class="stat-compact-label">WebSocket Messages</span>
-          <span class="stat-compact-value" id="wsMessages">0</span>
+          <span class="stat-compact-label"
+            >🌐 WebSocket Messages&nbsp;&nbsp;</span
+          >
+          <span class="stat-compact-value" id="wsMessages">&nbsp;0&nbsp;</span>
         </div>
         <div class="stats-row">
-          <span class="stat-compact-label">Files Uploaded</span>
-          <span class="stat-compact-value" id="fileUploadCount">0</span>
+          <span class="stat-compact-label">📤 Files Uploaded&nbsp;&nbsp;</span>
+          <span class="stat-compact-value" id="fileUploadCount"
+            >&nbsp;0&nbsp;</span
+          >
         </div>
         <div class="stats-row">
-          <div class="eye">👁</div>
+          <div class="eye">👁️</div>
         </div>
         <div class="stats-row">
-          <div class="eye">👁</div>
+          <div class="eye">👁️</div>
         </div>
       </div>
       <div class="console-section">
         <div class="console-header">
           <div class="console-tabs">
-            <div
-              class="console-tab active"
-              data-tab="events"
-            >
-              Events
-            </div>
-            <div
-              class="console-tab"
-              data-tab="websocket"
-            >
-              WebSocket
-            </div>
-            <div
-              class="console-tab"
-              data-tab="audio"
-            >
-              Audio
-            </div>
-            <div
-              class="console-tab"
-              data-tab="files"
-            >
-              Files
-            </div>
+            <div class="console-tab active" data-tab="events">📅 Events</div>
+            <div class="console-tab" data-tab="websocket">🌐 WebSocket</div>
+            <div class="console-tab" data-tab="audio">🎧 Audio</div>
+            <div class="console-tab" data-tab="files">📂 Files</div>
           </div>
           <div class="console-actions">
-            <button class="console-btn" id="clearConsoleBtn">
-              Clear
-            </button>
-            <button class="console-btn" id="exportLogsBtn">
-              Export
-            </button>
+            <button class="console-btn" id="clearConsoleBtn">🗑️ Clear</button>
+            <button class="console-btn" id="exportLogsBtn">💾 Export</button>
           </div>
         </div>
         <div class="console-content" id="consoleContent"></div>
@@ -198,7 +166,7 @@
     <div class="room-popup-overlay" id="roomPopupOverlay">
       <div class="room-popup" id="roomPopup">
         <div class="room-popup-header">
-          <h3 class="room-popup-title">Incoming Streaming Request</h3>
+          <h3 class="room-popup-title">📞 Incoming Streaming Request</h3>
         </div>
         <div class="room-popup-content">
           <div class="room-request-info">
@@ -209,10 +177,10 @@
           </div>
           <div class="room-popup-actions">
             <button class="room-popup-btn decline" id="declineRoomBtn">
-              Decline
+              ❌ Decline
             </button>
             <button class="room-popup-btn accept" id="acceptRoomBtn">
-              Accept
+              ✅ Accept
             </button>
           </div>
         </div>
@@ -223,7 +191,7 @@
     <div class="settings-popup-overlay" id="uploadSettingsOverlay">
       <div class="settings-popup" id="uploadSettingsPopup">
         <div class="settings-popup-header">
-          <h3 class="settings-popup-title">Upload Settings</h3>
+          <h3 class="settings-popup-title">⚙️ Upload Settings</h3>
         </div>
         <div class="settings-popup-content">
           <label for="packetSize">Packet Size (KB):</label>
@@ -239,13 +207,13 @@
               class="settings-popup-btn cancel"
               id="cancelUploadSettingsBtn"
             >
-              Cancel
+              ❌ Cancel
             </button>
             <button
               class="settings-popup-btn submit"
               id="submitUploadSettingsBtn"
             >
-              Submit
+              ✅ Submit
             </button>
           </div>
         </div>
