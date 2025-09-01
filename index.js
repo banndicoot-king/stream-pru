@@ -32,7 +32,6 @@ function sendSafe(ws, data) {
 }
 
 function broadcast(data, exceptWs = null) {
-  console.log("broadcasting:", data);
   for (const client of wss.clients) {
     if (client.readyState === WebSocket.OPEN && client !== exceptWs) {
       sendSafe(client, data);
@@ -115,6 +114,7 @@ wss.on("connection", (ws, req) => {
         sendToStream(ws, msg);
         break;
       default:
+        sendToAllListeners(ws, msg);
         console.log("Unknown event:", event);
     }
   });

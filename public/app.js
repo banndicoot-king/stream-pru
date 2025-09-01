@@ -65,9 +65,6 @@ class StreamingApp {
   }
 
   /**
-   * 🗂️ Cache DOM elements for quick access
-   */
-  /**
    * 🗂️ Cache DOM elements for quick access (with line-by-line emojis and comments)
    */
   cacheElements() {
@@ -854,7 +851,16 @@ class StreamingApp {
       const reader = new FileReader();
       reader.onload = (e) => {
         const arrayBuffer = e.target.result;
-        const pcm = new Int16Array(arrayBuffer); // 16-bit signed PCM assumption
+
+        // 🛑 Skip WAV header only for first chunk
+        let dataBuffer = arrayBuffer;
+        if (chunkIndex === 0) {
+          const HEADER_SIZE = 44; // PCM16 WAV header
+          dataBuffer = arrayBuffer.slice(HEADER_SIZE);
+        }
+
+        // 🎵 Convert to PCM16
+        const pcm = new Int16Array(dataBuffer); // 16-bit signed PCM assumption
 
         // 🎚️ Normalize (optional: boost quiet voices)
         let maxAmp = 0;
