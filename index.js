@@ -233,6 +233,9 @@ function sendToStream(ws, msg, config = {}) {
   const { room_id } = msg;
   if (!room_id || !streams.has(room_id)) return;
 
+  // if the mark send by the ws then no send to itself
+  if (ws === room.ws) return broadcast(msg, ws);
+
   const room = streams.get(room_id);
   sendSafe(room.ws, { ...msg, ...config });
 }
