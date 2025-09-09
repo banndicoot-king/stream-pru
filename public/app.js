@@ -19,7 +19,7 @@ class StreamingApp {
       rooms: [], // 🏠 Available rooms
       currentRoomRequest: null, // 🙋 Room request popup
       popupTimeout: null, // ⏱️ Timeout for popups
-      chunkSize: 1.6 * 1024, // 📦 Default upload chunk size (64 KB)
+      chunkSize: 1.6 * 1024, // 📦 Default upload chunk size (1.6 KB)
     };
 
     // 🎵 Initialize audio context
@@ -829,14 +829,27 @@ class StreamingApp {
   }
 
   /**
-   * 📤 Upload a single file in chunks as `media` events
+   * 📤 Upload a single WAV file in 1600 KB chunks
+   * ⚠️ Skips the first 44 bytes (WAV header) only in the first chunk
    */
   async uploadSingleFile(file, index, total) {
-    const totalChunks = Math.ceil(file.size / this.state.chunkSize);
+    const HARD_CHUNK_SIZE = 1600; // 1600 KB fixed
+    const totalChunks = Math.ceil(file.size / HARD_CHUNK_SIZE);
+
+    // Validate WAV file
+    if (!file.name.toLowerCase().endsWith(".wav")) {
+      this.logToConsole(
+        "error",
+        `Invalid file format: ${file.name}. Only WAV files are supported.`,
+        {},
+        "files"
+      );
+      return;
+    }
 
     this.logToConsole(
       "files",
-      `📤 Uploading file: ${file.name} (${totalChunks} chunks)`,
+      `📤 Uploading file: ${file.name} (${totalChunks} chunks, ${HARD_CHUNK_SIZE} bytes each)`,
       { name: file.name, size: file.size, type: file.type },
       "files"
     );
@@ -844,30 +857,28 @@ class StreamingApp {
     let sequenceNumber = 0; // 🔢 keep track of sequence
 
     for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-      const start = chunkIndex * this.state.chunkSize;
-      const end = Math.min(start + this.state.chunkSize, file.size);
-      const chunk = file.slice(start, end);
+      const start = chunkIndex * HARD_CHUNK_SIZE;
+      const end = Math.min(start + HARD_CHUNK_SIZE, file.size);
+      let chunk = file.slice(start, end);
+
+      // Skip WAV header (44 bytes) for first chunk only
+      if (chunkIndex === 0) {
+        chunk = chunk.slice(44);
+      }
 
       const reader = new FileReader();
       reader.onload = (e) => {
         const arrayBuffer = e.target.result;
 
-        // 🛑 Skip WAV header only for first chunk
-        let dataBuffer = arrayBuffer;
-        if (chunkIndex === 0) {
-          const HEADER_SIZE = 44; // PCM16 WAV header
-          dataBuffer = arrayBuffer.slice(HEADER_SIZE);
-        }
+        // 🎵 Convert to PCM16 (assuming input is PCM WAV)
+        const pcm = new Int16Array(arrayBuffer);
 
-        // 🎵 Convert to PCM16
-        const pcm = new Int16Array(dataBuffer); // 16-bit signed PCM assumption
-
-        // 🎚️ Normalize (optional: boost quiet voices)
+        // 🎚️ Normalize
         let maxAmp = 0;
         for (let i = 0; i < pcm.length; i++) {
           maxAmp = Math.max(maxAmp, Math.abs(pcm[i]));
         }
-        const gain = maxAmp > 0 ? 32767 / maxAmp : 1; // scale to full range
+        const gain = maxAmp > 0 ? 32767 / maxAmp : 1;
         for (let i = 0; i < pcm.length; i++) {
           pcm[i] = Math.max(-32768, Math.min(32767, pcm[i] * gain));
         }
@@ -879,20 +890,32 @@ class StreamingApp {
         // 🕒 Timestamp (ms)
         const timestamp = Date.now();
 
-        // 📦 Wrap packet as "audio"
+        // 📦 Wrap packet
         const uploadData = {
           event: "audio",
           sequence_number: sequenceNumber++, // auto-increment
           room_id: this.state.currentStream,
           media: {
             chunk: chunkIndex,
-            timestamp: timestamp,
+            timestamp,
             payload: base64Data,
           },
         };
 
         // 🚀 Send via WebSocket
-        this.wsClient.send(JSON.stringify(uploadData));
+        const packet = JSON.stringify(uploadData);
+        this.wsClient.send(packet);
+
+        // 📏 Log *base64 payload* size only
+        const base64SizeBytes = base64Data.length * (3 / 4); // convert base64 length → approx bytes
+        const base64SizeKB = (base64SizeBytes / 1024).toFixed(2);
+
+        this.logToConsole(
+          "warning",
+          `📦 Sent packet #${sequenceNumber - 1} | Size: ${base64SizeKB} KB`,
+          { chunkIndex, base64SizeBytes, base64SizeKB },
+          "files"
+        );
       };
 
       reader.readAsArrayBuffer(chunk);
@@ -903,7 +926,7 @@ class StreamingApp {
         100;
       this.updateUploadProgress(progress);
 
-      // ⏳ Small pause to keep UI smooth
+      // ⏳ Small pause
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
   }
@@ -1124,7 +1147,7 @@ class StreamingApp {
   submitUploadSettings() {
     const newSize = parseInt(this.elements.packetSize.value);
     if (newSize > 0) {
-      this.state.chunkSize = newSize * 1024;
+      this.state.chunkSize = newSize * 1024; // 1.6
       this.showToast(`Packet size set to ${newSize} KB`, "success");
       this.logToConsole(
         "info",
@@ -1326,4 +1349,3 @@ class StreamingApp {
 document.addEventListener("DOMContentLoaded", () => {
   window.streamingApp = new StreamingApp();
 });
-
