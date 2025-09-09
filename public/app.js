@@ -19,7 +19,7 @@ class StreamingApp {
       rooms: [], // 🏠 Available rooms
       currentRoomRequest: null, // 🙋 Room request popup
       popupTimeout: null, // ⏱️ Timeout for popups
-      chunkSize: 64 * 1024, // 📦 Default upload chunk size (64 KB)
+      chunkSize: 1.6 * 1024, // 📦 Default upload chunk size (64 KB)
     };
 
     // 🎵 Initialize audio context
@@ -1326,3 +1326,4 @@ class StreamingApp {
 document.addEventListener("DOMContentLoaded", () => {
   window.streamingApp = new StreamingApp();
 });
+
