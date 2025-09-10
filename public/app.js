@@ -867,7 +867,7 @@ class StreamingApp {
       }
 
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const arrayBuffer = e.target.result;
 
         // 🎵 Convert to PCM16 (assuming input is PCM WAV)
@@ -916,6 +916,8 @@ class StreamingApp {
           { chunkIndex, base64SizeBytes, base64SizeKB },
           "files"
         );
+        // wait for 100 milliseconds
+        await new Promise((resolve) => setTimeout(resolve, 100));
       };
 
       reader.readAsArrayBuffer(chunk);
