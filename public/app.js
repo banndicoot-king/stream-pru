@@ -929,7 +929,7 @@ class StreamingApp {
       this.updateUploadProgress(progress);
 
       // ⏳ Small pause
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 10));
     }
   }
 
@@ -1351,4 +1351,5 @@ class StreamingApp {
 document.addEventListener("DOMContentLoaded", () => {
   window.streamingApp = new StreamingApp();
 });
+
 
