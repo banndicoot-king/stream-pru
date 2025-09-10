@@ -917,7 +917,7 @@ class StreamingApp {
           "files"
         );
         // wait for 100 milliseconds
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        //await new Promise((resolve) => setTimeout(resolve, 100));
       };
 
       reader.readAsArrayBuffer(chunk);
@@ -929,7 +929,7 @@ class StreamingApp {
       this.updateUploadProgress(progress);
 
       // ⏳ Small pause
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
 
@@ -1351,3 +1351,4 @@ class StreamingApp {
 document.addEventListener("DOMContentLoaded", () => {
   window.streamingApp = new StreamingApp();
 });
+
