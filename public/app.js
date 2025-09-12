@@ -870,20 +870,33 @@ class StreamingApp {
       reader.onload = async (e) => {
         const arrayBuffer = e.target.result;
 
-        // 🎵 Convert to PCM16 (assuming input is PCM WAV)
         const pcm = new Int16Array(arrayBuffer);
 
-        // 🎚️ Normalize
+        // 🚫 Skip if silent (threshold: < 1% of full scale to allow tiny noise)
         let maxAmp = 0;
         for (let i = 0; i < pcm.length; i++) {
           maxAmp = Math.max(maxAmp, Math.abs(pcm[i]));
         }
-        const gain = maxAmp > 0 ? 32767 / maxAmp : 1;
-        for (let i = 0; i < pcm.length; i++) {
-          pcm[i] = Math.max(-32768, Math.min(32767, pcm[i] * gain));
+        if (maxAmp < 327.67) {
+          // ~1% threshold; adjust as needed
+          this.logToConsole(
+            "info",
+            `⏭️ Skipping silent chunk ${chunkIndex}`,
+            { chunkIndex, maxAmp },
+            "files"
+          );
+          sequenceNumber++; // Increment to maintain sequence
+          // Update progress
+          const progress =
+            (((index - 1) * totalChunks + chunkIndex + 1) /
+              (total * totalChunks)) *
+            100;
+          this.updateUploadProgress(progress);
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          return;
         }
 
-        // 🔡 Encode back to base64
+        // Encode to base64 (raw PCM, no normalization)
         const uint8 = new Uint8Array(pcm.buffer);
         const base64Data = btoa(String.fromCharCode(...uint8));
 
@@ -1351,5 +1364,3 @@ class StreamingApp {
 document.addEventListener("DOMContentLoaded", () => {
   window.streamingApp = new StreamingApp();
 });
-
-
