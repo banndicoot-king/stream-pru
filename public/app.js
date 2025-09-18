@@ -189,9 +189,9 @@ class StreamingApp {
     this.elements.declineRoomBtn.addEventListener("click", () =>
       this.dismissRoomPopup()
     );
-    this.elements.uploadSettingsBtn.addEventListener("click", () =>
+    //this.elements.uploadSettingsBtn.addEventListener("click", () =>
      // this.openUploadSettings()
-    );
+    //);
     this.elements.submitUploadSettingsBtn.addEventListener("click", () =>
       this.submitUploadSettings()
     );
