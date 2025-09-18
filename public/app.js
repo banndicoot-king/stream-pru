@@ -56,8 +56,6 @@ class StreamingApp {
     // 🔌 Connect WebSocket
     this.wsClient.connect();
 
-    this.elements.uploadSettingsBtn.disabled = true;
-
     this.logToConsole(
       "success",
       "✅ Application initialized successfully",
@@ -192,7 +190,7 @@ class StreamingApp {
       this.dismissRoomPopup()
     );
     this.elements.uploadSettingsBtn.addEventListener("click", () =>
-      this.openUploadSettings()
+     // this.openUploadSettings()
     );
     this.elements.submitUploadSettingsBtn.addEventListener("click", () =>
       this.submitUploadSettings()
