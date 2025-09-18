@@ -56,6 +56,8 @@ class StreamingApp {
     // 🔌 Connect WebSocket
     this.wsClient.connect();
 
+    this.elements.uploadSettingsBtn.disabled = true;
+
     this.logToConsole(
       "success",
       "✅ Application initialized successfully",
@@ -128,8 +130,6 @@ class StreamingApp {
       cancelUploadSettingsBtn: document.getElementById(
         "cancelUploadSettingsBtn"
       ), // ❌ Cancel upload settings
-
-      this.elements.uploadSettingsBtn.disabled = true;
     };
   }
 
