@@ -128,6 +128,8 @@ class StreamingApp {
       cancelUploadSettingsBtn: document.getElementById(
         "cancelUploadSettingsBtn"
       ), // ❌ Cancel upload settings
+
+      this.elements.uploadSettingsBtn.disabled = true;
     };
   }
 
