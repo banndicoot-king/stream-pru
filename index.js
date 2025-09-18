@@ -132,6 +132,7 @@ wss.on("connection", (ws, req) => {
 // Event Handlers
 // =====================
 function handleStart(ws, msg) {
+  var start = msg.start;
   const {
     call_id,
     room_id,
@@ -139,10 +140,11 @@ function handleStart(ws, msg) {
     dni,
     media_format = {},
     custom_parameters = [],
-  } = msg.start || {};
+  } = start || {};
   if (!room_id) return;
 
   const room = {
+    ...start,
     id: room_id,
     name: room_id,
     call_id,
@@ -159,7 +161,7 @@ function handleStart(ws, msg) {
   broadcast(
     {
       event: "add-stream",
-      stream: [{ name: room_id, room_id, call_id, cli, dni }],
+      stream: [{ name: room_id, room_id, call_id, cli, dni, Event: start }],
     },
     ws
   );
