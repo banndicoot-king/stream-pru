@@ -555,6 +555,16 @@ audio {
   box-shadow: 0 4px 12px rgba(118, 75, 162, 0.45);
 }
 
+.stream-btn.exit {
+  background: linear-gradient(135deg, #667eea 0%, #4cffd8 100%);
+  color: #fff;
+}
+.stream-btn.exit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #9237ec 0%, #667eea 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(118, 75, 162, 0.45);
+}
+
 .stream-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;

@@ -19,7 +19,7 @@ class StreamingApp {
       rooms: [], // 🏠 Available rooms
       currentRoomRequest: null, // 🙋 Room request popup
       popupTimeout: null, // ⏱️ Timeout for popups
-      chunkSize: 1.6 * 1024, // 📦 Default upload chunk size (1.6 KB)
+      chunkSize: 1.6 * 1000, // 📦 Default upload chunk size (1.6 KB)
     };
 
     // 🎵 Initialize audio context
@@ -74,6 +74,7 @@ class StreamingApp {
       currentStreamName: document.getElementById("currentStreamName"), // 🏷️ Current stream name
       clearStreamBtn: document.getElementById("clearStreamBtn"), // ❌ Clear stream button
       markStreamBtn: document.getElementById("markStreamBtn"), // 🏷️ Mark stream button
+      exitStreamBtn: document.getElementById("exitStreamBtn"), // 🚪 Exit stream button
 
       // 🟢 Status indicators
       connectionStatus: document.getElementById("connectionStatus"), // 🟢 Main status dot
@@ -143,6 +144,9 @@ class StreamingApp {
     );
     this.elements.markStreamBtn.addEventListener("click", () =>
       this.markStream()
+    );
+    this.elements.exitStreamBtn.addEventListener("click", () =>
+      this.exitStream()
     );
 
     // 📂 File handling
@@ -271,6 +275,10 @@ class StreamingApp {
       this.handleDtmf(data);
     });
 
+    this.wsClient.on("mark", (data) => {
+      this.handleMark(data);
+    });
+
     this.wsClient.on("audioData", (data) => {
       this.handleAudioData(data);
     });
@@ -330,6 +338,18 @@ class StreamingApp {
     this.logToConsole(
       "success", // ✅ Log type
       `DTMF digit received: ${data.dtmf.digit} `, // 📝 Message
+      data, // 📦 Data
+      "events" // 🖥️ Log tab
+    );
+  }
+
+  handleMark(data) {
+    // log the data.mark
+    console.log("Mark received:");
+    this.showToast(`Mark received  `, "info");
+    this.logToConsole(
+      "success", // ✅ Log type
+      `Mark received`, // 📝 Message
       data, // 📦 Data
       "events" // 🖥️ Log tab
     );
@@ -503,6 +523,7 @@ class StreamingApp {
         // 🔓 Enable clear and mark buttons
         this.elements.clearStreamBtn.disabled = false;
         this.elements.markStreamBtn.disabled = false;
+        this.elements.exitStreamBtn.disabled = false;
 
         // ▶️ Start streaming the selected room
         this.startStreaming();
@@ -517,6 +538,7 @@ class StreamingApp {
         // 🚫 No stream selected, disable buttons and update UI
         this.elements.clearStreamBtn.disabled = true;
         this.elements.markStreamBtn.disabled = true;
+        this.elements.exitStreamBtn.disabled = true;
         this.elements.currentStreamName.textContent = "No stream selected";
       }
     }
@@ -559,6 +581,7 @@ class StreamingApp {
       this.state.currentStream = null;
       this.elements.clearStreamBtn.disabled = true;
       this.elements.markStreamBtn.disabled = true;
+      this.elements.exitStreamBtn.disabled = true;
       this.elements.currentStreamName.textContent = "No stream selected";
     }
   }
@@ -590,6 +613,21 @@ class StreamingApp {
         "events"
       );
       this.showToast("Marked audio stream", "info");
+    }
+  }
+
+  /**
+   * exit stream
+   */
+  exitStream() {
+    if (this.wsClient.exitStream(this.state.currentStream)) {
+      this.logToConsole(
+        "info",
+        `Exited stream: ${this.state.currentStream}`,
+        null,
+        "events"
+      );
+      this.showToast("Exited audio stream", "info");
     }
   }
 
@@ -833,7 +871,7 @@ class StreamingApp {
    * ⚠️ Skips the first 44 bytes (WAV header) only in the first chunk
    */
   async uploadSingleFile(file, index, total) {
-    const HARD_CHUNK_SIZE = 1600; // 1600 KB fixed
+    const HARD_CHUNK_SIZE = this.state.chunkSize;
     const totalChunks = Math.ceil(file.size / HARD_CHUNK_SIZE);
 
     // Validate WAV file
@@ -1151,7 +1189,7 @@ class StreamingApp {
    * Open upload settings
    */
   openUploadSettings() {
-    this.elements.packetSize.value = this.state.chunkSize / 1024;
+    this.elements.packetSize.value = this.state.chunkSize / 1000;
     this.elements.uploadSettingsOverlay.classList.add("show");
     this.elements.uploadSettingsPopup.classList.add("show");
   }
@@ -1162,7 +1200,7 @@ class StreamingApp {
   submitUploadSettings() {
     const newSize = parseInt(this.elements.packetSize.value);
     if (newSize > 0) {
-      this.state.chunkSize = newSize * 1024; // 1.6
+       this.state.chunkSize = parseInt(newSize * 1000); // 1.6
       this.showToast(`Packet size set to ${newSize} KB`, "success");
       this.logToConsole(
         "info",

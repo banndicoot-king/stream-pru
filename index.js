@@ -110,6 +110,9 @@ wss.on("connection", (ws, req) => {
       case "clear":
         sendToStream(ws, msg);
         break;
+      case "exit":
+        sendToStream(ws, msg);
+        break;
       case "mark":
         sendToStream(ws, msg);
         break;
