@@ -545,11 +545,11 @@ audio {
   box-shadow: 0 4px 10px rgba(253, 160, 133, 0.4);
 }
 
-.stream-btn.done {
+.stream-btn.mark {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
 }
-.stream-btn.done:hover:not(:disabled) {
+.stream-btn.mark:hover:not(:disabled) {
   background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
   transform: translateY(-2px) scale(1.03);
   box-shadow: 0 4px 12px rgba(118, 75, 162, 0.45);
