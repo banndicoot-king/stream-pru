@@ -252,7 +252,7 @@ function handleMedia(ws, msg) {
 
   const room = streams.get(room_id);
   for (const listener of room.listeners) {
-    if (listener !== ws)
+    //if (listener !== ws)
       sendSafe(listener, {
         ...msg,
         media_format: room.media_format,
