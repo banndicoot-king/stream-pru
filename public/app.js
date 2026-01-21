@@ -60,7 +60,7 @@ class StreamingApp {
       "success",
       "✅ Application initialized successfully",
       null,
-      "events"
+      "events",
     );
   }
 
@@ -119,15 +119,24 @@ class StreamingApp {
 
       // ⚙️ Upload settings popup
       uploadSettingsOverlay: document.getElementById("uploadSettingsOverlay"), // 🪟 Upload settings overlay
+      endJsonSettingsOverlay: document.getElementById("endJsonSettingsOverlay"), // 🪟 Upload settings overlay
       uploadSettingsPopup: document.getElementById("uploadSettingsPopup"), // 🪟 Upload settings popup
+      endJsonSettingsPopup: document.getElementById("endJsonSettingsPopup"), // 🪟 Upload settings popup
       uploadSettingsBtn: document.getElementById("uploadSettingsBtn"), // ⚙️ Open upload settings button
       packetSize: document.getElementById("packetSize"), // 📦 Packet size input
+      jsonData: document.getElementById("jsonData"), // 📦 Packet size input
       submitUploadSettingsBtn: document.getElementById(
-        "submitUploadSettingsBtn"
+        "submitUploadSettingsBtn",
       ), // ✅ Submit upload settings
       cancelUploadSettingsBtn: document.getElementById(
-        "cancelUploadSettingsBtn"
+        "cancelUploadSettingsBtn",
       ), // ❌ Cancel upload settings
+      submitJSONUploadSettingsBtn: document.getElementById(
+        "submitJSONUploadSettingsBtn",
+      ), // ✅ Submit JSON upload settings
+      cancelJSONUploadSettingsBtn: document.getElementById(
+        "cancelJSONUploadSettingsBtn",
+      ), // ❌ Cancel JSON upload settings
     };
   }
 
@@ -137,44 +146,44 @@ class StreamingApp {
   setupEventListeners() {
     // 🎛️ Stream controls
     this.elements.streamSelect.addEventListener("change", (e) =>
-      this.handleStreamSelection(e.target.value)
+      this.handleStreamSelection(e.target.value),
     );
     this.elements.clearStreamBtn.addEventListener("click", () =>
-      this.clearStream()
+      this.clearStream(),
     );
     this.elements.markStreamBtn.addEventListener("click", () =>
-      this.markStream()
+      this.markStream(),
     );
     this.elements.exitStreamBtn.addEventListener("click", () =>
-      this.exitStream()
+      this.exitStream(),
     );
 
     // 📂 File handling
     this.elements.fileInput.addEventListener("change", (e) =>
-      this.handleFileSelection(e.target.files)
+      this.handleFileSelection(e.target.files),
     );
     this.elements.clearBtn.addEventListener("click", () =>
-      this.clearFileSelection()
+      this.clearFileSelection(),
     );
     this.elements.doneBtn.addEventListener("click", () => this.uploadFiles());
 
     // 🎵 Audio status
     this.elements.player.addEventListener("play", () =>
-      this.updateAudioStatus("▶️ Playing Audio")
+      this.updateAudioStatus("▶️ Playing Audio"),
     );
     this.elements.player.addEventListener("pause", () =>
-      this.updateAudioStatus("⏸️ Paused")
+      this.updateAudioStatus("⏸️ Paused"),
     );
     this.elements.player.addEventListener("ended", () =>
-      this.updateAudioStatus("⏹️ Ended")
+      this.updateAudioStatus("⏹️ Ended"),
     );
 
     // 🖥️ Console actions
     this.elements.clearConsoleBtn.addEventListener("click", () =>
-      this.clearConsole()
+      this.clearConsole(),
     );
     this.elements.exportLogsBtn.addEventListener("click", () =>
-      this.exportLogs()
+      this.exportLogs(),
     );
 
     // 📑 Console tabs
@@ -184,19 +193,25 @@ class StreamingApp {
 
     // 🔔 Popup buttons
     this.elements.acceptRoomBtn.addEventListener("click", () =>
-      this.acceptRoomRequest()
+      this.acceptRoomRequest(),
     );
     this.elements.declineRoomBtn.addEventListener("click", () =>
-      this.dismissRoomPopup()
+      this.dismissRoomPopup(),
     );
     //this.elements.uploadSettingsBtn.addEventListener("click", () =>
-     // this.openUploadSettings()
+    // this.openUploadSettings()
     //);
     this.elements.submitUploadSettingsBtn.addEventListener("click", () =>
-      this.submitUploadSettings()
+      this.submitUploadSettings(),
     );
     this.elements.cancelUploadSettingsBtn.addEventListener("click", () =>
-      this.dismissUploadSettings()
+      this.dismissUploadSettings(),
+    );
+    this.elements.submitJSONUploadSettingsBtn.addEventListener("click", () =>
+      this.submitJSONUploadSettings(),
+    );
+    this.elements.cancelJSONUploadSettingsBtn.addEventListener("click", () =>
+      this.dismissJSONUploadSettings(),
     );
 
     // 🖱️ Overlay close
@@ -225,7 +240,7 @@ class StreamingApp {
         "success",
         "✅ WebSocket connection established",
         data,
-        "events"
+        "events",
       );
       this.logToConsole("websocket", "📡 Connection opened", data, "websocket");
       this.blinkIODot("out");
@@ -249,7 +264,7 @@ class StreamingApp {
         "websocket",
         `⬅️ Received: ${data.type}`,
         data.payload,
-        "websocket"
+        "websocket",
       );
     });
 
@@ -259,7 +274,7 @@ class StreamingApp {
         "websocket",
         `➡️ Sent: ${data.type}`,
         data.payload,
-        "websocket"
+        "websocket",
       );
     });
 
@@ -292,7 +307,7 @@ class StreamingApp {
         "error",
         `❌ Server error: ${data.error}`,
         data,
-        "events"
+        "events",
       );
       this.showToast(`❌ Server error: ${data.error}`, "error");
     });
@@ -327,7 +342,7 @@ class StreamingApp {
       "success", // ✅ Log type
       ` Added ${data.stream.length} stream(s)`, // 📝 Message
       data.stream, // 📦 Data
-      "events" // 🖥️ Log tab
+      "events", // 🖥️ Log tab
     );
   }
 
@@ -339,7 +354,7 @@ class StreamingApp {
       "success", // ✅ Log type
       `DTMF digit received: ${data.dtmf.digit} `, // 📝 Message
       data, // 📦 Data
-      "events" // 🖥️ Log tab
+      "events", // 🖥️ Log tab
     );
   }
 
@@ -351,7 +366,7 @@ class StreamingApp {
       "success", // ✅ Log type
       `Mark received`, // 📝 Message
       data, // 📦 Data
-      "events" // 🖥️ Log tab
+      "events", // 🖥️ Log tab
     );
   }
 
@@ -367,7 +382,7 @@ class StreamingApp {
         "error",
         "❌ Invalid room ID in remove-stream message",
         data,
-        "events"
+        "events",
       );
       return; // ⏹️ Stop further processing
     }
@@ -391,7 +406,7 @@ class StreamingApp {
       "warning", // ⚠️ Log type
       `🗑️ Removed stream: ${roomId}`, // 📝 Message
       null, // 📦 No extra data
-      "events" // 🖥️ Log tab
+      "events", // 🖥️ Log tab
     );
   }
 
@@ -407,7 +422,7 @@ class StreamingApp {
         chunk: data.media?.chunk || "", // 🧩 Chunk identifier
         size: data.media?.payload ? data.media.payload.length : "unknown", // 📏 Payload size
       },
-      "audio" // 🎵 Log tab
+      "audio", // 🎵 Log tab
     );
 
     // ⏱️ If testtime is present, log delay info
@@ -441,7 +456,7 @@ class StreamingApp {
           clientReceiveTs: now.getTime(), // 🕒 Client receive timestamp
           streamerTs: streamerTs.getTime(), // 🕒 Streamer send timestamp
         },
-        "audio" // 🎵 Log tab
+        "audio", // 🎵 Log tab
       );
     } else {
       // ⚠️ Warn if testtime could not be parsed
@@ -514,7 +529,7 @@ class StreamingApp {
       if (this.state.currentStream) {
         // 🔍 Find the selected room object by ID
         const selectedRoom = this.state.rooms.find(
-          (room) => room.id === this.state.currentStream
+          (room) => room.id === this.state.currentStream,
         );
         // 🏷️ Update UI with stream name or fallback
         this.elements.currentStreamName.textContent = selectedRoom
@@ -532,7 +547,7 @@ class StreamingApp {
           "info",
           `Selected stream: ${selectedRoom?.name || "Unknown"}`,
           selectedRoom,
-          "events"
+          "events",
         );
       } else {
         // 🚫 No stream selected, disable buttons and update UI
@@ -554,14 +569,14 @@ class StreamingApp {
       "info",
       `Starting stream: ${this.state.currentStream}`,
       null,
-      "events"
+      "events",
     );
     this.wsClient.joinRoom(this.state.currentStream);
     this.logToConsole(
       "success",
       `Joined room: ${this.state.currentStream}`,
       null,
-      "events"
+      "events",
     );
   }
 
@@ -595,7 +610,7 @@ class StreamingApp {
         "info",
         `Sent clear audio to ${this.state.currentStream}`,
         null,
-        "events"
+        "events",
       );
       this.showToast("Cleared audio stream", "info");
     }
@@ -610,7 +625,7 @@ class StreamingApp {
         "info",
         `Marked audio to ${this.state.currentStream}`,
         null,
-        "events"
+        "events",
       );
       this.showToast("Marked audio stream", "info");
     }
@@ -620,15 +635,9 @@ class StreamingApp {
    * exit stream
    */
   exitStream() {
-    if (this.wsClient.exitStream(this.state.currentStream)) {
-      this.logToConsole(
-        "info",
-        `Exited stream: ${this.state.currentStream}`,
-        null,
-        "events"
-      );
-      this.showToast("Exited audio stream", "info");
-    }
+     this.elements.endJsonSettingsOverlay.classList.add("show");
+      this.elements.endJsonSettingsPopup.classList.add("show");
+    
   }
 
   // 🎵 Decode + play PCM audio
@@ -654,7 +663,7 @@ class StreamingApp {
       const audioBuffer = this.audioCtx.createBuffer(
         numChannels,
         sampleCount,
-        sampleRate
+        sampleRate,
       );
 
       // 📝 Fill buffer (16-bit signed PCM → float [-1,1])
@@ -681,10 +690,10 @@ class StreamingApp {
       this.logToConsole(
         "audio",
         `⏱️ Audio scheduling: Current=${now.toFixed(
-          3
+          3,
         )} Playhead=${this.playTime.toFixed(3)} Gap=${gap.toFixed(3)} sec`,
         null,
-        "audio"
+        "audio",
       );
 
       // 🎯 Target small buffer ahead (e.g. 0.1s)
@@ -696,7 +705,7 @@ class StreamingApp {
           "warn",
           "⚠️ Too much buffered ahead, adjusting back smoothly.",
           null,
-          "audio"
+          "audio",
         );
         console.warn("⚠️ Too much buffered ahead, adjusting back smoothly.");
         this.playTime -= 0.2; // shift back slightly
@@ -708,7 +717,7 @@ class StreamingApp {
           "warn",
           "⚠️ Underrun detected, adjusting forward.",
           null,
-          "audio"
+          "audio",
         );
         console.warn("⚠️ Underrun detected, adjusting forward.");
         this.playTime = now + targetLead;
@@ -751,7 +760,7 @@ class StreamingApp {
         size: f.size, // 📏 File size
         type: f.type, // 🏷️ File type
       })),
-      "files" // 📁 Log tab
+      "files", // 📁 Log tab
     );
   }
 
@@ -824,7 +833,7 @@ class StreamingApp {
         "warning",
         "❌ No files selected for upload",
         null,
-        "files"
+        "files",
       );
       this.showToast("No files selected", "warning");
       return;
@@ -839,7 +848,7 @@ class StreamingApp {
         "warning",
         "❌ No stream selected for upload",
         null,
-        "files"
+        "files",
       );
       this.showToast("No stream selected", "warning");
       return;
@@ -860,7 +869,7 @@ class StreamingApp {
     // 🎉 Show success toast
     this.showToast(
       `Successfully uploaded ${this.state.selectedFiles.length} file(s)`,
-      "success"
+      "success",
     );
     // 🧹 Clear file selection after upload
     this.clearFileSelection();
@@ -880,7 +889,7 @@ class StreamingApp {
         "error",
         `Invalid file format: ${file.name}. Only WAV files are supported.`,
         {},
-        "files"
+        "files",
       );
       return;
     }
@@ -889,7 +898,7 @@ class StreamingApp {
       "files",
       `📤 Uploading file: ${file.name} (${totalChunks} chunks, ${HARD_CHUNK_SIZE} bytes each)`,
       { name: file.name, size: file.size, type: file.type },
-      "files"
+      "files",
     );
 
     let sequenceNumber = 0; // 🔢 keep track of sequence
@@ -921,7 +930,7 @@ class StreamingApp {
             "info",
             `⏭️ Skipping silent chunk ${chunkIndex}`,
             { chunkIndex, maxAmp },
-            "files"
+            "files",
           );
           sequenceNumber++; // Increment to maintain sequence
           // Update progress
@@ -965,7 +974,7 @@ class StreamingApp {
           "warning",
           `📦 Sent packet #${sequenceNumber - 1} | Size: ${base64SizeKB} KB`,
           { chunkIndex, base64SizeBytes, base64SizeKB },
-          "files"
+          "files",
         );
         // wait for 100 milliseconds
         //await new Promise((resolve) => setTimeout(resolve, 100));
@@ -993,14 +1002,14 @@ class StreamingApp {
         "files",
         `File upload successful: ${response.fileName}`,
         response,
-        "files"
+        "files",
       );
     } else {
       this.logToConsole(
         "files",
         `File upload failed: ${response.fileName} - ${response.error}`,
         response,
-        "files"
+        "files",
       );
       this.showToast(`Upload failed: ${response.error}`, "error");
     }
@@ -1099,7 +1108,7 @@ class StreamingApp {
     this.elements.connectionStatus2.classList.add(dotId);
     setTimeout(
       () => this.elements.connectionStatus2.classList.remove(dotId),
-      300
+      300,
     );
   }
 
@@ -1126,7 +1135,7 @@ class StreamingApp {
       "events",
       `Room request popup shown: ${roomData.name}`,
       roomData,
-      "events"
+      "events",
     );
   }
 
@@ -1142,11 +1151,11 @@ class StreamingApp {
         "success",
         `Accepted room request: ${this.state.currentRoomRequest.name}`,
         this.state.currentRoomRequest,
-        "events"
+        "events",
       );
       this.showToast(
         `Room "${this.state.currentRoomRequest.name}" accepted!`,
-        "success"
+        "success",
       );
     }
     this.dismissRoomPopup();
@@ -1200,18 +1209,39 @@ class StreamingApp {
   submitUploadSettings() {
     const newSize = parseInt(this.elements.packetSize.value);
     if (newSize > 0) {
-       this.state.chunkSize = parseInt(newSize * 1000); // 1.6
+      this.state.chunkSize = parseInt(newSize * 1000); // 1.6
       this.showToast(`Packet size set to ${newSize} KB`, "success");
       this.logToConsole(
         "info",
         `Updated packet size to ${newSize} KB`,
         null,
-        "files"
+        "files",
       );
     } else {
       this.showToast("Invalid packet size", "warning");
     }
     this.dismissUploadSettings();
+  }
+
+  submitJSONUploadSettings() {
+    var data_json = this.elements.jsonData.value;
+    try {
+      var jsonData = JSON.parse(data_json);
+    } catch (e) {
+      this.showToast("Invalid JSON data", "error");
+      return;
+    }
+
+    if (this.wsClient.exitStream(this.state.currentStream, jsonData)) {
+      this.logToConsole(
+        "info",
+        `Exited stream: ${this.state.currentStream}`,
+        null,
+        "events",
+      );
+      this.showToast("Exited audio stream", "info");
+    }
+    this.dismissJSONUploadSettings();
   }
 
   /**
@@ -1220,6 +1250,11 @@ class StreamingApp {
   dismissUploadSettings() {
     this.elements.uploadSettingsOverlay.classList.remove("show");
     this.elements.uploadSettingsPopup.classList.remove("show");
+  }
+
+  dismissJSONUploadSettings() {
+    this.elements.endJsonSettingsOverlay.classList.remove("show");
+    this.elements.endJsonSettingsPopup.classList.remove("show");
   }
 
   /**
@@ -1266,7 +1301,7 @@ class StreamingApp {
       logData = `<div class="log-data">${JSON.stringify(
         logEntry.data,
         null,
-        2
+        2,
       )}</div>`;
     }
 
@@ -1324,7 +1359,7 @@ class StreamingApp {
         this.state.currentTab.slice(1)
       } console cleared`,
       null,
-      this.state.currentTab
+      this.state.currentTab,
     );
   }
 
@@ -1339,7 +1374,7 @@ class StreamingApp {
     downloadAnchorNode.setAttribute("href", dataStr);
     downloadAnchorNode.setAttribute(
       "download",
-      `console-logs-${new Date().toISOString()}.json`
+      `console-logs-${new Date().toISOString()}.json`,
     );
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();

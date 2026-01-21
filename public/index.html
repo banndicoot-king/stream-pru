@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -223,9 +223,39 @@
         </div>
       </div>
     </div>
+    <!-- Upload Settings Popup -->
+    <div class="settings-popup-overlay" id="endJsonSettingsOverlay">
+      <div class="settings-popup" id="endJsonSettingsPopup">
+        <div class="settings-popup-header">
+          <h3 class="settings-popup-title">JSON DATA</h3>
+        </div>
+        <div class="settings-popup-content">
+          <label for="jsonData">JSON Data:</label>
+          <input
+            type="text"
+            id="jsonData"
+            class="settings-input"
+            value=""
+          />
+          <div class="settings-popup-actions">
+            <button
+              class="settings-popup-btn cancel"
+              id="cancelJSONUploadSettingsBtn"
+            >
+              ❌ Cancel
+            </button>
+            <button
+              class="settings-popup-btn submit"
+              id="submitJSONUploadSettingsBtn"
+            >
+              ✅ Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="./websocket-client.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
-

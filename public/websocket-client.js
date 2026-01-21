@@ -256,7 +256,7 @@ class WebSocketClient {
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1); // Exponential backoff
 
     console.log(
-      `Scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`
+      `Scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`,
     );
 
     setTimeout(() => {
@@ -335,10 +335,11 @@ class WebSocketClient {
     });
   }
 
-  exitStream(roomId) {
+  exitStream(roomId, data) {
     return this.send({
       event: "exit",
       room_id: roomId,
+      exit: data,
     });
   }
 
@@ -348,7 +349,6 @@ class WebSocketClient {
       ...uploadData,
     });
   }
-
 }
 
 // Export for use in main application

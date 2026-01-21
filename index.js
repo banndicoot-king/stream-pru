@@ -163,7 +163,7 @@ function handleStart(ws, msg) {
       event: "add-stream",
       stream: [{ name: room_id, room_id, call_id, cli, dni, Event: start }],
     },
-    ws
+    ws,
   );
 
   console.log(`Stream started: ${room_id}`);
@@ -177,7 +177,7 @@ function handleStop(ws, msg) {
     streams.delete(room_id);
     broadcast(
       { event: "remove-stream", room_id, reason: msg?.stop?.reason, data: msg },
-      ws
+      ws,
     );
     console.log(`Stream stopped: ${room_id}`);
   }
@@ -253,10 +253,10 @@ function handleMedia(ws, msg) {
   const room = streams.get(room_id);
   for (const listener of room.listeners) {
     //if (listener !== ws)
-      sendSafe(listener, {
-        ...msg,
-        media_format: room.media_format,
-      });
+    sendSafe(listener, {
+      ...msg,
+      media_format: room.media_format,
+    });
   }
 }
 
@@ -312,6 +312,6 @@ server.listen(PORT, () => {
     .map((x) => x.address)
     .filter((ip) => ip && ip.includes("."));
   ip.forEach((ip) =>
-    console.log(`HTTP Server running on http://${ip}:${PORT}`)
+    console.log(`HTTP Server running on http://${ip}:${PORT}`),
   );
 });
